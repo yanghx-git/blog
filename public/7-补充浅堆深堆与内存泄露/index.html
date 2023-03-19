@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noodp" />
+    <title> - yanghx blog</title><meta name="Description" content="yanghx blog"><meta property="og:title" content="" />
+<meta property="og:description" content="补充：浅堆深堆与内存泄露 1. 浅堆（Shallow Heap）浅堆是指一个对象所消耗的内存。在 32 位系统中，一个对象引用会占据 4 个字节，一个 int 类型会" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://yanghx.vip/7-%E8%A1%A5%E5%85%85%E6%B5%85%E5%A0%86%E6%B7%B1%E5%A0%86%E4%B8%8E%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
+
+<meta property="og:site_name" content="yanghx blog" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
+
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="补充：浅堆深堆与内存泄露 1. 浅堆（Shallow Heap）浅堆是指一个对象所消耗的内存。在 32 位系统中，一个对象引用会占据 4 个字节，一个 int 类型会"/>
+<meta name="application-name" content="DoIt">
+<meta name="apple-mobile-web-app-title" content="DoIt">
+
+<meta name="theme-color" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" href="http://yanghx.vip/7-%E8%A1%A5%E5%85%85%E6%B5%85%E5%A0%86%E6%B7%B1%E5%A0%86%E4%B8%8E%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2/" /><link rel="prev" href="http://yanghx.vip/readme/" /><link rel="next" href="http://yanghx.vip/6-%E8%A1%A5%E5%85%85%E4%BD%BF%E7%94%A8-oql-%E8%AF%AD%E8%A8%80%E6%9F%A5%E8%AF%A2%E5%AF%B9%E8%B1%A1%E4%BF%A1%E6%81%AF/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/color.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/fontawesome-free/all.min.css">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/animate/animate.min.css">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/yanghx.vip\/7-%E8%A1%A5%E5%85%85%E6%B5%85%E5%A0%86%E6%B7%B1%E5%A0%86%E4%B8%8E%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2\/"
+        },"genre": "posts","wordcount":  4920 ,
+        "url": "http:\/\/yanghx.vip\/7-%E8%A1%A5%E5%85%85%E6%B5%85%E5%A0%86%E6%B7%B1%E5%A0%86%E4%B8%8E%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2\/","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "yanghx"
+            },"description": ""
+    }
+    </script><script src="//instant.page/5.1.1" defer type="module" integrity="sha384-MWfCL6g1OTGsbSwfuMHc8+8J2u71/LA8dzlIN3ycajckxuZZmF+DNjdm7O6H3PSq"></script>
+</head>
+
+<body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">
+        function setTheme(theme) {document.body.setAttribute('theme', theme); document.documentElement.style.setProperty('color-scheme', theme === 'light' ? 'light' : 'dark');}
+        function saveTheme(theme) {window.localStorage && localStorage.setItem('theme', theme);}
+        function getMeta(metaName) {const metas = document.getElementsByTagName('meta'); for (let i = 0; i < metas.length; i++) if (metas[i].getAttribute('name') === metaName) return metas[i]; return '';}
+        if (window.localStorage && localStorage.getItem('theme')) {let theme = localStorage.getItem('theme');theme === 'light' || theme === 'dark' || theme === 'black' ? setTheme(theme) : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? setTheme('dark') : setTheme('light')); } else { if ('auto' === 'light' || 'auto' === 'dark' || 'auto' === 'black') setTheme('auto'), saveTheme('auto'); else saveTheme('auto'), window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? setTheme('dark') : setTheme('light');}
+        let metaColors = {'light': '#f8f8f8','dark': '#252627','black': '#000000'}
+        getMeta('theme-color').content = metaColors[document.body.getAttribute('theme')];
+    </script>
+    <div id="back-to-top"></div>
+    <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="yanghx blog">yanghx blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="#" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="#" class="menu-item theme-select" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                    <select class="color-theme-select" id="theme-select-desktop" title="切换主题">
+                        <option value="light">浅色</option>
+                        <option value="dark">深色</option>
+                        <option value="black">黑色</option>
+                        <option value="auto">跟随系统</option>
+                    </select>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="yanghx blog">yanghx blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="#" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="#" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="#" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+                <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
+                    <option value="light">浅色</option>
+                    <option value="dark">深色</option>
+                    <option value="black">黑色</option>
+                    <option value="auto">跟随系统</option>
+                </select>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="post-meta-line">
+                <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
+                </span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 4920 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 10 分钟&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  kept="true">
+                <div class="details-summary toc-title">
+                    <span>目录</span>
+                    <span><i class="details-icon fas fa-angle-right"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-浅堆shallow-heap">1. 浅堆（Shallow Heap）</a></li>
+    <li><a href="#2-保留集retained-set">2. 保留集（Retained Set）</a></li>
+    <li><a href="#3-深堆retained-heap">3. 深堆（Retained Heap）</a></li>
+    <li><a href="#4-对象的实际大小">4. 对象的实际大小</a></li>
+    <li><a href="#5-支配树dominator-tree">5. 支配树（Dominator Tree）</a></li>
+    <li><a href="#6-内存泄漏memory-leak">6. 内存泄漏（memory leak）</a></li>
+    <li><a href="#7-内存溢出out-of-memory">7. 内存溢出（out of memory）</a></li>
+    <li><a href="#8-java-中内存泄露的-8-种情况">8. Java 中内存泄露的 8 种情况</a>
+      <ul>
+        <li><a href="#81-静态集合类">8.1. 静态集合类</a></li>
+        <li><a href="#82-单例模式">8.2. 单例模式</a></li>
+        <li><a href="#83-内部类持有外部类">8.3. 内部类持有外部类</a></li>
+        <li><a href="#84-各种连接如数据库连接网络连接和-io-连接等">8.4. 各种连接，如数据库连接、网络连接和 IO 连接等</a></li>
+        <li><a href="#85-变量不合理的作用域">8.5. 变量不合理的作用域</a></li>
+        <li><a href="#86-改变哈希值">8.6. 改变哈希值</a></li>
+        <li><a href="#87-缓存泄露">8.7. 缓存泄露</a></li>
+        <li><a href="#88-监听器和其他回调">8.8. 监听器和其他回调</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-内存泄露案例分析">9. 内存泄露案例分析</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="补充浅堆深堆与内存泄露" class="headerLink">
+    <a href="#%e8%a1%a5%e5%85%85%e6%b5%85%e5%a0%86%e6%b7%b1%e5%a0%86%e4%b8%8e%e5%86%85%e5%ad%98%e6%b3%84%e9%9c%b2" class="header-mark"></a>补充：浅堆深堆与内存泄露</h1><h2 id="1-浅堆shallow-heap" class="headerLink">
+    <a href="#1-%e6%b5%85%e5%a0%86shallow-heap" class="header-mark"></a>1. 浅堆（Shallow Heap）</h2><p>浅堆是指一个对象所消耗的内存。在 32 位系统中，一个对象引用会占据 4 个字节，一个 int 类型会占据 4 个字节，long 型变量会占据 8 个字节，每个对象头需要占用 8 个字节。根据堆快照格式不同，对象的大小可能会同 8 字节进行对齐。</p>
+<p>以 String 为例：2 个 int 值共占 8 字节，对象引用占用 4 字节，对象头 8 字节，合计 20 字节，向 8 字节对齐，故占 24 字节。（jdk7 中）</p>
+<table>
+<thead>
+<tr>
+<th>int</th>
+<th>hash32</th>
+<th>0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>int</strong></td>
+<td><strong>hash</strong></td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td><strong>ref</strong></td>
+<td><strong>value</strong></td>
+<td><strong>C:\Users\Administrat</strong></td>
+</tr>
+</tbody>
+</table>
+<p>这 24 字节为 String 对象的浅堆大小。它与 String 的 value 实际取值无关，无论字符串长度如何，浅堆大小始终是 24 字节。</p>
+<h2 id="2-保留集retained-set" class="headerLink">
+    <a href="#2-%e4%bf%9d%e7%95%99%e9%9b%86retained-set" class="header-mark"></a>2. 保留集（Retained Set）</h2><p>对象 A 的保留集指当对象 A 被垃圾回收后，可以被释放的所有的对象集合（包括对象 A 本身），即对象 A 的保留集可以被认为是只能通过对象 A 被直接或间接访问到的所有对象的集合。通俗地说，就是指仅被对象 A 所持有的对象的集合。</p>
+<h2 id="3-深堆retained-heap" class="headerLink">
+    <a href="#3-%e6%b7%b1%e5%a0%86retained-heap" class="header-mark"></a>3. 深堆（Retained Heap）</h2><p>深堆是指对象的保留集中所有的对象的浅堆大小之和。</p>
+<p>注意：浅堆指对象本身占用的内存，不包括其内部引用对象的大小。一个对象的深堆指只能通过该对象访问到的（直接或间接）所有对象的浅堆之和，即对象被回收后，可以释放的真实空间。</p>
+<h2 id="4-对象的实际大小" class="headerLink">
+    <a href="#4-%e5%af%b9%e8%b1%a1%e7%9a%84%e5%ae%9e%e9%99%85%e5%a4%a7%e5%b0%8f" class="header-mark"></a>4. 对象的实际大小</h2><p>这里，对象的实际大小定义为一个对象所能触及的所有对象的浅堆大小之和，也就是通常意义上我们说的对象大小。与深堆相比，似乎这个在日常开发中更为直观和被人接受，但实际上，这个概念和垃圾回收无关。</p>
+<p>下图显示了一个简单的对象引用关系图，对象 A 引用了 C 和 D，对象 B 引用了 C 和 E。那么对象 A 的浅堆大小只是 A 本身，不含 C 和 D，而 A 的实际大小为 A、C、D 三者之和。而 A 的深堆大小为 A 与 D 之和，由于对象 C 还可以通过对象 B 访问到，因此不在对象 A 的深堆范围内。</p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/ecc35ddfcfd13200bbc881333d38ac93.png" title="image-20210505151123427" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/ecc35ddfcfd13200bbc881333d38ac93.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/ecc35ddfcfd13200bbc881333d38ac93.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/ecc35ddfcfd13200bbc881333d38ac93.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/ecc35ddfcfd13200bbc881333d38ac93.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/ecc35ddfcfd13200bbc881333d38ac93.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/ecc35ddfcfd13200bbc881333d38ac93.png">
+    </a></p>
+<h2 id="5-支配树dominator-tree" class="headerLink">
+    <a href="#5-%e6%94%af%e9%85%8d%e6%a0%91dominator-tree" class="header-mark"></a>5. 支配树（Dominator Tree）</h2><p>支配树的概念源自图论。MAT 提供了一个称为支配树（Dominator Tree）的对象图。支配树体现了对象实例间的支配关系。在对象引用图中，所有指向对象 B 的路径都经过对象 A，则认为对象 A 支配对象 B。如果对象 A 是离对象 B 最近的一个支配对象，则认为对象 A 为对象 B 的直接支配者。支配树是基于对象间的引用图所建立的，它有以下基本性质：</p>
+<ul>
+<li>对象 A 的子树（所有被对象 A 支配的对象集合）表示对象 A 的保留集（retained set），即深堆。</li>
+<li>如果对象 A 支配对象 B，那么对象 A 的直接支配者也支配对象 B。</li>
+<li>支配树的边与对象引用图的边不直接对应。</li>
+</ul>
+<p>如下图所示：左图表示对象引用图，右图表示左图所对应的支配树。对象 A 和 B 由根对象直接支配，由于在到对象 C 的路径中，可以经过 A，也可以经过 B，因此对象 C 的直接支配者也是根对象。对象 F 与对象 D 相互引用，因为到对象 F 的所有路径必然经过对象 D，因此，对象 D 是对象 F 的直接支配者。而到对象 D 的所有路径中，必然经过对象 C，即使是从对象 F 到对象 D 的引用，从根节点出发，也是经过对象 C 的，所以，对象 D 的直接支配者为对象 C。同理，对象 E 支配对象 G。到达对象 H 的可以通过对象 D，也可以通过对象 E，因此对象 D 和 E 都不能支配对象 H，而经过对象 C 既可以到达 D 也可以到达 E，因此对象 C 为对象 H 的直接支配者。</p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4aea560be1feff266c7cb79c6a3a27ec.png" title="image-20210505151951136" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4aea560be1feff266c7cb79c6a3a27ec.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4aea560be1feff266c7cb79c6a3a27ec.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4aea560be1feff266c7cb79c6a3a27ec.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/4aea560be1feff266c7cb79c6a3a27ec.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/4aea560be1feff266c7cb79c6a3a27ec.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4aea560be1feff266c7cb79c6a3a27ec.png">
+    </a></p>
+<h2 id="6-内存泄漏memory-leak" class="headerLink">
+    <a href="#6-%e5%86%85%e5%ad%98%e6%b3%84%e6%bc%8fmemory-leak" class="header-mark"></a>6. 内存泄漏（memory leak）</h2><p>可达性分析算法来判断对象是否是不再使用的对象，本质都是判断一个对象是否还被引用。那么对于这种情况下，由于代码的实现不同就会出现很多种内存泄漏问题（让 JVM 误以为此对象还在引用中，无法回收，造成内存泄漏）。</p>
+<p>＞ 是否还被使用？是</p>
+<p>＞ 是否还被需要？否</p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/d5715ef16f3d967f6a79c82909877c15.png" title="image-20210505152542224" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/d5715ef16f3d967f6a79c82909877c15.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/d5715ef16f3d967f6a79c82909877c15.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/d5715ef16f3d967f6a79c82909877c15.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/d5715ef16f3d967f6a79c82909877c15.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/d5715ef16f3d967f6a79c82909877c15.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/d5715ef16f3d967f6a79c82909877c15.png">
+    </a></p>
+<p>严格来说，只有对象不会再被程序用到了，但是 GC 又不能回收他们的情况，才叫内存泄漏。但实际情况很多时候一些不太好的实践（或疏忽）会导致对象的生命周期变得很长甚至导致 00M，也可以叫做宽泛意义上的“内存泄漏”。</p>
+<p>如下图，当 Y 生命周期结束的时候，X 依然引用着 Y，这时候，垃圾回收期是不会回收对象 Y 的；如果对象 X 还引用着生命周期比较短的 A、B、C，对象 A 又引用着对象 a、b、c，这样就可能造成大量无用的对象不能被回收，进而占据了内存资源，造成内存泄漏，直到内存溢出。</p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/98ee5c3507d1b8b73f4e12789728c56c.png" title="image-20210505152704141" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/98ee5c3507d1b8b73f4e12789728c56c.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/98ee5c3507d1b8b73f4e12789728c56c.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/98ee5c3507d1b8b73f4e12789728c56c.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/98ee5c3507d1b8b73f4e12789728c56c.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/98ee5c3507d1b8b73f4e12789728c56c.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/98ee5c3507d1b8b73f4e12789728c56c.png">
+    </a></p>
+<p>申请了内存用完了不释放，比如一共有 1024M 的内存，分配了 512M 的内存一直不回收，那么可以用的内存只有 512M 了，仿佛泄露掉了一部分；通俗一点讲的话，内存泄漏就是【占着茅坑不拉 shi】</p>
+<h2 id="7-内存溢出out-of-memory" class="headerLink">
+    <a href="#7-%e5%86%85%e5%ad%98%e6%ba%a2%e5%87%baout-of-memory" class="header-mark"></a>7. 内存溢出（out of memory）</h2><p>申请内存时，没有足够的内存可以使用；通俗一点儿讲，一个厕所就三个坑，有两个站着茅坑不走的（内存泄漏），剩下最后一个坑，厕所表示接待压力很大，这时候一下子来了两个人，坑位（内存）就不够了，内存泄漏变成内存溢出了。可见，内存泄漏和内存溢出的关系：内存泄漏的增多，最终会导致内存溢出。</p>
+<p>泄漏的分类</p>
+<ul>
+<li>经常发生：发生内存泄露的代码会被多次执行，每次执行，泄露一块内存；</li>
+<li>偶然发生：在某些特定情况下才会发生</li>
+<li>一次性：发生内存泄露的方法只会执行一次；</li>
+<li>隐式泄漏：一直占着内存不释放，直到执行结束；严格的说这个不算内存泄漏，因为最终释放掉了，但是如果执行时间特别长，也可能会导致内存耗尽。</li>
+</ul>
+<h2 id="8-java-中内存泄露的-8-种情况" class="headerLink">
+    <a href="#8-java-%e4%b8%ad%e5%86%85%e5%ad%98%e6%b3%84%e9%9c%b2%e7%9a%84-8-%e7%a7%8d%e6%83%85%e5%86%b5" class="header-mark"></a>8. Java 中内存泄露的 8 种情况</h2><h3 id="81-静态集合类" class="headerLink">
+    <a href="#81-%e9%9d%99%e6%80%81%e9%9b%86%e5%90%88%e7%b1%bb" class="header-mark"></a>8.1. 静态集合类</h3><p>静态集合类，如 HashMap、LinkedList 等等。如果这些容器为静态的，那么它们的生命周期与 JVM 程序一致，则容器中的对象在程序结束之前将不能被释放，从而造成内存泄漏。简单而言，长生命周期的对象持有短生命周期对象的引用，尽管短生命周期的对象不再使用，但是因为长生命周期对象持有它的引用而导致不能被回收。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MemoryLeak</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">static</span> <span class="n">List</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">oomTests</span><span class="o">(){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Object</span> <span class="n">obj</span><span class="err">＝</span><span class="k">new</span> <span class="n">Object</span><span class="o">();</span><span class="c1">//局部变量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">list</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">obj</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="82-单例模式" class="headerLink">
+    <a href="#82-%e5%8d%95%e4%be%8b%e6%a8%a1%e5%bc%8f" class="header-mark"></a>8.2. 单例模式</h3><p>单例模式，和静态集合导致内存泄露的原因类似，因为单例的静态特性，它的生命周期和 JVM 的生命周期一样长，所以如果单例对象如果持有外部对象的引用，那么这个外部对象也不会被回收，那么就会造成内存泄漏。</p>
+<h3 id="83-内部类持有外部类" class="headerLink">
+    <a href="#83-%e5%86%85%e9%83%a8%e7%b1%bb%e6%8c%81%e6%9c%89%e5%a4%96%e9%83%a8%e7%b1%bb" class="header-mark"></a>8.3. 内部类持有外部类</h3><p>内部类持有外部类，如果一个外部类的实例对象的方法返回了一个内部类的实例对象。这个内部类对象被长期引用了，即使那个外部类实例对象不再被使用，但由于内部类持有外部类的实例对象，这个外部类对象将不会被垃圾回收，这也会造成内存泄漏。</p>
+<h3 id="84-各种连接如数据库连接网络连接和-io-连接等" class="headerLink">
+    <a href="#84-%e5%90%84%e7%a7%8d%e8%bf%9e%e6%8e%a5%e5%a6%82%e6%95%b0%e6%8d%ae%e5%ba%93%e8%bf%9e%e6%8e%a5%e7%bd%91%e7%bb%9c%e8%bf%9e%e6%8e%a5%e5%92%8c-io-%e8%bf%9e%e6%8e%a5%e7%ad%89" class="header-mark"></a>8.4. 各种连接，如数据库连接、网络连接和 IO 连接等</h3><p>在对数据库进行操作的过程中，首先需要建立与数据库的连接，当不再使用时，需要调用 close 方法来释放与数据库的连接。只有连接被关闭后，垃圾回收器才会回收对应的对象。否则，如果在访问数据库的过程中，对 Connection、Statement 或 ResultSet 不显性地关闭，将会造成大量的对象无法被回收，从而引起内存泄漏。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">try</span><span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Connection</span> <span class="n">conn</span> <span class="o">=</span><span class="kc">null</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="s">&#34;com.mysql.jdbc.Driver&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">conn</span> <span class="o">=</span><span class="n">DriverManager</span><span class="o">.</span><span class="na">getConnection</span><span class="o">(</span><span class="s">&#34;url&#34;</span><span class="o">,</span><span class="s">&#34;&#34;</span><span class="o">,</span><span class="s">&#34;&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Statement</span> <span class="n">stmt</span> <span class="o">=</span><span class="n">conn</span><span class="o">.</span><span class="na">createStatement</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ResultSet</span> <span class="n">rs</span> <span class="o">=</span><span class="n">stmt</span><span class="o">.</span><span class="na">executeQuery</span><span class="o">(</span><span class="s">&#34;....&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span> <span class="k">catch</span><span class="err">（</span><span class="n">Exception</span> <span class="n">e</span><span class="err">）</span><span class="o">{</span><span class="c1">//异常日志
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 1．关闭结果集 Statement
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// 2．关闭声明的对象 ResultSet
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// 3．关闭连接 Connection
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="85-变量不合理的作用域" class="headerLink">
+    <a href="#85-%e5%8f%98%e9%87%8f%e4%b8%8d%e5%90%88%e7%90%86%e7%9a%84%e4%bd%9c%e7%94%a8%e5%9f%9f" class="header-mark"></a>8.5. 变量不合理的作用域</h3><p>变量不合理的作用域。一般而言，一个变量的定义的作用范围大于其使用范围，很有可能会造成内存泄漏。另一方面，如果没有及时地把对象设置为 null，很有可能导致内存泄漏的发生。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">UsingRandom</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="n">String</span> <span class="n">msg</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">receiveMsg</span><span class="o">(){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">readFromNet</span><span class="o">();</span><span class="c1">//从网络中接受数据保存到msg中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">saveDB</span><span class="o">();</span><span class="c1">//把msg保存到数据库中
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>如上面这个伪代码，通过 readFromNet 方法把接受的消息保存在变量 msg 中，然后调用 saveDB 方法把 msg 的内容保存到数据库中，此时 msg 已经就没用了，由于 msg 的生命周期与对象的生命周期相同，此时 msg 还不能回收，因此造成了内存泄漏。实际上这个 msg 变量可以放在 receiveMsg 方法内部，当方法使用完，那么 msg 的生命周期也就结束，此时就可以回收了。还有一种方法，在使用完 msg 后，把 msg 设置为 null，这样垃圾回收器也会回收 msg 的内存空间。</p>
+<h3 id="86-改变哈希值" class="headerLink">
+    <a href="#86-%e6%94%b9%e5%8f%98%e5%93%88%e5%b8%8c%e5%80%bc" class="header-mark"></a>8.6. 改变哈希值</h3><p>改变哈希值，当一个对象被存储进 HashSet 集合中以后，就不能修改这个对象中的那些参与计算哈希值的字段了。</p>
+<p>否则，对象修改后的哈希值与最初存储进 HashSet 集合中时的哈希值就不同了，在这种情况下，即使在 contains 方法使用该对象的当前引用作为的参数去 HashSet 集合中检索对象，也将返回找不到对象的结果，这也会导致无法从 HashSet 集合中单独删除当前对象，造成内存泄漏。</p>
+<p>这也是 String 为什么被设置成了不可变类型，我们可以放心地把 String 存入 HashSet，或者把 String 当做 HashMap 的 key 值；</p>
+<p>当我们想把自己定义的类保存到散列表的时候，需要保证对象的 hashCode 不可变。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm"> * 例1
+</span></span></span><span class="line"><span class="cl"><span class="cm"> */</span>
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ChangeHashCode</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">HashSet</span> <span class="n">set</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Person</span> <span class="n">p1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Person</span><span class="o">(</span><span class="mi">1001</span><span class="o">,</span> <span class="s">&#34;AA&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Person</span> <span class="n">p2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Person</span><span class="o">(</span><span class="mi">1002</span><span class="o">,</span> <span class="s">&#34;BB&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">set</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">p1</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">set</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">p2</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">p1</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="s">&#34;CC&#34;</span><span class="o">;</span><span class="c1">//导致了内存的泄漏
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">set</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">p1</span><span class="o">);</span> <span class="c1">//删除失败
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">set</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">set</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">Person</span><span class="o">(</span><span class="mi">1001</span><span class="o">,</span> <span class="s">&#34;CC&#34;</span><span class="o">));</span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">set</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">set</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">Person</span><span class="o">(</span><span class="mi">1001</span><span class="o">,</span> <span class="s">&#34;AA&#34;</span><span class="o">));</span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">set</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">class</span> <span class="nc">Person</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">id</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="nf">Person</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">,</span> <span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nd">@Override</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">equals</span><span class="o">(</span><span class="n">Object</span> <span class="n">o</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="o">(</span><span class="k">this</span> <span class="o">==</span> <span class="n">o</span><span class="o">)</span> <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="o">(!(</span><span class="n">o</span> <span class="k">instanceof</span> <span class="n">Person</span><span class="o">))</span> <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">Person</span> <span class="n">person</span> <span class="o">=</span> <span class="o">(</span><span class="n">Person</span><span class="o">)</span> <span class="n">o</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="o">(</span><span class="n">id</span> <span class="o">!=</span> <span class="n">person</span><span class="o">.</span><span class="na">id</span><span class="o">)</span> <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">name</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">?</span> <span class="n">name</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">person</span><span class="o">.</span><span class="na">name</span><span class="o">)</span> <span class="o">:</span> <span class="n">person</span><span class="o">.</span><span class="na">name</span> <span class="o">==</span> <span class="kc">null</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nd">@Override</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">hashCode</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">result</span> <span class="o">=</span> <span class="mi">31</span> <span class="o">*</span> <span class="n">result</span> <span class="o">+</span> <span class="o">(</span><span class="n">name</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">?</span> <span class="n">name</span><span class="o">.</span><span class="na">hashCode</span><span class="o">()</span> <span class="o">:</span> <span class="mi">0</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nd">@Override</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="s">&#34;Person{&#34;</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">                <span class="s">&#34;id=&#34;</span> <span class="o">+</span> <span class="n">id</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">                <span class="s">&#34;, name=&#39;&#34;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="sc">&#39;\&#39;&#39;</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">                <span class="sc">&#39;}&#39;</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm"> * 例2
+</span></span></span><span class="line"><span class="cl"><span class="cm"> */</span>
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ChangeHashCode1</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">HashSet</span><span class="o">&lt;</span><span class="n">Point</span><span class="o">&gt;</span> <span class="n">hs</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;</span><span class="n">Point</span><span class="o">&gt;();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Point</span> <span class="n">cc</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Point</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cc</span><span class="o">.</span><span class="na">setX</span><span class="o">(</span><span class="mi">10</span><span class="o">);</span><span class="c1">//hashCode = 41
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">hs</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">cc</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">cc</span><span class="o">.</span><span class="na">setX</span><span class="o">(</span><span class="mi">20</span><span class="o">);</span><span class="c1">//hashCode = 51  此行为导致了内存的泄漏
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&#34;hs.remove = &#34;</span> <span class="o">+</span> <span class="n">hs</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">cc</span><span class="o">));</span><span class="c1">//false
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">hs</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">cc</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&#34;hs.size = &#34;</span> <span class="o">+</span> <span class="n">hs</span><span class="o">.</span><span class="na">size</span><span class="o">());</span><span class="c1">//size = 2
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">hs</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">class</span> <span class="nc">Point</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">x</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getX</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">x</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setX</span><span class="o">(</span><span class="kt">int</span> <span class="n">x</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">this</span><span class="o">.</span><span class="na">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nd">@Override</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">hashCode</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kd">final</span> <span class="kt">int</span> <span class="n">prime</span> <span class="o">=</span> <span class="mi">31</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">result</span> <span class="o">=</span> <span class="n">prime</span> <span class="o">*</span> <span class="n">result</span> <span class="o">+</span> <span class="n">x</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nd">@Override</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">equals</span><span class="o">(</span><span class="n">Object</span> <span class="n">obj</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="o">(</span><span class="k">this</span> <span class="o">==</span> <span class="n">obj</span><span class="o">)</span> <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="o">(</span><span class="n">obj</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="o">(</span><span class="n">getClass</span><span class="o">()</span> <span class="o">!=</span> <span class="n">obj</span><span class="o">.</span><span class="na">getClass</span><span class="o">())</span> <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Point</span> <span class="n">other</span> <span class="o">=</span> <span class="o">(</span><span class="n">Point</span><span class="o">)</span> <span class="n">obj</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="o">(</span><span class="n">x</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="na">x</span><span class="o">)</span> <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nd">@Override</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="s">&#34;Point{&#34;</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">                <span class="s">&#34;x=&#34;</span> <span class="o">+</span> <span class="n">x</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">                <span class="sc">&#39;}&#39;</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="87-缓存泄露" class="headerLink">
+    <a href="#87-%e7%bc%93%e5%ad%98%e6%b3%84%e9%9c%b2" class="header-mark"></a>8.7. 缓存泄露</h3><p>内存泄漏的另一个常见来源是缓存，一旦你把对象引用放入到缓存中，他就很容易遗忘。比如：之前项目在一次上线的时候，应用启动奇慢直到夯死，就是因为代码中会加载一个表中的数据到缓存（内存）中，测试环境只有几百条数据，但是生产环境有几百万的数据。</p>
+<p>对于这个问题，可以使用 WeakHashMap 代表缓存，此种 Map 的特点是，当除了自身有对 key 的引用外，此 key 没有其他引用那么此 map 会自动丢弃此值。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MapTest</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">static</span> <span class="n">Map</span> <span class="n">wMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WeakHashMap</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">static</span> <span class="n">Map</span> <span class="n">map</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">init</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">testWeakHashMap</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">testHashMap</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">init</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">String</span> <span class="n">ref1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="s">&#34;obejct1&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">String</span> <span class="n">ref2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="s">&#34;obejct2&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">String</span> <span class="n">ref3</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="s">&#34;obejct3&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">String</span> <span class="n">ref4</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="s">&#34;obejct4&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">wMap</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">ref1</span><span class="o">,</span> <span class="s">&#34;cacheObject1&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">wMap</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">ref2</span><span class="o">,</span> <span class="s">&#34;cacheObject2&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">ref3</span><span class="o">,</span> <span class="s">&#34;cacheObject3&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">ref4</span><span class="o">,</span> <span class="s">&#34;cacheObject4&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&#34;String引用ref1，ref2，ref3，ref4 消失&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">testWeakHashMap</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&#34;WeakHashMap GC之前&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="o">(</span><span class="n">Object</span> <span class="n">o</span> <span class="o">:</span> <span class="n">wMap</span><span class="o">.</span><span class="na">entrySet</span><span class="o">())</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">o</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">try</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">System</span><span class="o">.</span><span class="na">gc</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">            <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">5</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&#34;WeakHashMap GC之后&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="o">(</span><span class="n">Object</span> <span class="n">o</span> <span class="o">:</span> <span class="n">wMap</span><span class="o">.</span><span class="na">entrySet</span><span class="o">())</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">o</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">testHashMap</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&#34;HashMap GC之前&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="o">(</span><span class="n">Object</span> <span class="n">o</span> <span class="o">:</span> <span class="n">map</span><span class="o">.</span><span class="na">entrySet</span><span class="o">())</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">o</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">try</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">System</span><span class="o">.</span><span class="na">gc</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">            <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">5</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&#34;HashMap GC之后&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="o">(</span><span class="n">Object</span> <span class="n">o</span> <span class="o">:</span> <span class="n">map</span><span class="o">.</span><span class="na">entrySet</span><span class="o">())</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">o</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>上面代码和图示主演演示 WeakHashMap 如何自动释放缓存对象，当 init 函数执行完成后，局部变量字符串引用 weakd1，weakd2，d1，d2 都会消失，此时只有静态 map 中保存中对字符串对象的引用，可以看到，调用 gc 之后，HashMap 的没有被回收，而 WeakHashMap 里面的缓存被回收了。</p>
+<h3 id="88-监听器和其他回调" class="headerLink">
+    <a href="#88-%e7%9b%91%e5%90%ac%e5%99%a8%e5%92%8c%e5%85%b6%e4%bb%96%e5%9b%9e%e8%b0%83" class="header-mark"></a>8.8. 监听器和其他回调</h3><p>内存泄漏第三个常见来源是监听器和其他回调，如果客户端在你实现的 API 中注册回调，却没有显示的取消，那么就会积聚。</p>
+<p>需要确保回调立即被当作垃圾回收的最佳方法是只保存它的弱引用，例如将他们保存成为 WeakHashMap 中的键。</p>
+<h2 id="9-内存泄露案例分析" class="headerLink">
+    <a href="#9-%e5%86%85%e5%ad%98%e6%b3%84%e9%9c%b2%e6%a1%88%e4%be%8b%e5%88%86%e6%9e%90" class="header-mark"></a>9. 内存泄露案例分析</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Stack</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="n">Object</span><span class="o">[]</span> <span class="n">elements</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">DEFAULT_INITIAL_CAPACITY</span> <span class="o">=</span> <span class="mi">16</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="nf">Stack</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">elements</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Object</span><span class="o">[</span><span class="n">DEFAULT_INITIAL_CAPACITY</span><span class="o">];</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">push</span><span class="o">(</span><span class="n">Object</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span> <span class="c1">//入栈
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">ensureCapacity</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">elements</span><span class="o">[</span><span class="n">size</span><span class="o">++]</span> <span class="o">=</span> <span class="n">e</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">Object</span> <span class="nf">pop</span><span class="o">()</span> <span class="o">{</span> <span class="c1">//出栈
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">if</span> <span class="o">(</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">throw</span> <span class="k">new</span> <span class="n">EmptyStackException</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">elements</span><span class="o">[--</span><span class="n">size</span><span class="o">];</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">ensureCapacity</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="o">(</span><span class="n">elements</span><span class="o">.</span><span class="na">length</span> <span class="o">==</span> <span class="n">size</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">elements</span> <span class="o">=</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">copyOf</span><span class="o">(</span><span class="n">elements</span><span class="o">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">size</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>上述程序并没有明显的错误，但是这段程序有一个内存泄漏，随着 GC 活动的增加，或者内存占用的不断增加，程序性能的降低就会表现出来，严重时可导致内存泄漏，但是这种失败情况相对较少。</p>
+<p>代码的主要问题在 pop 函数，下面通过这张图示展现。假设这个栈一直增长，增长后如下图所示</p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/36134d739f40208bf54a0b5c89a8f882.png" title="image-20210505160114618" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/36134d739f40208bf54a0b5c89a8f882.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/36134d739f40208bf54a0b5c89a8f882.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/36134d739f40208bf54a0b5c89a8f882.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/36134d739f40208bf54a0b5c89a8f882.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/36134d739f40208bf54a0b5c89a8f882.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/36134d739f40208bf54a0b5c89a8f882.png">
+    </a></p>
+<p>当进行大量的 pop 操作时，由于引用未进行置空，gc 是不会释放的，如下图所示</p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/52eed9c8a0279db4b1f07fd23c0d5eca.png" title="image-20210505160158618" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/52eed9c8a0279db4b1f07fd23c0d5eca.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/52eed9c8a0279db4b1f07fd23c0d5eca.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/52eed9c8a0279db4b1f07fd23c0d5eca.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/52eed9c8a0279db4b1f07fd23c0d5eca.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/52eed9c8a0279db4b1f07fd23c0d5eca.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/52eed9c8a0279db4b1f07fd23c0d5eca.png">
+    </a></p>
+<p>从上图中看以看出，如果栈先增长，再收缩，那么从栈中弹出的对象将不会被当作垃圾回收，即使程序不再使用栈中的这些队象，他们也不会回收，因为栈中仍然保存这对象的引用，俗称过期引用，这个内存泄露很隐蔽。</p>
+<p>将代码中的 pop()方法变成如下方法：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span> <span class="n">Object</span> <span class="nf">pop</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="o">(</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">throw</span> <span class="k">new</span> <span class="n">EmptyStackException</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Object</span> <span class="n">result</span> <span class="o">=</span> <span class="n">elements</span><span class="o">[--</span><span class="n">size</span><span class="o">];</span>
+</span></span><span class="line"><span class="cl">    <span class="n">elements</span><span class="o">[</span><span class="n">size</span><span class="o">]</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>一旦引用过期，清空这些引用，将引用置空。</p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160554294.png" title="image-20230310160554294" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160554294.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160554294.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160554294.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160554294.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160554294.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160554294.png">
+    </a></p>
+</div>
+
+        
+
+<div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 0001-01-01</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span><a class="link-to-mardown" href=/7-%E8%A1%A5%E5%85%85%E6%B5%85%E5%A0%86%E6%B7%B1%E5%A0%86%E4%B8%8E%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2/index.md target="_blank" rel="noopener noreferrer">阅读原始文档</a>
+                    </span></div>
+            <div class="post-info-share">
+                <span><a href="#" title="分享到 Twitter" data-sharer="twitter" data-url="http://yanghx.vip/7-%E8%A1%A5%E5%85%85%E6%B5%85%E5%A0%86%E6%B7%B1%E5%A0%86%E4%B8%8E%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2/" data-title="" data-via="xxxx"><i class="fab fa-twitter fa-fw"></i></a><a href="#" title="分享到 Facebook" data-sharer="facebook" data-url="http://yanghx.vip/7-%E8%A1%A5%E5%85%85%E6%B5%85%E5%A0%86%E6%B7%B1%E5%A0%86%E4%B8%8E%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2/"><i class="fab fa-facebook-square fa-fw"></i></a><a href="#" title="分享到 WhatsApp" data-sharer="whatsapp" data-url="http://yanghx.vip/7-%E8%A1%A5%E5%85%85%E6%B5%85%E5%A0%86%E6%B7%B1%E5%A0%86%E4%B8%8E%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2/" data-title="" data-web><i class="fab fa-whatsapp fa-fw"></i></a><a href="#" title="分享到 Line" data-sharer="line" data-url="http://yanghx.vip/7-%E8%A1%A5%E5%85%85%E6%B5%85%E5%A0%86%E6%B7%B1%E5%A0%86%E4%B8%8E%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2/" data-title=""><i data-svg-src="/lib/simple-icons/icons/line.min.svg"></i></a><a href="#" title="分享到 微博" data-sharer="weibo" data-url="http://yanghx.vip/7-%E8%A1%A5%E5%85%85%E6%B5%85%E5%A0%86%E6%B7%B1%E5%A0%86%E4%B8%8E%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2/" data-title=""><i class="fab fa-weibo fa-fw"></i></a><a href="#" title="分享到 Myspace" data-sharer="myspace" data-url="http://yanghx.vip/7-%E8%A1%A5%E5%85%85%E6%B5%85%E5%A0%86%E6%B7%B1%E5%A0%86%E4%B8%8E%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2/" data-title="" data-description=""><i data-svg-src="/lib/simple-icons/icons/myspace.min.svg"></i></a><a href="#" title="分享到 Blogger" data-sharer="blogger" data-url="http://yanghx.vip/7-%E8%A1%A5%E5%85%85%E6%B5%85%E5%A0%86%E6%B7%B1%E5%A0%86%E4%B8%8E%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2/" data-title="" data-description=""><i class="fab fa-blogger fa-fw"></i></a><a href="#" title="分享到 Evernote" data-sharer="evernote" data-url="http://yanghx.vip/7-%E8%A1%A5%E5%85%85%E6%B5%85%E5%A0%86%E6%B7%B1%E5%A0%86%E4%B8%8E%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2/" data-title=""><i class="fab fa-evernote fa-fw"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/readme/" class="prev" rel="prev" title=""><i class="fas fa-angle-left fa-fw"></i></a>
+            <a href="/6-%E8%A1%A5%E5%85%85%E4%BD%BF%E7%94%A8-oql-%E8%AF%AD%E8%A8%80%E6%9F%A5%E8%AF%A2%E5%AF%B9%E8%B1%A1%E4%BF%A1%E6%81%AF/" class="next" rel="next" title=""><i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+        </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">
+                    由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+            <div class="footer-line"></div>
+            <div class="footer-line">
+            </div>
+        </div></footer></div>
+
+    <div id="fixed-buttons"><a href="#back-to-top" id="back-to-top-button" class="fixed-button" title="回到顶部">
+            <i class="fas fa-arrow-up fa-fw"></i>
+        </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+            <i class="fas fa-comment fa-fw"></i>
+        </a>
+    </div><div id="cookieconsent-container"></div><div class="assets"><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/katex/copy-tex.min.css">
+        <noscript><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"></noscript><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"distance":100,"findAllMatches":false,"fuseIndexURL":"/index.json","highlightTag":"em","ignoreFieldNorm":false,"ignoreLocation":false,"isCaseSensitive":false,"location":0,"maxResultLength":10,"minMatchCharLength":2,"noResultsFound":"没有找到结果","snippetLength":50,"threshold":0.3,"type":"fuse","useExtendedSearch":false},"sharerjs":true,"table":{"sort":true}};</script><script type="text/javascript" src="/lib/tablesort/tablesort.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js" defer></script><script type="text/javascript" src="/lib/katex/auto-render.min.js" defer></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js" defer></script><script type="text/javascript" src="/lib/katex/mhchem.min.js" defer></script><script type="text/javascript" src="/js/katex.min.js" defer></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script type="text/javascript" src="/js/cookieconsent.min.js" defer></script><script type="text/javascript" src="/js/theme.min.js" defer></script></div>
+</body>
+
+</html>

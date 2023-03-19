@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noodp" />
+    <title> - yanghx blog</title><meta name="Description" content="yanghx blog"><meta property="og:title" content="" />
+<meta property="og:description" content="一、字节码指令集 1.1 概述 二、加载与存储指令 2.1 局部变量压栈指令 iload 从局部变量中装载int类型值 lload 从局部变量中装载long类型值 fload 从局部变量中装载f" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://yanghx.vip/2-%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
+
+<meta property="og:site_name" content="yanghx blog" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
+
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="一、字节码指令集 1.1 概述 二、加载与存储指令 2.1 局部变量压栈指令 iload 从局部变量中装载int类型值 lload 从局部变量中装载long类型值 fload 从局部变量中装载f"/>
+<meta name="application-name" content="DoIt">
+<meta name="apple-mobile-web-app-title" content="DoIt">
+
+<meta name="theme-color" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" href="http://yanghx.vip/2-%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/" /><link rel="prev" href="http://yanghx.vip/3-%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E7%B1%BB%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E8%AF%A6%E8%A7%A3/" /><link rel="next" href="http://yanghx.vip/1-class%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/color.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/fontawesome-free/all.min.css">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/animate/animate.min.css">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/yanghx.vip\/2-%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86\/"
+        },"genre": "posts","wordcount":  7070 ,
+        "url": "http:\/\/yanghx.vip\/2-%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86\/","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "yanghx"
+            },"description": ""
+    }
+    </script><script src="//instant.page/5.1.1" defer type="module" integrity="sha384-MWfCL6g1OTGsbSwfuMHc8+8J2u71/LA8dzlIN3ycajckxuZZmF+DNjdm7O6H3PSq"></script>
+</head>
+
+<body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">
+        function setTheme(theme) {document.body.setAttribute('theme', theme); document.documentElement.style.setProperty('color-scheme', theme === 'light' ? 'light' : 'dark');}
+        function saveTheme(theme) {window.localStorage && localStorage.setItem('theme', theme);}
+        function getMeta(metaName) {const metas = document.getElementsByTagName('meta'); for (let i = 0; i < metas.length; i++) if (metas[i].getAttribute('name') === metaName) return metas[i]; return '';}
+        if (window.localStorage && localStorage.getItem('theme')) {let theme = localStorage.getItem('theme');theme === 'light' || theme === 'dark' || theme === 'black' ? setTheme(theme) : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? setTheme('dark') : setTheme('light')); } else { if ('auto' === 'light' || 'auto' === 'dark' || 'auto' === 'black') setTheme('auto'), saveTheme('auto'); else saveTheme('auto'), window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? setTheme('dark') : setTheme('light');}
+        let metaColors = {'light': '#f8f8f8','dark': '#252627','black': '#000000'}
+        getMeta('theme-color').content = metaColors[document.body.getAttribute('theme')];
+    </script>
+    <div id="back-to-top"></div>
+    <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="yanghx blog">yanghx blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="#" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="#" class="menu-item theme-select" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                    <select class="color-theme-select" id="theme-select-desktop" title="切换主题">
+                        <option value="light">浅色</option>
+                        <option value="dark">深色</option>
+                        <option value="black">黑色</option>
+                        <option value="auto">跟随系统</option>
+                    </select>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="yanghx blog">yanghx blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="#" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="#" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="#" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+                <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
+                    <option value="light">浅色</option>
+                    <option value="dark">深色</option>
+                    <option value="black">黑色</option>
+                    <option value="auto">跟随系统</option>
+                </select>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="post-meta-line">
+                <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
+                </span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 7070 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 15 分钟&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  kept="true">
+                <div class="details-summary toc-title">
+                    <span>目录</span>
+                    <span><i class="details-icon fas fa-angle-right"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#一字节码指令集">一、字节码指令集</a>
+          <ul>
+            <li><a href="#11-概述">1.1 概述</a></li>
+          </ul>
+        </li>
+        <li><a href="#二加载与存储指令">二、加载与存储指令</a>
+          <ul>
+            <li><a href="#21-局部变量压栈指令">2.1 局部变量压栈指令</a></li>
+            <li><a href="#22-局部变量压栈常用指令集">2.2 局部变量压栈常用指令集</a></li>
+            <li><a href="#23-局部变量压栈指令剖析">2.3 局部变量压栈指令剖析</a></li>
+            <li><a href="#24-常量入栈指令">2.4 常量入栈指令</a></li>
+            <li><a href="#25-常量入栈常用指令集">2.5 常量入栈常用指令集</a></li>
+            <li><a href="#26-常量入栈指令剖析">2.6 常量入栈指令剖析</a></li>
+            <li><a href="#27-出栈装入局部变量表指令">2.7 出栈装入局部变量表指令</a></li>
+            <li><a href="#28-出栈装入局部变量表常用指令集">2.8 出栈装入局部变量表常用指令集</a></li>
+            <li><a href="#29-出栈装入局部变量表指令剖析">2.9 出栈装入局部变量表指令剖析</a></li>
+          </ul>
+        </li>
+        <li><a href="#三算术指令">三、算术指令</a>
+          <ul>
+            <li><a href="#整数运算">整数运算</a></li>
+            <li><a href="#逻辑运算">逻辑运算</a></li>
+            <li><a href="#移位操作">移位操作</a></li>
+            <li><a href="#按位布尔运算">按位布尔运算</a></li>
+            <li><a href="#浮点运算">浮点运算</a></li>
+            <li><a href="#31-算术指令集">3.1 算术指令集</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#集">集</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#32-算术指令举例">3.2 算术指令举例</a>
+              <ul>
+                <li><a href="#举例1">举例1</a></li>
+                <li><a href="#举例2">举例2</a></li>
+                <li><a href="#举例3">举例3</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#四类型转换指令">四、类型转换指令</a>
+          <ul>
+            <li><a href="#宽化类型转换">宽化类型转换</a></li>
+            <li><a href="#窄化类型转换">窄化类型转换</a></li>
+            <li><a href="#41-宽化类型转换剖析">4.1 宽化类型转换剖析</a></li>
+            <li><a href="#42-窄化类型转换剖析">4.2 窄化类型转换剖析</a></li>
+          </ul>
+        </li>
+        <li><a href="#五对象的创建与访问指令">五、对象的创建与访问指令</a>
+          <ul>
+            <li><a href="#对象操作指令">对象操作指令</a></li>
+            <li><a href="#数组操作指令">数组操作指令</a></li>
+            <li><a href="#51-创建指令">5.1 创建指令</a></li>
+            <li><a href="#52-字段访问指令">5.2 字段访问指令</a></li>
+            <li><a href="#53-数组操作指令">5.3 数组操作指令</a></li>
+            <li><a href="#54-类型检查指令">5.4 类型检查指令</a></li>
+          </ul>
+        </li>
+        <li><a href="#六-方法调用与返回指令">六、 方法调用与返回指令</a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#方法调用指令">方法调用指令</a></li>
+                <li><a href="#方法返回指令">方法返回指令</a></li>
+              </ul>
+            </li>
+            <li><a href="#61-方法调用指令">6.1 方法调用指令</a></li>
+            <li><a href="#62-方法返回指令">6.2 方法返回指令</a></li>
+          </ul>
+        </li>
+        <li><a href="#七操作数栈管理指令">七、操作数栈管理指令</a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#通用无类型栈操作">通用(无类型）栈操作</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#八控制转移指令">八、控制转移指令</a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#比较指令">比较指令</a></li>
+                <li><a href="#条件分支指令">条件分支指令</a></li>
+                <li><a href="#比较条件分支指令">比较条件分支指令</a></li>
+                <li><a href="#多条件分支跳转指令">多条件分支跳转指令</a></li>
+                <li><a href="#无条件跳转指令">无条件跳转指令</a></li>
+              </ul>
+            </li>
+            <li><a href="#81-比较指令">8.1 比较指令</a></li>
+            <li><a href="#82-条件跳转指令">8.2 条件跳转指令</a></li>
+            <li><a href="#83-比较条件跳转指令">8.3 比较条件跳转指令</a></li>
+            <li><a href="#85-无条件跳转">8.5 无条件跳转</a></li>
+          </ul>
+        </li>
+        <li><a href="#九-异常处理指令">九、 异常处理指令</a></li>
+        <li><a href="#十同步控制指令">十、同步控制指令</a>
+          <ul>
+            <li><a href="#线程同步">线程同步</a></li>
+            <li><a href="#101方法级的同步">10.1.方法级的同步</a></li>
+            <li><a href="#102-方法内指令指令序列的同步">10.2 方法内指令指令序列的同步</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h3 id="一字节码指令集" class="headerLink">
+    <a href="#%e4%b8%80%e5%ad%97%e8%8a%82%e7%a0%81%e6%8c%87%e4%bb%a4%e9%9b%86" class="header-mark"></a>一、字节码指令集</h3><h4 id="11-概述" class="headerLink">
+    <a href="#11-%e6%a6%82%e8%bf%b0" class="header-mark"></a>1.1 概述</h4><p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/630bca9b1bbeeeb4f772fea5f94d43fc.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/630bca9b1bbeeeb4f772fea5f94d43fc.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/630bca9b1bbeeeb4f772fea5f94d43fc.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/630bca9b1bbeeeb4f772fea5f94d43fc.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/630bca9b1bbeeeb4f772fea5f94d43fc.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/630bca9b1bbeeeb4f772fea5f94d43fc.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/630bca9b1bbeeeb4f772fea5f94d43fc.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/74bb5f23ad01f05a39f8eb171d205390.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/74bb5f23ad01f05a39f8eb171d205390.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/74bb5f23ad01f05a39f8eb171d205390.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/74bb5f23ad01f05a39f8eb171d205390.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/74bb5f23ad01f05a39f8eb171d205390.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/74bb5f23ad01f05a39f8eb171d205390.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/74bb5f23ad01f05a39f8eb171d205390.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/bb3c57508713e377f3f4084409abaa30.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/bb3c57508713e377f3f4084409abaa30.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/bb3c57508713e377f3f4084409abaa30.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/bb3c57508713e377f3f4084409abaa30.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/bb3c57508713e377f3f4084409abaa30.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/bb3c57508713e377f3f4084409abaa30.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/bb3c57508713e377f3f4084409abaa30.png">
+    </a></p>
+<h3 id="二加载与存储指令" class="headerLink">
+    <a href="#%e4%ba%8c%e5%8a%a0%e8%bd%bd%e4%b8%8e%e5%ad%98%e5%82%a8%e6%8c%87%e4%bb%a4" class="header-mark"></a>二、加载与存储指令</h3><p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/3585fe67d5d83aff5db707d8eedccbae.png" title="0ca8044c-f78d-4787-aeac-c986a35f9cdf" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/3585fe67d5d83aff5db707d8eedccbae.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/3585fe67d5d83aff5db707d8eedccbae.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/3585fe67d5d83aff5db707d8eedccbae.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/3585fe67d5d83aff5db707d8eedccbae.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/3585fe67d5d83aff5db707d8eedccbae.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/3585fe67d5d83aff5db707d8eedccbae.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/8e911caaa5c0502b038af324c16edce8.png" title="08e01fd0-a33e-47e4-8fd2-34c2935db71d" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/8e911caaa5c0502b038af324c16edce8.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/8e911caaa5c0502b038af324c16edce8.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/8e911caaa5c0502b038af324c16edce8.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/8e911caaa5c0502b038af324c16edce8.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/8e911caaa5c0502b038af324c16edce8.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/8e911caaa5c0502b038af324c16edce8.png">
+    </a></p>
+<h4 id="21-局部变量压栈指令" class="headerLink">
+    <a href="#21-%e5%b1%80%e9%83%a8%e5%8f%98%e9%87%8f%e5%8e%8b%e6%a0%88%e6%8c%87%e4%bb%a4" class="header-mark"></a>2.1 局部变量压栈指令</h4><blockquote>
+<p>iload 从局部变量中装载int类型值</p>
+<p>lload 从局部变量中装载long类型值</p>
+<p>fload 从局部变量中装载float类型值</p>
+<p>dload 从局部变量中装载double类型值</p>
+<p>aload 从局部变量中装载引用类型值（refernce）</p>
+<p>iload_0 从局部变量0中装载int类型值</p>
+<p>iload_1 从局部变量1中装载int类型值</p>
+<p>iload_2 从局部变量2中装载int类型值</p>
+<p>iload_3 从局部变量3中装载int类型值</p>
+<p>lload_0 从局部变量0中装载long类型值</p>
+<p>lload_1 从局部变量1中装载long类型值</p>
+<p>lload_2 从局部变量2中装载long类型值</p>
+<p>lload_3 从局部变量3中装载long类型值</p>
+<p>fload_0 从局部变量0中装载float类型值</p>
+<p>fload_1 从局部变量1中装载float类型值</p>
+<p>fload_2 从局部变量2中装载float类型值</p>
+<p>fload_3 从局部变量3中装载float类型值</p>
+<p>dload_0 从局部变量0中装载double类型值</p>
+<p>dload_1 从局部变量1中装载double类型值</p>
+<p>dload_2 从局部变量2中装载double类型值</p>
+<p>dload_3 从局部变量3中装载double类型值</p>
+<p>aload_0 从局部变量0中装载引用类型值</p>
+<p>aload_1 从局部变量1中装载引用类型值</p>
+<p>aload_2 从局部变量2中装载引用类型值</p>
+<p>aload_3 从局部变量3中装载引用类型值</p>
+<p>iaload 从数组中装载int类型值</p>
+<p>laload 从数组中装载long类型值</p>
+<p>faload 从数组中装载float类型值</p>
+<p>daload 从数组中装载double类型值</p>
+<p>aaload 从数组中装载引用类型值</p>
+<p>baload 从数组中装载byte类型或boolean类型值</p>
+<p>caload 从数组中装载char类型值</p>
+<p>saload 从数组中装载short类型值</p>
+</blockquote>
+<h4 id="22-局部变量压栈常用指令集" class="headerLink">
+    <a href="#22-%e5%b1%80%e9%83%a8%e5%8f%98%e9%87%8f%e5%8e%8b%e6%a0%88%e5%b8%b8%e7%94%a8%e6%8c%87%e4%bb%a4%e9%9b%86" class="header-mark"></a>2.2 局部变量压栈常用指令集</h4><table>
+<thead>
+<tr>
+<th>xload_n</th>
+<th>xload_0</th>
+<th>xload_1</th>
+<th>xload_2</th>
+<th>xload_3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>iload_n</strong></td>
+<td>iload_0</td>
+<td>iload_1</td>
+<td>iload_2</td>
+<td>iload_3</td>
+</tr>
+<tr>
+<td><strong>lload_n</strong></td>
+<td>lload_0</td>
+<td>lload_1</td>
+<td>lload_2</td>
+<td>lload_3</td>
+</tr>
+<tr>
+<td><strong>fload_n</strong></td>
+<td>fload_0</td>
+<td>fload_1</td>
+<td>fload_2</td>
+<td>fload_3</td>
+</tr>
+<tr>
+<td><strong>dload_n</strong></td>
+<td>dload_0</td>
+<td>dload_1</td>
+<td>dload_2</td>
+<td>dload_3</td>
+</tr>
+<tr>
+<td><strong>aload_n</strong></td>
+<td>aload_0</td>
+<td>aload_1</td>
+<td>aload_2</td>
+<td>aload_3</td>
+</tr>
+</tbody>
+</table>
+<h4 id="23-局部变量压栈指令剖析" class="headerLink">
+    <a href="#23-%e5%b1%80%e9%83%a8%e5%8f%98%e9%87%8f%e5%8e%8b%e6%a0%88%e6%8c%87%e4%bb%a4%e5%89%96%e6%9e%90" class="header-mark"></a>2.3 局部变量压栈指令剖析</h4><p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/a34d465c4c8c83b3fcedc3ba31401732.png" title="1" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/a34d465c4c8c83b3fcedc3ba31401732.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/a34d465c4c8c83b3fcedc3ba31401732.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/a34d465c4c8c83b3fcedc3ba31401732.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/a34d465c4c8c83b3fcedc3ba31401732.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/a34d465c4c8c83b3fcedc3ba31401732.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/a34d465c4c8c83b3fcedc3ba31401732.png">
+    </a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">load</span><span class="o">(</span><span class="kt">int</span> <span class="n">num</span><span class="o">,</span> <span class="n">Object</span> <span class="n">obj</span><span class="o">,</span> <span class="kt">long</span> <span class="n">count</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">flag</span><span class="o">,</span> <span class="kt">short</span><span class="o">[]</span> <span class="n">arr</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">num</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">obj</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">count</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">flag</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">arr</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/deb49e69ed62ed9d71c7059748299b59.png" title="3" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/deb49e69ed62ed9d71c7059748299b59.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/deb49e69ed62ed9d71c7059748299b59.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/deb49e69ed62ed9d71c7059748299b59.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/deb49e69ed62ed9d71c7059748299b59.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/deb49e69ed62ed9d71c7059748299b59.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/deb49e69ed62ed9d71c7059748299b59.png">
+    </a></p>
+<h4 id="24-常量入栈指令" class="headerLink">
+    <a href="#24-%e5%b8%b8%e9%87%8f%e5%85%a5%e6%a0%88%e6%8c%87%e4%bb%a4" class="header-mark"></a>2.4 常量入栈指令</h4><blockquote>
+<p>aconst_null 将null对象引用压入栈</p>
+<p>iconst_m1 将int类型常量-1压入栈</p>
+<p>iconst_0 将int类型常量0压入栈</p>
+<p>iconst_1 将int类型常量1压入栈</p>
+<p>iconst_2 将int类型常量2压入栈</p>
+<p>iconst_3 将int类型常量3压入栈</p>
+<p>iconst_4 将int类型常量4压入栈</p>
+<p>iconst_5 将int类型常量5压入栈</p>
+<p>lconst_0 将long类型常量0压入栈</p>
+<p>lconst_1 将long类型常量1压入栈</p>
+<p>fconst_0 将float类型常量0压入栈</p>
+<p>fconst_1 将float类型常量1压入栈</p>
+<p>dconst_0 将double类型常量0压入栈</p>
+<p>dconst_1 将double类型常量1压入栈</p>
+<p>bipush 将一个8位带符号整数压入栈</p>
+<p>sipush 将16位带符号整数压入栈</p>
+<p>ldc 把常量池中的项压入栈</p>
+<p>ldc_w 把常量池中的项压入栈（使用宽索引）</p>
+<p>ldc2_w 把常量池中long类型或者double类型的项压入栈（使用宽索引）</p>
+</blockquote>
+<h4 id="25-常量入栈常用指令集" class="headerLink">
+    <a href="#25-%e5%b8%b8%e9%87%8f%e5%85%a5%e6%a0%88%e5%b8%b8%e7%94%a8%e6%8c%87%e4%bb%a4%e9%9b%86" class="header-mark"></a>2.5 常量入栈常用指令集</h4><table>
+<thead>
+<tr>
+<th>xconst_n</th>
+<th>范围</th>
+<th>xconst_null</th>
+<th>xconst_m1</th>
+<th>xconst_0</th>
+<th>xconst_1</th>
+<th>xconst_2</th>
+<th>xconst_3</th>
+<th>xconst_4</th>
+<th>xconst_5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>iconst_n</strong></td>
+<td>[-1, 5]</td>
+<td></td>
+<td>iconst_m1</td>
+<td>iconst_0</td>
+<td>iconst_1</td>
+<td>iconst_2</td>
+<td>iconst_3</td>
+<td>iconst_4</td>
+<td>iconst_5</td>
+</tr>
+<tr>
+<td><strong>lconst_n</strong></td>
+<td>0, 1</td>
+<td></td>
+<td></td>
+<td>lconst_0</td>
+<td>lconst_1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>fconst_n</strong></td>
+<td>0, 1, 2</td>
+<td></td>
+<td></td>
+<td>fconst_0</td>
+<td>fconst_1</td>
+<td>fconst_2</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>dconst_n</strong></td>
+<td>0, 1</td>
+<td></td>
+<td></td>
+<td>dconst_0</td>
+<td>dconst_1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>aconst_n</strong></td>
+<td>null, String literal, Class literal</td>
+<td>aconst_null</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>bipush</strong></td>
+<td>一个字节，2^8^，[-2^7^, 2^7^ - 1]，即[-128, 127]</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>sipush</strong></td>
+<td>两个字节，2^16^，[-2^15^, 2^15^ - 1]，即[-32768, 32767]</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>ldc</strong></td>
+<td>四个字节，2^32^，[-2^31^, 2^31^ - 1]</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>ldc_w</strong></td>
+<td>宽索引</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>ldc2_w</strong></td>
+<td>宽索引，long或double</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="26-常量入栈指令剖析" class="headerLink">
+    <a href="#26-%e5%b8%b8%e9%87%8f%e5%85%a5%e6%a0%88%e6%8c%87%e4%bb%a4%e5%89%96%e6%9e%90" class="header-mark"></a>2.6 常量入栈指令剖析</h4><p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/fafa61a6702b5fc88179c404ba736029.png" title="437a717e-98e2-4847-b52e-e6632d0745a4" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/fafa61a6702b5fc88179c404ba736029.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/fafa61a6702b5fc88179c404ba736029.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/fafa61a6702b5fc88179c404ba736029.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/fafa61a6702b5fc88179c404ba736029.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/fafa61a6702b5fc88179c404ba736029.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/fafa61a6702b5fc88179c404ba736029.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/c0a6284e1deaf76669089e669916f440.png" title="ffd7246e-2e46-41e0-9fd6-1e65ace5dbd1" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/c0a6284e1deaf76669089e669916f440.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/c0a6284e1deaf76669089e669916f440.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/c0a6284e1deaf76669089e669916f440.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/c0a6284e1deaf76669089e669916f440.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/c0a6284e1deaf76669089e669916f440.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/c0a6284e1deaf76669089e669916f440.png">
+    </a></p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>常数指令</th>
+<th>范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>int(boolean,byte,char,short)</td>
+<td>iconst</td>
+<td>[-1, 5]</td>
+</tr>
+<tr>
+<td>bipush</td>
+<td>[-128, 127]</td>
+<td></td>
+</tr>
+<tr>
+<td>sipush</td>
+<td>[-32768, 32767]</td>
+<td></td>
+</tr>
+<tr>
+<td>ldc</td>
+<td>any int value</td>
+<td></td>
+</tr>
+<tr>
+<td>long</td>
+<td>lconst</td>
+<td>0, 1</td>
+</tr>
+<tr>
+<td>ldc</td>
+<td>any long value</td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td>fconst</td>
+<td>0, 1, 2</td>
+</tr>
+<tr>
+<td>ldc</td>
+<td>any float value</td>
+<td></td>
+</tr>
+<tr>
+<td>double</td>
+<td>dconst</td>
+<td>0, 1</td>
+</tr>
+<tr>
+<td>ldc</td>
+<td>any double value</td>
+<td></td>
+</tr>
+<tr>
+<td>reference</td>
+<td>aconst</td>
+<td>null</td>
+</tr>
+<tr>
+<td>ldc</td>
+<td>String literal, Class literal</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/59982d71dc70f7d7b873f50130281c21.png" title="566b9397-5afe-4a3f-9e17-9ebf504dfc80" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/59982d71dc70f7d7b873f50130281c21.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/59982d71dc70f7d7b873f50130281c21.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/59982d71dc70f7d7b873f50130281c21.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/59982d71dc70f7d7b873f50130281c21.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/59982d71dc70f7d7b873f50130281c21.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/59982d71dc70f7d7b873f50130281c21.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/cd990ebc801bf53b4f7b1966d9974345.png" title="b59702d2-4c93-44df-87f1-01a5dfe53b61" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/cd990ebc801bf53b4f7b1966d9974345.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/cd990ebc801bf53b4f7b1966d9974345.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/cd990ebc801bf53b4f7b1966d9974345.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/cd990ebc801bf53b4f7b1966d9974345.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/cd990ebc801bf53b4f7b1966d9974345.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/cd990ebc801bf53b4f7b1966d9974345.png">
+    </a></p>
+<h4 id="27-出栈装入局部变量表指令" class="headerLink">
+    <a href="#27-%e5%87%ba%e6%a0%88%e8%a3%85%e5%85%a5%e5%b1%80%e9%83%a8%e5%8f%98%e9%87%8f%e8%a1%a8%e6%8c%87%e4%bb%a4" class="header-mark"></a>2.7 出栈装入局部变量表指令</h4><blockquote>
+<p>istore 将int类型值存入局部变量</p>
+<p>lstore 将long类型值存入局部变量</p>
+<p>fstore 将float类型值存入局部变量</p>
+<p>dstore 将double类型值存入局部变量</p>
+<p>astore 将将引用类型或returnAddress类型值存入局部变量</p>
+<p>istore_0 将int类型值存入局部变量0</p>
+<p>istore_1 将int类型值存入局部变量1</p>
+<p>istore_2 将int类型值存入局部变量2</p>
+<p>istore_3 将int类型值存入局部变量3</p>
+<p>lstore_0 将long类型值存入局部变量0</p>
+<p>lstore_1 将long类型值存入局部变量1</p>
+<p>lstore_2 将long类型值存入局部变量2</p>
+<p>lstore_3 将long类型值存入局部变量3</p>
+<p>fstore_0 将float类型值存入局部变量0</p>
+<p>fstore_1 将float类型值存入局部变量1</p>
+<p>fstore_2 将float类型值存入局部变量2</p>
+<p>fstore_3 将float类型值存入局部变量3</p>
+<p>dstore_0 将double类型值存入局部变量0</p>
+<p>dstore_1 将double类型值存入局部变量1</p>
+<p>dstore_2 将double类型值存入局部变量2</p>
+<p>dstore_3 将double类型值存入局部变量3</p>
+<p>astore_0 将引用类型或returnAddress类型值存入局部变量0</p>
+<p>astore_1 将引用类型或returnAddress类型值存入局部变量1</p>
+<p>astore_2 将引用类型或returnAddress类型值存入局部变量2</p>
+<p>astore_3 将引用类型或returnAddress类型值存入局部变量3</p>
+<p>iastore 将int类型值存入数组中</p>
+<p>lastore 将long类型值存入数组中</p>
+<p>fastore 将float类型值存入数组中</p>
+<p>dastore 将double类型值存入数组中</p>
+<p>aastore 将引用类型值存入数组中</p>
+<p>bastore 将byte类型或者boolean类型值存入数组中</p>
+<p>castore 将char类型值存入数组中</p>
+<p>sastore 将short类型值存入数组中</p>
+<p>wide指令</p>
+<p>wide 使用附加字节扩展局部变量索引</p>
+</blockquote>
+<h4 id="28-出栈装入局部变量表常用指令集" class="headerLink">
+    <a href="#28-%e5%87%ba%e6%a0%88%e8%a3%85%e5%85%a5%e5%b1%80%e9%83%a8%e5%8f%98%e9%87%8f%e8%a1%a8%e5%b8%b8%e7%94%a8%e6%8c%87%e4%bb%a4%e9%9b%86" class="header-mark"></a>2.8 出栈装入局部变量表常用指令集</h4><table>
+<thead>
+<tr>
+<th>xstore_n</th>
+<th>xstore_0</th>
+<th>xstore_1</th>
+<th>xstore_2</th>
+<th>xstore_3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>istore_n</strong></td>
+<td>istore_0</td>
+<td>istore_1</td>
+<td>istore_2</td>
+<td>istore_3</td>
+</tr>
+<tr>
+<td><strong>lstore_n</strong></td>
+<td>lstore_0</td>
+<td>lstore_1</td>
+<td>lstore_2</td>
+<td>lstore_3</td>
+</tr>
+<tr>
+<td><strong>fstore_n</strong></td>
+<td>fstore_0</td>
+<td>fstore_1</td>
+<td>fstore_2</td>
+<td>fstore_3</td>
+</tr>
+<tr>
+<td><strong>dstore_n</strong></td>
+<td>dstore_0</td>
+<td>dstore_1</td>
+<td>dstore_2</td>
+<td>dstore_3</td>
+</tr>
+<tr>
+<td><strong>astore_n</strong></td>
+<td>astore_0</td>
+<td>astore_1</td>
+<td>astore_2</td>
+<td>astore_3</td>
+</tr>
+</tbody>
+</table>
+<h4 id="29-出栈装入局部变量表指令剖析" class="headerLink">
+    <a href="#29-%e5%87%ba%e6%a0%88%e8%a3%85%e5%85%a5%e5%b1%80%e9%83%a8%e5%8f%98%e9%87%8f%e8%a1%a8%e6%8c%87%e4%bb%a4%e5%89%96%e6%9e%90" class="header-mark"></a>2.9 出栈装入局部变量表指令剖析</h4><p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/52b46ba6b57aa1ab8581cb022da7e58e.png" title="1" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/52b46ba6b57aa1ab8581cb022da7e58e.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/52b46ba6b57aa1ab8581cb022da7e58e.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/52b46ba6b57aa1ab8581cb022da7e58e.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/52b46ba6b57aa1ab8581cb022da7e58e.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/52b46ba6b57aa1ab8581cb022da7e58e.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/52b46ba6b57aa1ab8581cb022da7e58e.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4adce45129332dd04b89f4aa8ffc6e28.png" title="2" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4adce45129332dd04b89f4aa8ffc6e28.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4adce45129332dd04b89f4aa8ffc6e28.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4adce45129332dd04b89f4aa8ffc6e28.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/4adce45129332dd04b89f4aa8ffc6e28.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/4adce45129332dd04b89f4aa8ffc6e28.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4adce45129332dd04b89f4aa8ffc6e28.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/e4665e8fc25e2d63bff2e8423b60b1dc.png" title="3" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/e4665e8fc25e2d63bff2e8423b60b1dc.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/e4665e8fc25e2d63bff2e8423b60b1dc.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/e4665e8fc25e2d63bff2e8423b60b1dc.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/e4665e8fc25e2d63bff2e8423b60b1dc.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/e4665e8fc25e2d63bff2e8423b60b1dc.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/e4665e8fc25e2d63bff2e8423b60b1dc.png">
+    </a></p>
+<h3 id="三算术指令" class="headerLink">
+    <a href="#%e4%b8%89%e7%ae%97%e6%9c%af%e6%8c%87%e4%bb%a4" class="header-mark"></a>三、算术指令</h3><blockquote>
+<h4 id="整数运算" class="headerLink">
+    <a href="#%e6%95%b4%e6%95%b0%e8%bf%90%e7%ae%97" class="header-mark"></a>整数运算</h4><p>iadd 执行int类型的加法</p>
+<p>ladd 执行long类型的加法</p>
+<p>isub 执行int类型的减法</p>
+<p>lsub 执行long类型的减法</p>
+<p>imul 执行int类型的乘法</p>
+<p>lmul 执行long类型的乘法</p>
+<p>idiv 执行int类型的除法</p>
+<p>ldiv 执行long类型的除法</p>
+<p>irem 计算int类型除法的余数</p>
+<p>lrem 计算long类型除法的余数</p>
+<p>ineg 对一个int类型值进行取反操作</p>
+<p>lneg 对一个long类型值进行取反操作</p>
+<p>iinc 把一个常量值加到一个int类型的局部变量上</p>
+<h4 id="逻辑运算" class="headerLink">
+    <a href="#%e9%80%bb%e8%be%91%e8%bf%90%e7%ae%97" class="header-mark"></a>逻辑运算</h4><h4 id="移位操作" class="headerLink">
+    <a href="#%e7%a7%bb%e4%bd%8d%e6%93%8d%e4%bd%9c" class="header-mark"></a>移位操作</h4><p>ishl 执行int类型的向左移位操作</p>
+<p>lshl 执行long类型的向左移位操作</p>
+<p>ishr 执行int类型的向右移位操作</p>
+<p>lshr 执行long类型的向右移位操作</p>
+<p>iushr 执行int类型的向右逻辑移位操作</p>
+<p>lushr 执行long类型的向右逻辑移位操作</p>
+<h4 id="按位布尔运算" class="headerLink">
+    <a href="#%e6%8c%89%e4%bd%8d%e5%b8%83%e5%b0%94%e8%bf%90%e7%ae%97" class="header-mark"></a>按位布尔运算</h4><p>iand 对int类型值进行“逻辑与”操作</p>
+<p>land 对long类型值进行“逻辑与”操作</p>
+<p>ior 对int类型值进行“逻辑或”操作</p>
+<p>lor 对long类型值进行“逻辑或”操作</p>
+<p>ixor 对int类型值进行“逻辑异或”操作</p>
+<p>lxor 对long类型值进行“逻辑异或”操作</p>
+<h4 id="浮点运算" class="headerLink">
+    <a href="#%e6%b5%ae%e7%82%b9%e8%bf%90%e7%ae%97" class="header-mark"></a>浮点运算</h4><p>fadd 执行float类型的加法</p>
+<p>dadd 执行double类型的加法</p>
+<p>fsub 执行float类型的减法</p>
+<p>dsub 执行double类型的减法</p>
+<p>fmul 执行float类型的乘法</p>
+<p>dmul 执行double类型的乘法</p>
+<p>fdiv 执行float类型的除法</p>
+<p>ddiv 执行double类型的除法</p>
+<p>frem 计算float类型除法的余数</p>
+<p>drem 计算double类型除法的余数</p>
+<p>fneg 将一个float类型的数值取反</p>
+<p>dneg 将一个double类型的数值取反</p>
+</blockquote>
+<h4 id="31-算术指令集" class="headerLink">
+    <a href="#31-%e7%ae%97%e6%9c%af%e6%8c%87%e4%bb%a4%e9%9b%86" class="header-mark"></a>3.1 算术指令集</h4><h2 id="集" class="headerLink">
+    <a href="#%e9%9b%86" class="header-mark"></a>集</h2><table>
+<thead>
+<tr>
+<th>算数指令</th>
+<th>int(boolean,byte,char,short)</th>
+<th>long</th>
+<th>float</th>
+<th>double</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>加法指令</td>
+<td>iadd</td>
+<td>ladd</td>
+<td>fadd</td>
+<td>dadd</td>
+<td></td>
+</tr>
+<tr>
+<td>减法指令</td>
+<td>isub</td>
+<td>lsub</td>
+<td>fsub</td>
+<td>dsub</td>
+<td></td>
+</tr>
+<tr>
+<td>乘法指令</td>
+<td>imul</td>
+<td>lmul</td>
+<td>fmul</td>
+<td>dmul</td>
+<td></td>
+</tr>
+<tr>
+<td>除法指令</td>
+<td>idiv</td>
+<td>ldiv</td>
+<td>fdiv</td>
+<td>ddiv</td>
+<td></td>
+</tr>
+<tr>
+<td>求余指令</td>
+<td>irem</td>
+<td>lrem</td>
+<td>frem</td>
+<td>drem</td>
+<td></td>
+</tr>
+<tr>
+<td>取反指令</td>
+<td>ineg</td>
+<td>lneg</td>
+<td>fneg</td>
+<td>dneg</td>
+<td></td>
+</tr>
+<tr>
+<td>自增指令</td>
+<td>iinc</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>位运算指令</td>
+<td>按位或指令</td>
+<td>ior</td>
+<td>lor</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>按位或指令</td>
+<td>ior</td>
+<td>lor</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>按位与指令</td>
+<td>iand</td>
+<td>land</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>按位异或指令</td>
+<td>ixor</td>
+<td>lxor</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>比较指令</td>
+<td></td>
+<td>lcmp</td>
+<td>fcmpg / fcmpl</td>
+<td>dcmpg / dcmpl</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/39ac5dc0cb406c2d75b50b10226322b0.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/39ac5dc0cb406c2d75b50b10226322b0.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/39ac5dc0cb406c2d75b50b10226322b0.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/39ac5dc0cb406c2d75b50b10226322b0.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/39ac5dc0cb406c2d75b50b10226322b0.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/39ac5dc0cb406c2d75b50b10226322b0.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/39ac5dc0cb406c2d75b50b10226322b0.png">
+    </a></p>
+<blockquote>
+<p>注意：NaN(Not a Number)表示不是一个数字</p>
+</blockquote>
+<h4 id="32-算术指令举例" class="headerLink">
+    <a href="#32-%e7%ae%97%e6%9c%af%e6%8c%87%e4%bb%a4%e4%b8%be%e4%be%8b" class="header-mark"></a>3.2 算术指令举例</h4><h5 id="举例1" class="headerLink">
+    <a href="#%e4%b8%be%e4%be%8b1" class="header-mark"></a>举例1</h5><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">bar</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="o">((</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span> <span class="o">-</span> <span class="mi">2</span><span class="o">)</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">/</span> <span class="mi">4</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/256d8a8ec2309b6d396795e9a7e79959.png" title="a54c2ac8-dd36-49f4-a49d-9afd725e8365" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/256d8a8ec2309b6d396795e9a7e79959.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/256d8a8ec2309b6d396795e9a7e79959.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/256d8a8ec2309b6d396795e9a7e79959.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/256d8a8ec2309b6d396795e9a7e79959.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/256d8a8ec2309b6d396795e9a7e79959.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/256d8a8ec2309b6d396795e9a7e79959.png">
+    </a></p>
+<h5 id="举例2" class="headerLink">
+    <a href="#%e4%b8%be%e4%be%8b2" class="header-mark"></a>举例2</h5><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">add</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">byte</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">15</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">8</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">j</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/58c6064f2d2103610c6e2f9c9472f122.png" title="image-20210424210710750" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/58c6064f2d2103610c6e2f9c9472f122.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/58c6064f2d2103610c6e2f9c9472f122.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/58c6064f2d2103610c6e2f9c9472f122.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/58c6064f2d2103610c6e2f9c9472f122.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/58c6064f2d2103610c6e2f9c9472f122.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/58c6064f2d2103610c6e2f9c9472f122.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/d0257760ed00864d7e36421c2df971ca.png" title="2" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/d0257760ed00864d7e36421c2df971ca.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/d0257760ed00864d7e36421c2df971ca.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/d0257760ed00864d7e36421c2df971ca.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/d0257760ed00864d7e36421c2df971ca.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/d0257760ed00864d7e36421c2df971ca.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/d0257760ed00864d7e36421c2df971ca.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/df724aebb307c6dda0780bbf5d4e1f92.png" title="3" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/df724aebb307c6dda0780bbf5d4e1f92.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/df724aebb307c6dda0780bbf5d4e1f92.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/df724aebb307c6dda0780bbf5d4e1f92.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/df724aebb307c6dda0780bbf5d4e1f92.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/df724aebb307c6dda0780bbf5d4e1f92.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/df724aebb307c6dda0780bbf5d4e1f92.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/f2edaef3312398b63decea146718f2d6.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/f2edaef3312398b63decea146718f2d6.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/f2edaef3312398b63decea146718f2d6.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/f2edaef3312398b63decea146718f2d6.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/f2edaef3312398b63decea146718f2d6.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/f2edaef3312398b63decea146718f2d6.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/f2edaef3312398b63decea146718f2d6.png">
+    </a></p>
+<h5 id="举例3" class="headerLink">
+    <a href="#%e4%b8%be%e4%be%8b3" class="header-mark"></a>举例3</h5><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">500</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">100</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="n">y</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">50</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/ce924815ec9c6ddc5cd98f18538c250e.png" title="c43c0407-020f-4ec4-bd27-e4c109640b39" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/ce924815ec9c6ddc5cd98f18538c250e.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/ce924815ec9c6ddc5cd98f18538c250e.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/ce924815ec9c6ddc5cd98f18538c250e.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/ce924815ec9c6ddc5cd98f18538c250e.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/ce924815ec9c6ddc5cd98f18538c250e.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/ce924815ec9c6ddc5cd98f18538c250e.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/918a9850ced5114086db35ce59e651af.png" title="04282df1-4e52-4c3d-a47b-84023159b624" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/918a9850ced5114086db35ce59e651af.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/918a9850ced5114086db35ce59e651af.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/918a9850ced5114086db35ce59e651af.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/918a9850ced5114086db35ce59e651af.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/918a9850ced5114086db35ce59e651af.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/918a9850ced5114086db35ce59e651af.png">
+    </a></p>
+<h3 id="四类型转换指令" class="headerLink">
+    <a href="#%e5%9b%9b%e7%b1%bb%e5%9e%8b%e8%bd%ac%e6%8d%a2%e6%8c%87%e4%bb%a4" class="header-mark"></a>四、类型转换指令</h3><blockquote>
+<h4 id="宽化类型转换" class="headerLink">
+    <a href="#%e5%ae%bd%e5%8c%96%e7%b1%bb%e5%9e%8b%e8%bd%ac%e6%8d%a2" class="header-mark"></a>宽化类型转换</h4><p>i2l 把int类型的数据转化为long类型</p>
+<p>i2f 把int类型的数据转化为float类型</p>
+<p>i2d 把int类型的数据转化为double类型</p>
+<p>l2f 把long类型的数据转化为float类型</p>
+<p>l2d 把long类型的数据转化为double类型</p>
+<p>f2d 把float类型的数据转化为double类型</p>
+<h4 id="窄化类型转换" class="headerLink">
+    <a href="#%e7%aa%84%e5%8c%96%e7%b1%bb%e5%9e%8b%e8%bd%ac%e6%8d%a2" class="header-mark"></a>窄化类型转换</h4><p>i2b 把int类型的数据转化为byte类型</p>
+<p>i2c 把int类型的数据转化为char类型</p>
+<p>i2s 把int类型的数据转化为short类型</p>
+<p>l2i 把long类型的数据转化为int类型</p>
+<p>f2i 把float类型的数据转化为int类型</p>
+<p>f2l 把float类型的数据转化为long类型</p>
+<p>d2i 把double类型的数据转化为int类型</p>
+<p>d2l 把double类型的数据转化为long类型</p>
+<p>d2f 把double类型的数据转化为float类型</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>byte</strong></th>
+<th><strong>char</strong></th>
+<th><strong>short</strong></th>
+<th><strong>int</strong></th>
+<th><strong>long</strong></th>
+<th><strong>float</strong></th>
+<th><strong>double</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>int</strong></td>
+<td>i2b</td>
+<td>i2c</td>
+<td>i2s</td>
+<td>○</td>
+<td>i2l</td>
+<td>i2f</td>
+<td>i2d</td>
+</tr>
+<tr>
+<td><strong>long</strong></td>
+<td>l2i i2b</td>
+<td>l2i i2c</td>
+<td>l2i i2s</td>
+<td>l2i</td>
+<td>○</td>
+<td>l2f</td>
+<td>l2d</td>
+</tr>
+<tr>
+<td><strong>float</strong></td>
+<td>f2i i2b</td>
+<td>f2i i2c</td>
+<td>f2i i2s</td>
+<td>f2i</td>
+<td>f2l</td>
+<td>○</td>
+<td>f2d</td>
+</tr>
+<tr>
+<td><strong>double</strong></td>
+<td>d2i i2b</td>
+<td>d2i i2c</td>
+<td>d2i i2s</td>
+<td>d2i</td>
+<td>d2l</td>
+<td>d2f</td>
+<td>○</td>
+</tr>
+</tbody>
+</table>
+<p>类型转换指令可以将两种不同的数值类型进行相互转换。这些转换操作一般用于实现用户代码中的显式类型转換操作，或者用来处理字节码指令集中数据类型相关指令无法与数据类型一一对应的问题。</p>
+<h4 id="41-宽化类型转换剖析" class="headerLink">
+    <a href="#41-%e5%ae%bd%e5%8c%96%e7%b1%bb%e5%9e%8b%e8%bd%ac%e6%8d%a2%e5%89%96%e6%9e%90" class="header-mark"></a>4.1 宽化类型转换剖析</h4><blockquote>
+<p>宽化类型转换( Widening Numeric Conversions)</p>
+<ol>
+<li>转换规则</li>
+</ol>
+<p>Java虚拟机直接支持以下数值的宽化类型转换（ widening numeric conversion,小范围类型向大范围类型的安全转换）。也就是说，并不需要指令执行，包括</p>
+<blockquote>
+<p>从int类型到long、float或者 double类型。对应的指令为：i21、i2f、i2d</p>
+<p>从long类型到float、 double类型。对应的指令为：i2f、i2d</p>
+<p>从float类型到double类型。对应的指令为：f2d</p>
+</blockquote>
+<p>简化为：int&ndash;&gt;long&ndash;&gt;float-&gt; double</p>
+<ol>
+<li>精度损失问题</li>
+</ol>
+<blockquote>
+<p>2.1. 宽化类型转换是不会因为超过目标类型最大值而丢失信息的，例如，从int转换到long,或者从int转换到double,都不会丢失任何信息，转换前后的值是精确相等的。</p>
+<p>2.2. 从int、long类型数值转换到float,或者long类型数值转换到double时，将可能发生精度丢失一一可能丢失掉几个最低有效位上的值，转换后的浮点数值是根据IEEE754最接近含入模式所得到的正确整数值。</p>
+</blockquote>
+<p>尽管宽化类型转换实际上是可能发生精度丢失的，但是这种转换永远不会导致Java虚拟机抛出运行时异常</p>
+<ol>
+<li>补充说明</li>
+</ol>
+<p>从byte、char和 short类型到int类型的宽化类型转换实际上是不存在的。对于byte类型转为int,拟机并没有做实质性的转化处理，只是简单地通过操作数栈交換了两个数据。而将byte转为long时，使用的是i2l,可以看到在内部，byte在这里已经等同于int类型处理，类似的还有 short类型，这种处理方式有两个特点：</p>
+<p>一方面可以减少实际的数据类型，如果为 short和byte都准备一套指令，那么指令的数量就会大増，而虚拟机目前的设计上，只愿意使用一个字节表示指令，因此指令总数不能超过256个，为了节省指令资源，将 short和byte当做int处理也在情理之中。</p>
+<p>另一方面，由于局部变量表中的槽位固定为32位，无论是byte或者 short存入局部变量表，都会占用32位空间。从这个角度说，也没有必要特意区分这几种数据类型。</p>
+</blockquote>
+<h4 id="42-窄化类型转换剖析" class="headerLink">
+    <a href="#42-%e7%aa%84%e5%8c%96%e7%b1%bb%e5%9e%8b%e8%bd%ac%e6%8d%a2%e5%89%96%e6%9e%90" class="header-mark"></a>4.2 窄化类型转换剖析</h4><blockquote>
+<p>窄化类型转换( Narrowing Numeric Conversion)</p>
+<ol>
+<li>转换规则</li>
+</ol>
+<p>Java虚拟机也直接支持以下窄化类型转换：</p>
+<blockquote>
+<p>从主int类型至byte、 short或者char类型。对应的指令有：i2b、i2c、i2s</p>
+<p>从long类型到int类型。对应的指令有：l2i</p>
+<p>从float类型到int或者long类型。对应的指令有：f2i、f2l</p>
+<p>从double类型到int、long或者float类型。对应的指令有：d2i、d2l、d2f</p>
+</blockquote>
+<ol>
+<li>精度损失问题</li>
+</ol>
+<p>窄化类型转换可能会导致转换结果具备不同的正负号、不同的数量级，因此，转换过程很可能会导致数值丢失精度。</p>
+<p>尽管数据类型窄化转换可能会发生上限溢出、下限溢出和精度丢失等情况，但是Java虚拟机规范中明确规定数值类型的窄化转换指令永远不可能导致虚拟机抛出运行时异常</p>
+<ol>
+<li>补充说明</li>
+</ol>
+<blockquote>
+<p>3.1. 当将一个浮点值窄化转换为整数类型T(T限于int或long类型之一)的时候，将遵循以下转换规则：</p>
+<blockquote>
+<p>如果浮点值是NaN,那转换结果就是int或long类型的0.</p>
+<p>如果浮点值不是无穷大的话，浮点值使用IEEE754的向零含入模式取整，获得整数值Vv如果v在目标类型T(int或long)的表示范围之内，那转换结果就是v。否则，将根据v的符号，转换为T所能表示的最大或者最小正数</p>
+</blockquote>
+<p>3.2. 当将一个double类型窄化转换为float类型时，将遵循以下转换规则</p>
+<blockquote>
+<p>通过向最接近数舍入模式舍入一个可以使用float类型表示的数字。最后结果根据下面这3条规则判断</p>
+<p>如果转换结果的绝对值太小而无法使用float来表示，将返回float类型的正负零</p>
+<p>如果转换结果的绝对值太大而无法使用float来表示，将返回float类型的正负无穷大。</p>
+<p>对于double类型的NaN值将按规定转換为float类型的NaN值。</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<hr>
+<h3 id="五对象的创建与访问指令" class="headerLink">
+    <a href="#%e4%ba%94%e5%af%b9%e8%b1%a1%e7%9a%84%e5%88%9b%e5%bb%ba%e4%b8%8e%e8%ae%bf%e9%97%ae%e6%8c%87%e4%bb%a4" class="header-mark"></a>五、对象的创建与访问指令</h3><blockquote>
+<h4 id="对象操作指令" class="headerLink">
+    <a href="#%e5%af%b9%e8%b1%a1%e6%93%8d%e4%bd%9c%e6%8c%87%e4%bb%a4" class="header-mark"></a>对象操作指令</h4><p>new 创建一个新对象</p>
+<p>getfield 从对象中获取字段</p>
+<p>putfield 设置对象中字段的值</p>
+<p>getstatic 从类中获取静态字段</p>
+<p>putstatic 设置类中静态字段的值</p>
+<p>checkcast 确定对象为所给定的类型。后跟目标类，判断栈顶元素是否为目标类 / 接口的实例。如果不是便抛出异常</p>
+<p>instanceof 判断对象是否为给定的类型。后跟目标类，判断栈顶元素是否为目标类 / 接口的实例。是则压入 1，否则压入 0</p>
+<h4 id="数组操作指令" class="headerLink">
+    <a href="#%e6%95%b0%e7%bb%84%e6%93%8d%e4%bd%9c%e6%8c%87%e4%bb%a4" class="header-mark"></a>数组操作指令</h4><p>newarray 分配数据成员类型为基本上数据类型的新数组</p>
+<p>anewarray 分配数据成员类型为引用类型的新数组</p>
+<p>arraylength 获取数组长度</p>
+<p>multianewarray 分配新的多维数组</p>
+</blockquote>
+<p>Java是面向对象的程序设计语言，虚拟机平台从字节码层面就对面向对象做了深层次的支持。有一系列指令专门用于对象操作，可进一步细分为创建指令、字段访问指令、数组操作指令、类型检查指令。</p>
+<h4 id="51-创建指令" class="headerLink">
+    <a href="#51-%e5%88%9b%e5%bb%ba%e6%8c%87%e4%bb%a4" class="header-mark"></a>5.1 创建指令</h4><table>
+<thead>
+<tr>
+<th>创建指令</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>new</td>
+<td>创建类实例</td>
+</tr>
+<tr>
+<td>newarray</td>
+<td>创建基本类型数组</td>
+</tr>
+<tr>
+<td>anewarray</td>
+<td>创建引用类型数组</td>
+</tr>
+<tr>
+<td>multilanewarra</td>
+<td>创建多维数组</td>
+</tr>
+</tbody>
+</table>
+<h4 id="52-字段访问指令" class="headerLink">
+    <a href="#52-%e5%ad%97%e6%ae%b5%e8%ae%bf%e9%97%ae%e6%8c%87%e4%bb%a4" class="header-mark"></a>5.2 字段访问指令</h4><table>
+<thead>
+<tr>
+<th>字段访问指令</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>getstatic、putstatic</td>
+<td>访问类字段（static字段，或者称为类变量）的指令</td>
+</tr>
+<tr>
+<td>getfield、 putfield</td>
+<td>访问类实例字段（非static字段，或者称为实例变量）的指令</td>
+</tr>
+</tbody>
+</table>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/c95da4b9bcb174f367617ca977451b14.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/c95da4b9bcb174f367617ca977451b14.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/c95da4b9bcb174f367617ca977451b14.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/c95da4b9bcb174f367617ca977451b14.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/c95da4b9bcb174f367617ca977451b14.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/c95da4b9bcb174f367617ca977451b14.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/c95da4b9bcb174f367617ca977451b14.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/6f7033f9caaf3216c6ca6795de12f6a4.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/6f7033f9caaf3216c6ca6795de12f6a4.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/6f7033f9caaf3216c6ca6795de12f6a4.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/6f7033f9caaf3216c6ca6795de12f6a4.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/6f7033f9caaf3216c6ca6795de12f6a4.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/6f7033f9caaf3216c6ca6795de12f6a4.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/6f7033f9caaf3216c6ca6795de12f6a4.png">
+    </a></p>
+<h4 id="53-数组操作指令" class="headerLink">
+    <a href="#53-%e6%95%b0%e7%bb%84%e6%93%8d%e4%bd%9c%e6%8c%87%e4%bb%a4" class="header-mark"></a>5.3 数组操作指令</h4><table>
+<thead>
+<tr>
+<th>数组指令</th>
+<th>byte(boolean)</th>
+<th>char</th>
+<th>short</th>
+<th>long</th>
+<th>long</th>
+<th>float</th>
+<th>double</th>
+<th>reference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>xaload</strong></td>
+<td>baload</td>
+<td>caload</td>
+<td>saload</td>
+<td>iaload</td>
+<td>laload</td>
+<td>faload</td>
+<td>daload</td>
+<td>aaload</td>
+</tr>
+<tr>
+<td><strong>xastore</strong></td>
+<td>bastore</td>
+<td>castore</td>
+<td>sastore</td>
+<td>iastore</td>
+<td>lastore</td>
+<td>fastore</td>
+<td>dastore</td>
+<td>aastore</td>
+</tr>
+</tbody>
+</table>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/a25e46492ce58084d3bb1ee9a4255ac4.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/a25e46492ce58084d3bb1ee9a4255ac4.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/a25e46492ce58084d3bb1ee9a4255ac4.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/a25e46492ce58084d3bb1ee9a4255ac4.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/a25e46492ce58084d3bb1ee9a4255ac4.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/a25e46492ce58084d3bb1ee9a4255ac4.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/a25e46492ce58084d3bb1ee9a4255ac4.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4d55c1e67881b686d4dcb75118f257c5.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4d55c1e67881b686d4dcb75118f257c5.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4d55c1e67881b686d4dcb75118f257c5.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4d55c1e67881b686d4dcb75118f257c5.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/4d55c1e67881b686d4dcb75118f257c5.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/4d55c1e67881b686d4dcb75118f257c5.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4d55c1e67881b686d4dcb75118f257c5.png">
+    </a></p>
+<h4 id="54-类型检查指令" class="headerLink">
+    <a href="#54-%e7%b1%bb%e5%9e%8b%e6%a3%80%e6%9f%a5%e6%8c%87%e4%bb%a4" class="header-mark"></a>5.4 类型检查指令</h4><table>
+<thead>
+<tr>
+<th>类型检查指令</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>instanceof</td>
+<td>检查类型强制转换是否可以进行</td>
+</tr>
+<tr>
+<td>checkcast</td>
+<td>判断给定对象是否是某一个类的实例</td>
+</tr>
+</tbody>
+</table>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/df1e056d6e977d38b6c5974a428a040a.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/df1e056d6e977d38b6c5974a428a040a.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/df1e056d6e977d38b6c5974a428a040a.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/df1e056d6e977d38b6c5974a428a040a.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/df1e056d6e977d38b6c5974a428a040a.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/df1e056d6e977d38b6c5974a428a040a.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/df1e056d6e977d38b6c5974a428a040a.png">
+    </a></p>
+<h3 id="六-方法调用与返回指令" class="headerLink">
+    <a href="#%e5%85%ad-%e6%96%b9%e6%b3%95%e8%b0%83%e7%94%a8%e4%b8%8e%e8%bf%94%e5%9b%9e%e6%8c%87%e4%bb%a4" class="header-mark"></a>六、 方法调用与返回指令</h3><blockquote>
+<h5 id="方法调用指令" class="headerLink">
+    <a href="#%e6%96%b9%e6%b3%95%e8%b0%83%e7%94%a8%e6%8c%87%e4%bb%a4" class="header-mark"></a>方法调用指令</h5><p>invokcvirtual 运行时按照对象的类来调用实例方法</p>
+<p>invokespecial 根据编译时类型来调用实例方法</p>
+<p>invokestatic 调用类（静态）方法</p>
+<p>invokcinterface 调用接口方法</p>
+<h5 id="方法返回指令" class="headerLink">
+    <a href="#%e6%96%b9%e6%b3%95%e8%bf%94%e5%9b%9e%e6%8c%87%e4%bb%a4" class="header-mark"></a>方法返回指令</h5><p>ireturn 从方法中返回int类型的数据</p>
+<p>lreturn 从方法中返回long类型的数据</p>
+<p>freturn 从方法中返回float类型的数据</p>
+<p>dreturn 从方法中返回double类型的数据</p>
+<p>areturn 从方法中返回引用类型的数据</p>
+<p>return 从方法中返回，返回值为void</p>
+</blockquote>
+<h4 id="61-方法调用指令" class="headerLink">
+    <a href="#61-%e6%96%b9%e6%b3%95%e8%b0%83%e7%94%a8%e6%8c%87%e4%bb%a4" class="header-mark"></a>6.1 方法调用指令</h4><table>
+<thead>
+<tr>
+<th>方法调用指令</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>invokevirtual</td>
+<td>调用对象的实例方法</td>
+</tr>
+<tr>
+<td>invokeinterface</td>
+<td>调用接口方法</td>
+</tr>
+<tr>
+<td>invokespecial</td>
+<td>调用一些需要特殊处理的实例方法，包括实例初始化方法（构造器）、私有方法和父类方法</td>
+</tr>
+<tr>
+<td>invokestatic</td>
+<td>调用命名类中的类方法（static方法）</td>
+</tr>
+<tr>
+<td>invokedynamic</td>
+<td>调用动态绑定的方法</td>
+</tr>
+</tbody>
+</table>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/6b6c265e506611b1fa05134d7ede3f30.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/6b6c265e506611b1fa05134d7ede3f30.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/6b6c265e506611b1fa05134d7ede3f30.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/6b6c265e506611b1fa05134d7ede3f30.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/6b6c265e506611b1fa05134d7ede3f30.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/6b6c265e506611b1fa05134d7ede3f30.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/6b6c265e506611b1fa05134d7ede3f30.png">
+    </a></p>
+<h4 id="62-方法返回指令" class="headerLink">
+    <a href="#62-%e6%96%b9%e6%b3%95%e8%bf%94%e5%9b%9e%e6%8c%87%e4%bb%a4" class="header-mark"></a>6.2 方法返回指令</h4><table>
+<thead>
+<tr>
+<th>方法返回指令</th>
+<th>void</th>
+<th>int</th>
+<th>long</th>
+<th>float</th>
+<th>double</th>
+<th>reference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>xreturn</strong></td>
+<td>return</td>
+<td>ireturn</td>
+<td>lreturn</td>
+<td>freutrn</td>
+<td>dreturn</td>
+<td>areturn</td>
+</tr>
+</tbody>
+</table>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/8940d3d81dff02c08bf83cf0c66f3fea.png" title="image-20210425222017858" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/8940d3d81dff02c08bf83cf0c66f3fea.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/8940d3d81dff02c08bf83cf0c66f3fea.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/8940d3d81dff02c08bf83cf0c66f3fea.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/8940d3d81dff02c08bf83cf0c66f3fea.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/8940d3d81dff02c08bf83cf0c66f3fea.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/8940d3d81dff02c08bf83cf0c66f3fea.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/386375c9f516af716a5d8dec10177444.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/386375c9f516af716a5d8dec10177444.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/386375c9f516af716a5d8dec10177444.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/386375c9f516af716a5d8dec10177444.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/386375c9f516af716a5d8dec10177444.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/386375c9f516af716a5d8dec10177444.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/386375c9f516af716a5d8dec10177444.png">
+    </a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kt">int</span> <span class="nf">methodReturn</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">500</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">200</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">50</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">j</span><span class="o">)</span> <span class="o">/</span> <span class="n">k</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/3fbd1f2ca9f4300eee5e0c4a0227a441.png" title="image-20210425222245665" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/3fbd1f2ca9f4300eee5e0c4a0227a441.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/3fbd1f2ca9f4300eee5e0c4a0227a441.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/3fbd1f2ca9f4300eee5e0c4a0227a441.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/3fbd1f2ca9f4300eee5e0c4a0227a441.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/3fbd1f2ca9f4300eee5e0c4a0227a441.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/3fbd1f2ca9f4300eee5e0c4a0227a441.png">
+    </a></p>
+<h3 id="七操作数栈管理指令" class="headerLink">
+    <a href="#%e4%b8%83%e6%93%8d%e4%bd%9c%e6%95%b0%e6%a0%88%e7%ae%a1%e7%90%86%e6%8c%87%e4%bb%a4" class="header-mark"></a>七、操作数栈管理指令</h3><blockquote>
+<h5 id="通用无类型栈操作" class="headerLink">
+    <a href="#%e9%80%9a%e7%94%a8%e6%97%a0%e7%b1%bb%e5%9e%8b%e6%a0%88%e6%93%8d%e4%bd%9c" class="header-mark"></a>通用(无类型）栈操作</h5><p>nop 不做任何操作</p>
+<p>pop 弹出栈顶端一个字长的内容</p>
+<p>pop2 弹出栈顶端两个字长的内容</p>
+<p>dup 复制栈顶部一个字长内容</p>
+<p>dup_x1 复制栈顶部一个字长的内容，然后将复制内容及原来弹出的两个字长的内容压入栈</p>
+<p>dup_x2 复制栈顶部一个字长的内容，然后将复制内容及原来弹出的三个字长的内容压入栈</p>
+<p>dup2 复制栈顶部两个字长内容</p>
+<p>dup2_x1 复制栈顶部两个字长的内容，然后将复制内容及原来弹出的三个字长的内容压入栈</p>
+<p>dup2_x2 复制栈顶部两个字长的内容，然后将复制内容及原来弹出的四个字长的内容压入栈</p>
+<p>swap 交换栈顶部两个字长内容</p>
+</blockquote>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/316306469dcd1360c16578931cd064fa.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/316306469dcd1360c16578931cd064fa.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/316306469dcd1360c16578931cd064fa.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/316306469dcd1360c16578931cd064fa.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/316306469dcd1360c16578931cd064fa.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/316306469dcd1360c16578931cd064fa.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/316306469dcd1360c16578931cd064fa.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/0d8d5d90fc84398f114eae5d1119cf6b.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/0d8d5d90fc84398f114eae5d1119cf6b.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/0d8d5d90fc84398f114eae5d1119cf6b.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/0d8d5d90fc84398f114eae5d1119cf6b.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/0d8d5d90fc84398f114eae5d1119cf6b.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/0d8d5d90fc84398f114eae5d1119cf6b.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/0d8d5d90fc84398f114eae5d1119cf6b.png">
+    </a></p>
+<h3 id="八控制转移指令" class="headerLink">
+    <a href="#%e5%85%ab%e6%8e%a7%e5%88%b6%e8%bd%ac%e7%a7%bb%e6%8c%87%e4%bb%a4" class="header-mark"></a>八、控制转移指令</h3><blockquote>
+<h5 id="比较指令" class="headerLink">
+    <a href="#%e6%af%94%e8%be%83%e6%8c%87%e4%bb%a4" class="header-mark"></a>比较指令</h5><p>lcmp 比较long类型值</p>
+<p>fcmpl 比较float类型值（当遇到NaN时，返回-1）</p>
+<p>fcmpg 比较float类型值（当遇到NaN时，返回1）</p>
+<p>dcmpl 比较double类型值（当遇到NaN时，返回-1）</p>
+<p>dcmpg 比较double类型值（当遇到NaN时，返回1）</p>
+<h5 id="条件分支指令" class="headerLink">
+    <a href="#%e6%9d%a1%e4%bb%b6%e5%88%86%e6%94%af%e6%8c%87%e4%bb%a4" class="header-mark"></a>条件分支指令</h5><p>ifeq 如果等于0，则跳转</p>
+<p>ifne 如果不等于0，则跳转</p>
+<p>iflt 如果小于0，则跳转</p>
+<p>ifge 如果大于等于0，则跳转</p>
+<p>ifgt 如果大于0，则跳转</p>
+<p>ifle 如果小于等于0，则跳转</p>
+<h5 id="比较条件分支指令" class="headerLink">
+    <a href="#%e6%af%94%e8%be%83%e6%9d%a1%e4%bb%b6%e5%88%86%e6%94%af%e6%8c%87%e4%bb%a4" class="header-mark"></a>比较条件分支指令</h5><p>if_icmpeq 如果两个int值相等，则跳转</p>
+<p>if_icmpne 如果两个int类型值不相等，则跳转</p>
+<p>if_icmplt 如果一个int类型值小于另外一个int类型值，则跳转</p>
+<p>if_icmpge 如果一个int类型值大于或者等于另外一个int类型值，则跳转</p>
+<p>if_icmpgt 如果一个int类型值大于另外一个int类型值，则跳转</p>
+<p>if_icmple 如果一个int类型值小于或者等于另外一个int类型值，则跳转</p>
+<p>ifnull 如果等于null，则跳转</p>
+<p>ifnonnull 如果不等于null，则跳转</p>
+<p>if_acmpeq 如果两个对象引用相等，则跳转</p>
+<p>if_acmpne 如果两个对象引用不相等，则跳转</p>
+<h5 id="多条件分支跳转指令" class="headerLink">
+    <a href="#%e5%a4%9a%e6%9d%a1%e4%bb%b6%e5%88%86%e6%94%af%e8%b7%b3%e8%bd%ac%e6%8c%87%e4%bb%a4" class="header-mark"></a>多条件分支跳转指令</h5><p>tableswitch 通过索引访问跳转表，并跳转</p>
+<p>lookupswitch 通过键值匹配访问跳转表，并执行跳转操作</p>
+<h5 id="无条件跳转指令" class="headerLink">
+    <a href="#%e6%97%a0%e6%9d%a1%e4%bb%b6%e8%b7%b3%e8%bd%ac%e6%8c%87%e4%bb%a4" class="header-mark"></a>无条件跳转指令</h5><p>goto 无条件跳转</p>
+<p>goto_w 无条件跳转（宽索引）</p>
+</blockquote>
+<h4 id="81-比较指令" class="headerLink">
+    <a href="#81-%e6%af%94%e8%be%83%e6%8c%87%e4%bb%a4" class="header-mark"></a>8.1 比较指令</h4><blockquote>
+<p>比较指令的作用是比较占栈顶两个元素的大小，并将比较结果入栽。</p>
+<p>比较指令有： dcmpg,dcmpl、 fcmpg、fcmpl、lcmp</p>
+<p>与前面讲解的指令类似，首字符d表示double类型，f表示float,l表示long.</p>
+<p>对于double和float类型的数字，由于NaN的存在，各有两个版本的比较指令。以float为例，有fcmpg和fcmpl两个指令，它们的区别在于在数字比较时，若遇到NaN值，处理结果不同。</p>
+<p>指令dcmpl和 dcmpg也是类似的，根据其命名可以推测其含义，在此不再赘述。</p>
+<p>举例</p>
+<p>指令 fcmp和fcmpl都从中弹出两个操作数，并将它们做比较，设栈顶的元素为v2,顶顺位第2位的元素为v1,若v1=v2,则压入0:若v1&gt;v2则压入1:若v1&lt;v2则压入-1.</p>
+<p>两个指令的不同之处在于，如果遇到NaN值， fcmpg会压入1,而fcmpl会压入-1</p>
+</blockquote>
+<h4 id="82-条件跳转指令" class="headerLink">
+    <a href="#82-%e6%9d%a1%e4%bb%b6%e8%b7%b3%e8%bd%ac%e6%8c%87%e4%bb%a4" class="header-mark"></a>8.2 条件跳转指令</h4><table>
+<thead>
+<tr>
+<th>&lt;</th>
+<th>&lt;=</th>
+<th>==</th>
+<th>!=</th>
+<th>&gt;=</th>
+<th>&gt;</th>
+<th>null</th>
+<th>not null</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>iflt</td>
+<td>ifle</td>
+<td>ifeq</td>
+<td>ifng</td>
+<td>ifge</td>
+<td>ifgt</td>
+<td>ifnull</td>
+<td>ifnonnull</td>
+</tr>
+</tbody>
+</table>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/e59234f41d6946ead781b686455783d9.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/e59234f41d6946ead781b686455783d9.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/e59234f41d6946ead781b686455783d9.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/e59234f41d6946ead781b686455783d9.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/e59234f41d6946ead781b686455783d9.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/e59234f41d6946ead781b686455783d9.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/e59234f41d6946ead781b686455783d9.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/85374206e3cdbb00f45971b1429c6d34.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/85374206e3cdbb00f45971b1429c6d34.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/85374206e3cdbb00f45971b1429c6d34.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/85374206e3cdbb00f45971b1429c6d34.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/85374206e3cdbb00f45971b1429c6d34.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/85374206e3cdbb00f45971b1429c6d34.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/85374206e3cdbb00f45971b1429c6d34.png">
+    </a></p>
+<h4 id="83-比较条件跳转指令" class="headerLink">
+    <a href="#83-%e6%af%94%e8%be%83%e6%9d%a1%e4%bb%b6%e8%b7%b3%e8%bd%ac%e6%8c%87%e4%bb%a4" class="header-mark"></a>8.3 比较条件跳转指令</h4><table>
+<thead>
+<tr>
+<th>&lt;</th>
+<th>&lt;=</th>
+<th>==</th>
+<th>!=</th>
+<th>&gt;=</th>
+<th>&gt;</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>if_icmplt</td>
+<td>if_icmple</td>
+<td>if_icmpeq、if_acmpeq</td>
+<td>if_icmpne、if_acmpne</td>
+<td>if_icmpge</td>
+<td>if_icmpgt</td>
+</tr>
+</tbody>
+</table>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/7ffa349a864e62f3e0298b63acb904ae.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/7ffa349a864e62f3e0298b63acb904ae.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/7ffa349a864e62f3e0298b63acb904ae.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/7ffa349a864e62f3e0298b63acb904ae.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/7ffa349a864e62f3e0298b63acb904ae.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/7ffa349a864e62f3e0298b63acb904ae.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/7ffa349a864e62f3e0298b63acb904ae.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/57c7b57b096f8a8cfcdcdd1b5d4e179b.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/57c7b57b096f8a8cfcdcdd1b5d4e179b.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/57c7b57b096f8a8cfcdcdd1b5d4e179b.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/57c7b57b096f8a8cfcdcdd1b5d4e179b.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/57c7b57b096f8a8cfcdcdd1b5d4e179b.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/57c7b57b096f8a8cfcdcdd1b5d4e179b.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/57c7b57b096f8a8cfcdcdd1b5d4e179b.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/a709c4fcd4bf627ad47d53ac062db47b.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/a709c4fcd4bf627ad47d53ac062db47b.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/a709c4fcd4bf627ad47d53ac062db47b.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/a709c4fcd4bf627ad47d53ac062db47b.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/a709c4fcd4bf627ad47d53ac062db47b.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/a709c4fcd4bf627ad47d53ac062db47b.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/a709c4fcd4bf627ad47d53ac062db47b.png">
+    </a></p>
+<h4 id="85-无条件跳转" class="headerLink">
+    <a href="#85-%e6%97%a0%e6%9d%a1%e4%bb%b6%e8%b7%b3%e8%bd%ac" class="header-mark"></a>8.5 无条件跳转</h4><p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/9e86f7429623e68e353ce9d1962a1267.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/9e86f7429623e68e353ce9d1962a1267.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/9e86f7429623e68e353ce9d1962a1267.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/9e86f7429623e68e353ce9d1962a1267.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/9e86f7429623e68e353ce9d1962a1267.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/9e86f7429623e68e353ce9d1962a1267.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/9e86f7429623e68e353ce9d1962a1267.png">
+    </a></p>
+<h3 id="九-异常处理指令" class="headerLink">
+    <a href="#%e4%b9%9d-%e5%bc%82%e5%b8%b8%e5%a4%84%e7%90%86%e6%8c%87%e4%bb%a4" class="header-mark"></a>九、 异常处理指令</h3><p>athrow 抛出异常或错误。将栈顶异常抛出</p>
+<p>jsr 跳转到子例程</p>
+<p>jsr_w 跳转到子例程（宽索引）</p>
+<p>rct 从子例程返回</p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/196b81557c33474cf2cfa2032aa65340.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/196b81557c33474cf2cfa2032aa65340.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/196b81557c33474cf2cfa2032aa65340.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/196b81557c33474cf2cfa2032aa65340.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/196b81557c33474cf2cfa2032aa65340.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/196b81557c33474cf2cfa2032aa65340.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/196b81557c33474cf2cfa2032aa65340.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/9e9883544cea41b6148e535da4417d78.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/9e9883544cea41b6148e535da4417d78.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/9e9883544cea41b6148e535da4417d78.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/9e9883544cea41b6148e535da4417d78.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/9e9883544cea41b6148e535da4417d78.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/9e9883544cea41b6148e535da4417d78.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/9e9883544cea41b6148e535da4417d78.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/daa25784fc259c12af58bb094d6ffc52.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/daa25784fc259c12af58bb094d6ffc52.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/daa25784fc259c12af58bb094d6ffc52.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/daa25784fc259c12af58bb094d6ffc52.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/daa25784fc259c12af58bb094d6ffc52.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/daa25784fc259c12af58bb094d6ffc52.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/daa25784fc259c12af58bb094d6ffc52.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/cba1429ffc09988d78008f5309a6374a.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/cba1429ffc09988d78008f5309a6374a.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/cba1429ffc09988d78008f5309a6374a.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/cba1429ffc09988d78008f5309a6374a.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/cba1429ffc09988d78008f5309a6374a.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/cba1429ffc09988d78008f5309a6374a.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/cba1429ffc09988d78008f5309a6374a.png">
+    </a></p>
+<h3 id="十同步控制指令" class="headerLink">
+    <a href="#%e5%8d%81%e5%90%8c%e6%ad%a5%e6%8e%a7%e5%88%b6%e6%8c%87%e4%bb%a4" class="header-mark"></a>十、同步控制指令</h3><blockquote>
+<h4 id="线程同步" class="headerLink">
+    <a href="#%e7%ba%bf%e7%a8%8b%e5%90%8c%e6%ad%a5" class="header-mark"></a>线程同步</h4><p>montiorenter 进入并获取对象监视器。即：为栈顶对象加锁</p>
+<p>monitorexit 释放并退出对象监视器。即：为栈顶对象解锁</p>
+</blockquote>
+<p>Java虚拟机支持两种同步结构：方法级的同步和方法内部一段指令序列的同步，这两种同步都是使用monitor来支持的</p>
+<h4 id="101方法级的同步" class="headerLink">
+    <a href="#101%e6%96%b9%e6%b3%95%e7%ba%a7%e7%9a%84%e5%90%8c%e6%ad%a5" class="header-mark"></a>10.1.方法级的同步</h4><p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/20b7bf14a51e1be4f90dac5e305d2ea3.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/20b7bf14a51e1be4f90dac5e305d2ea3.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/20b7bf14a51e1be4f90dac5e305d2ea3.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/20b7bf14a51e1be4f90dac5e305d2ea3.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/20b7bf14a51e1be4f90dac5e305d2ea3.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/20b7bf14a51e1be4f90dac5e305d2ea3.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/20b7bf14a51e1be4f90dac5e305d2ea3.png">
+    </a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">private</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">synchronized</span> <span class="kt">void</span> <span class="nf">add</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">i</span><span class="o">++;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/098e9fef1897cf213d14f145db04c9f1.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/098e9fef1897cf213d14f145db04c9f1.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/098e9fef1897cf213d14f145db04c9f1.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/098e9fef1897cf213d14f145db04c9f1.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/098e9fef1897cf213d14f145db04c9f1.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/098e9fef1897cf213d14f145db04c9f1.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/098e9fef1897cf213d14f145db04c9f1.png">
+    </a></p>
+<h4 id="102-方法内指令指令序列的同步" class="headerLink">
+    <a href="#102-%e6%96%b9%e6%b3%95%e5%86%85%e6%8c%87%e4%bb%a4%e6%8c%87%e4%bb%a4%e5%ba%8f%e5%88%97%e7%9a%84%e5%90%8c%e6%ad%a5" class="header-mark"></a>10.2 方法内指令指令序列的同步</h4><p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/697b683f5fba682a6ed9772950f719a7.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/697b683f5fba682a6ed9772950f719a7.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/697b683f5fba682a6ed9772950f719a7.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/697b683f5fba682a6ed9772950f719a7.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/697b683f5fba682a6ed9772950f719a7.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/697b683f5fba682a6ed9772950f719a7.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/697b683f5fba682a6ed9772950f719a7.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/71ab99d8f145e61b31daa03a233f2596.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/71ab99d8f145e61b31daa03a233f2596.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/71ab99d8f145e61b31daa03a233f2596.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/71ab99d8f145e61b31daa03a233f2596.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/71ab99d8f145e61b31daa03a233f2596.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/71ab99d8f145e61b31daa03a233f2596.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/71ab99d8f145e61b31daa03a233f2596.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/ac36b8a792107c77956ef642afba2154.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/ac36b8a792107c77956ef642afba2154.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/ac36b8a792107c77956ef642afba2154.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/ac36b8a792107c77956ef642afba2154.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/ac36b8a792107c77956ef642afba2154.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/ac36b8a792107c77956ef642afba2154.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/ac36b8a792107c77956ef642afba2154.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160025023.png" title="image-20230310160025023" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160025023.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160025023.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160025023.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160025023.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160025023.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160025023.png">
+    </a></p>
+</div>
+
+        
+
+<div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 0001-01-01</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span><a class="link-to-mardown" href=/2-%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/index.md target="_blank" rel="noopener noreferrer">阅读原始文档</a>
+                    </span></div>
+            <div class="post-info-share">
+                <span><a href="#" title="分享到 Twitter" data-sharer="twitter" data-url="http://yanghx.vip/2-%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/" data-title="" data-via="xxxx"><i class="fab fa-twitter fa-fw"></i></a><a href="#" title="分享到 Facebook" data-sharer="facebook" data-url="http://yanghx.vip/2-%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/"><i class="fab fa-facebook-square fa-fw"></i></a><a href="#" title="分享到 WhatsApp" data-sharer="whatsapp" data-url="http://yanghx.vip/2-%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/" data-title="" data-web><i class="fab fa-whatsapp fa-fw"></i></a><a href="#" title="分享到 Line" data-sharer="line" data-url="http://yanghx.vip/2-%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/" data-title=""><i data-svg-src="/lib/simple-icons/icons/line.min.svg"></i></a><a href="#" title="分享到 微博" data-sharer="weibo" data-url="http://yanghx.vip/2-%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/" data-title=""><i class="fab fa-weibo fa-fw"></i></a><a href="#" title="分享到 Myspace" data-sharer="myspace" data-url="http://yanghx.vip/2-%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/" data-title="" data-description=""><i data-svg-src="/lib/simple-icons/icons/myspace.min.svg"></i></a><a href="#" title="分享到 Blogger" data-sharer="blogger" data-url="http://yanghx.vip/2-%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/" data-title="" data-description=""><i class="fab fa-blogger fa-fw"></i></a><a href="#" title="分享到 Evernote" data-sharer="evernote" data-url="http://yanghx.vip/2-%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/" data-title=""><i class="fab fa-evernote fa-fw"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/3-%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E7%B1%BB%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E8%AF%A6%E8%A7%A3/" class="prev" rel="prev" title=""><i class="fas fa-angle-left fa-fw"></i></a>
+            <a href="/1-class%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/" class="next" rel="next" title=""><i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+        </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">
+                    由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+            <div class="footer-line"></div>
+            <div class="footer-line">
+            </div>
+        </div></footer></div>
+
+    <div id="fixed-buttons"><a href="#back-to-top" id="back-to-top-button" class="fixed-button" title="回到顶部">
+            <i class="fas fa-arrow-up fa-fw"></i>
+        </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+            <i class="fas fa-comment fa-fw"></i>
+        </a>
+    </div><div id="cookieconsent-container"></div><div class="assets"><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/katex/copy-tex.min.css">
+        <noscript><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"></noscript><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"distance":100,"findAllMatches":false,"fuseIndexURL":"/index.json","highlightTag":"em","ignoreFieldNorm":false,"ignoreLocation":false,"isCaseSensitive":false,"location":0,"maxResultLength":10,"minMatchCharLength":2,"noResultsFound":"没有找到结果","snippetLength":50,"threshold":0.3,"type":"fuse","useExtendedSearch":false},"sharerjs":true,"table":{"sort":true}};</script><script type="text/javascript" src="/lib/tablesort/tablesort.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js" defer></script><script type="text/javascript" src="/lib/katex/auto-render.min.js" defer></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js" defer></script><script type="text/javascript" src="/lib/katex/mhchem.min.js" defer></script><script type="text/javascript" src="/js/katex.min.js" defer></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script type="text/javascript" src="/js/cookieconsent.min.js" defer></script><script type="text/javascript" src="/js/theme.min.js" defer></script></div>
+</body>
+
+</html>

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noodp" />
+    <title> - yanghx blog</title><meta name="Description" content="yanghx blog"><meta property="og:title" content="" />
+<meta property="og:description" content="补充：使用 OQL 语言查询对象信息MAT 支持一种类似于 SQL 的查询语言 OQL（Object Query Language）。OQL 使用类 SQL 语法，可以在堆中进行对象" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://yanghx.vip/6-%E8%A1%A5%E5%85%85%E4%BD%BF%E7%94%A8-oql-%E8%AF%AD%E8%A8%80%E6%9F%A5%E8%AF%A2%E5%AF%B9%E8%B1%A1%E4%BF%A1%E6%81%AF/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
+
+<meta property="og:site_name" content="yanghx blog" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
+
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="补充：使用 OQL 语言查询对象信息MAT 支持一种类似于 SQL 的查询语言 OQL（Object Query Language）。OQL 使用类 SQL 语法，可以在堆中进行对象"/>
+<meta name="application-name" content="DoIt">
+<meta name="apple-mobile-web-app-title" content="DoIt">
+
+<meta name="theme-color" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" href="http://yanghx.vip/6-%E8%A1%A5%E5%85%85%E4%BD%BF%E7%94%A8-oql-%E8%AF%AD%E8%A8%80%E6%9F%A5%E8%AF%A2%E5%AF%B9%E8%B1%A1%E4%BF%A1%E6%81%AF/" /><link rel="prev" href="http://yanghx.vip/7-%E8%A1%A5%E5%85%85%E6%B5%85%E5%A0%86%E6%B7%B1%E5%A0%86%E4%B8%8E%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2/" /><link rel="next" href="http://yanghx.vip/5-%E5%88%86%E6%9E%90gc%E6%97%A5%E5%BF%97/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/color.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/fontawesome-free/all.min.css">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/animate/animate.min.css">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/yanghx.vip\/6-%E8%A1%A5%E5%85%85%E4%BD%BF%E7%94%A8-oql-%E8%AF%AD%E8%A8%80%E6%9F%A5%E8%AF%A2%E5%AF%B9%E8%B1%A1%E4%BF%A1%E6%81%AF\/"
+        },"genre": "posts","wordcount":  795 ,
+        "url": "http:\/\/yanghx.vip\/6-%E8%A1%A5%E5%85%85%E4%BD%BF%E7%94%A8-oql-%E8%AF%AD%E8%A8%80%E6%9F%A5%E8%AF%A2%E5%AF%B9%E8%B1%A1%E4%BF%A1%E6%81%AF\/","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "yanghx"
+            },"description": ""
+    }
+    </script><script src="//instant.page/5.1.1" defer type="module" integrity="sha384-MWfCL6g1OTGsbSwfuMHc8+8J2u71/LA8dzlIN3ycajckxuZZmF+DNjdm7O6H3PSq"></script>
+</head>
+
+<body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">
+        function setTheme(theme) {document.body.setAttribute('theme', theme); document.documentElement.style.setProperty('color-scheme', theme === 'light' ? 'light' : 'dark');}
+        function saveTheme(theme) {window.localStorage && localStorage.setItem('theme', theme);}
+        function getMeta(metaName) {const metas = document.getElementsByTagName('meta'); for (let i = 0; i < metas.length; i++) if (metas[i].getAttribute('name') === metaName) return metas[i]; return '';}
+        if (window.localStorage && localStorage.getItem('theme')) {let theme = localStorage.getItem('theme');theme === 'light' || theme === 'dark' || theme === 'black' ? setTheme(theme) : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? setTheme('dark') : setTheme('light')); } else { if ('auto' === 'light' || 'auto' === 'dark' || 'auto' === 'black') setTheme('auto'), saveTheme('auto'); else saveTheme('auto'), window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? setTheme('dark') : setTheme('light');}
+        let metaColors = {'light': '#f8f8f8','dark': '#252627','black': '#000000'}
+        getMeta('theme-color').content = metaColors[document.body.getAttribute('theme')];
+    </script>
+    <div id="back-to-top"></div>
+    <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="yanghx blog">yanghx blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="#" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="#" class="menu-item theme-select" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                    <select class="color-theme-select" id="theme-select-desktop" title="切换主题">
+                        <option value="light">浅色</option>
+                        <option value="dark">深色</option>
+                        <option value="black">黑色</option>
+                        <option value="auto">跟随系统</option>
+                    </select>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="yanghx blog">yanghx blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="#" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="#" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="#" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+                <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
+                    <option value="light">浅色</option>
+                    <option value="dark">深色</option>
+                    <option value="black">黑色</option>
+                    <option value="auto">跟随系统</option>
+                </select>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="post-meta-line">
+                <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
+                </span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 795 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 2 分钟&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  kept="true">
+                <div class="details-summary toc-title">
+                    <span>目录</span>
+                    <span><i class="details-icon fas fa-angle-right"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#补充使用-oql-语言查询对象信息">补充：使用 OQL 语言查询对象信息</a>
+          <ul>
+            <li><a href="#1-select-子句">1. SELECT 子句</a></li>
+            <li><a href="#2-from-子句">2. FROM 子句</a></li>
+            <li><a href="#3-where-子句">3. WHERE 子句</a></li>
+            <li><a href="#4-内置对象与方法">4. 内置对象与方法</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h3 id="补充使用-oql-语言查询对象信息" class="headerLink">
+    <a href="#%e8%a1%a5%e5%85%85%e4%bd%bf%e7%94%a8-oql-%e8%af%ad%e8%a8%80%e6%9f%a5%e8%af%a2%e5%af%b9%e8%b1%a1%e4%bf%a1%e6%81%af" class="header-mark"></a>补充：使用 OQL 语言查询对象信息</h3><p>MAT 支持一种类似于 SQL 的查询语言 OQL（Object Query Language）。OQL 使用类 SQL 语法，可以在堆中进行对象的查找和筛选。</p>
+<h4 id="1-select-子句" class="headerLink">
+    <a href="#1-select-%e5%ad%90%e5%8f%a5" class="header-mark"></a>1. SELECT 子句</h4><p>在 MAT 中，Select 子句的格式与 SQL 基本一致，用于指定要显示的列。Select 子句中可以使用“＊”，查看结果对象的引用实例（相当于 outgoing references）。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">SELECT * FROM java.util.Vector v
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>使用“OBJECTS”关键字，可以将返回结果集中的项以对象的形式显示。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mysql" data-lang="mysql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="n">objects</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">elementData</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">Vector</span><span class="w"> </span><span class="n">v</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">SELECT</span><span class="w"> </span><span class="n">OBJECTS</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">value</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>在 Select 子句中，使用“AS RETAINED SET”关键字可以得到所得对象的保留集。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mysql" data-lang="mysql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">RETAINED</span><span class="w"> </span><span class="kt">SET</span><span class="w"> </span><span class="o">*</span><span class="k">FROM</span><span class="w"> </span><span class="n">com</span><span class="p">.</span><span class="n">atguigu</span><span class="p">.</span><span class="n">mat</span><span class="p">.</span><span class="n">Student</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>“DISTINCT”关键字用于在结果集中去除重复对象。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mysql" data-lang="mysql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="k">DISTINCT</span><span class="w"> </span><span class="n">OBJECTS</span><span class="w"> </span><span class="nf">classof</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="2-from-子句" class="headerLink">
+    <a href="#2-from-%e5%ad%90%e5%8f%a5" class="header-mark"></a>2. FROM 子句</h4><p>From 子句用于指定查询范围，它可以指定类名、正则表达式或者对象地址。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mysql" data-lang="mysql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>使用正则表达式，限定搜索范围，输出所有 com.atguigu 包下所有类的实例</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mysql" data-lang="mysql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="s2">&#34;com\.atguigu\..*&#34;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>使用类的地址进行搜索。使用类的地址的好处是可以区分被不同 ClassLoader 加载的同一种类型。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mysql" data-lang="mysql"><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="mi">0</span><span class="n">x37a0b4d</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="3-where-子句" class="headerLink">
+    <a href="#3-where-%e5%ad%90%e5%8f%a5" class="header-mark"></a>3. WHERE 子句</h4><p>Where 子句用于指定 OQL 的查询条件。OQL 查询将只返回满足 Where 子句指定条件的对象。Where 子句的格式与传统 SQL 极为相似。</p>
+<p>返回长度大于 10 的 char 数组。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mysql" data-lang="mysql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="k">FROM</span><span class="w"> </span><span class="n">Ichar</span><span class="p">[]</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="o">@</span><span class="n">length</span><span class="o">&gt;</span><span class="mi">10</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>返回包含“java”子字符串的所有字符串，使用“LIKE”操作符，“LIKE”操作符的操作参数为正则表达式。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mysql" data-lang="mysql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="nf">toString</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s2">&#34;.*java.*&#34;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>返回所有 value 域不为 null 的字符串，使用“＝”操作符。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mysql" data-lang="mysql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">value</span><span class="o">!=</span><span class="no">null</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>返回数组长度大于 15，并且深堆大于 1000 字节的所有 Vector 对象。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mysql" data-lang="mysql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">Vector</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">elementData</span><span class="p">.</span><span class="o">@</span><span class="n">length</span><span class="o">&gt;</span><span class="mi">15</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="o">@</span><span class="n">retainedHeapSize</span><span class="o">&gt;</span><span class="mi">1000</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="4-内置对象与方法" class="headerLink">
+    <a href="#4-%e5%86%85%e7%bd%ae%e5%af%b9%e8%b1%a1%e4%b8%8e%e6%96%b9%e6%b3%95" class="header-mark"></a>4. 内置对象与方法</h4><p>OQL 中可以访问堆内对象的属性，也可以访问堆内代理对象的属性。访问堆内对象的属性时，格式如下，其中 alias 为对象名称：</p>
+<p>[ <alias>. ] <field> . <field>. <field></p>
+<p>访问 java.io.File 对象的 path 属性，并进一步访问 path 的 value 属性：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mysql" data-lang="mysql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="nf">toString</span><span class="p">(</span><span class="n">f</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">File</span><span class="w"> </span><span class="n">f</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>显示 String 对象的内容、objectid 和 objectAddress。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mysql" data-lang="mysql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="nf">toString</span><span class="p">(),</span><span class="n">s</span><span class="p">.</span><span class="o">@</span><span class="n">objectId</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="o">@</span><span class="n">objectAddress</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">lang</span><span class="p">.</span><span class="n">String</span><span class="w"> </span><span class="n">s</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>显示 java.util.Vector 内部数组的长度。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mysql" data-lang="mysql"><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">elementData</span><span class="p">.</span><span class="o">@</span><span class="n">length</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">Vector</span><span class="w"> </span><span class="n">v</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>显示所有的 java.util.Vector 对象及其子类型</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-mysql" data-lang="mysql"><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">INSTANCEOF</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">Vector</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div></div>
+
+        
+
+<div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 0001-01-01</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span><a class="link-to-mardown" href=/6-%E8%A1%A5%E5%85%85%E4%BD%BF%E7%94%A8-oql-%E8%AF%AD%E8%A8%80%E6%9F%A5%E8%AF%A2%E5%AF%B9%E8%B1%A1%E4%BF%A1%E6%81%AF/index.md target="_blank" rel="noopener noreferrer">阅读原始文档</a>
+                    </span></div>
+            <div class="post-info-share">
+                <span><a href="#" title="分享到 Twitter" data-sharer="twitter" data-url="http://yanghx.vip/6-%E8%A1%A5%E5%85%85%E4%BD%BF%E7%94%A8-oql-%E8%AF%AD%E8%A8%80%E6%9F%A5%E8%AF%A2%E5%AF%B9%E8%B1%A1%E4%BF%A1%E6%81%AF/" data-title="" data-via="xxxx"><i class="fab fa-twitter fa-fw"></i></a><a href="#" title="分享到 Facebook" data-sharer="facebook" data-url="http://yanghx.vip/6-%E8%A1%A5%E5%85%85%E4%BD%BF%E7%94%A8-oql-%E8%AF%AD%E8%A8%80%E6%9F%A5%E8%AF%A2%E5%AF%B9%E8%B1%A1%E4%BF%A1%E6%81%AF/"><i class="fab fa-facebook-square fa-fw"></i></a><a href="#" title="分享到 WhatsApp" data-sharer="whatsapp" data-url="http://yanghx.vip/6-%E8%A1%A5%E5%85%85%E4%BD%BF%E7%94%A8-oql-%E8%AF%AD%E8%A8%80%E6%9F%A5%E8%AF%A2%E5%AF%B9%E8%B1%A1%E4%BF%A1%E6%81%AF/" data-title="" data-web><i class="fab fa-whatsapp fa-fw"></i></a><a href="#" title="分享到 Line" data-sharer="line" data-url="http://yanghx.vip/6-%E8%A1%A5%E5%85%85%E4%BD%BF%E7%94%A8-oql-%E8%AF%AD%E8%A8%80%E6%9F%A5%E8%AF%A2%E5%AF%B9%E8%B1%A1%E4%BF%A1%E6%81%AF/" data-title=""><i data-svg-src="/lib/simple-icons/icons/line.min.svg"></i></a><a href="#" title="分享到 微博" data-sharer="weibo" data-url="http://yanghx.vip/6-%E8%A1%A5%E5%85%85%E4%BD%BF%E7%94%A8-oql-%E8%AF%AD%E8%A8%80%E6%9F%A5%E8%AF%A2%E5%AF%B9%E8%B1%A1%E4%BF%A1%E6%81%AF/" data-title=""><i class="fab fa-weibo fa-fw"></i></a><a href="#" title="分享到 Myspace" data-sharer="myspace" data-url="http://yanghx.vip/6-%E8%A1%A5%E5%85%85%E4%BD%BF%E7%94%A8-oql-%E8%AF%AD%E8%A8%80%E6%9F%A5%E8%AF%A2%E5%AF%B9%E8%B1%A1%E4%BF%A1%E6%81%AF/" data-title="" data-description=""><i data-svg-src="/lib/simple-icons/icons/myspace.min.svg"></i></a><a href="#" title="分享到 Blogger" data-sharer="blogger" data-url="http://yanghx.vip/6-%E8%A1%A5%E5%85%85%E4%BD%BF%E7%94%A8-oql-%E8%AF%AD%E8%A8%80%E6%9F%A5%E8%AF%A2%E5%AF%B9%E8%B1%A1%E4%BF%A1%E6%81%AF/" data-title="" data-description=""><i class="fab fa-blogger fa-fw"></i></a><a href="#" title="分享到 Evernote" data-sharer="evernote" data-url="http://yanghx.vip/6-%E8%A1%A5%E5%85%85%E4%BD%BF%E7%94%A8-oql-%E8%AF%AD%E8%A8%80%E6%9F%A5%E8%AF%A2%E5%AF%B9%E8%B1%A1%E4%BF%A1%E6%81%AF/" data-title=""><i class="fab fa-evernote fa-fw"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/7-%E8%A1%A5%E5%85%85%E6%B5%85%E5%A0%86%E6%B7%B1%E5%A0%86%E4%B8%8E%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2/" class="prev" rel="prev" title=""><i class="fas fa-angle-left fa-fw"></i></a>
+            <a href="/5-%E5%88%86%E6%9E%90gc%E6%97%A5%E5%BF%97/" class="next" rel="next" title=""><i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+        </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">
+                    由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+            <div class="footer-line"></div>
+            <div class="footer-line">
+            </div>
+        </div></footer></div>
+
+    <div id="fixed-buttons"><a href="#back-to-top" id="back-to-top-button" class="fixed-button" title="回到顶部">
+            <i class="fas fa-arrow-up fa-fw"></i>
+        </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+            <i class="fas fa-comment fa-fw"></i>
+        </a>
+    </div><div id="cookieconsent-container"></div><div class="assets"><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/katex/copy-tex.min.css">
+        <noscript><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"></noscript><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"distance":100,"findAllMatches":false,"fuseIndexURL":"/index.json","highlightTag":"em","ignoreFieldNorm":false,"ignoreLocation":false,"isCaseSensitive":false,"location":0,"maxResultLength":10,"minMatchCharLength":2,"noResultsFound":"没有找到结果","snippetLength":50,"threshold":0.3,"type":"fuse","useExtendedSearch":false},"sharerjs":true,"table":{"sort":true}};</script><script type="text/javascript" src="/lib/tablesort/tablesort.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js" defer></script><script type="text/javascript" src="/lib/katex/auto-render.min.js" defer></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js" defer></script><script type="text/javascript" src="/lib/katex/mhchem.min.js" defer></script><script type="text/javascript" src="/js/katex.min.js" defer></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script type="text/javascript" src="/js/cookieconsent.min.js" defer></script><script type="text/javascript" src="/js/theme.min.js" defer></script></div>
+</body>
+
+</html>

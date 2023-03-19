@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noodp" />
+    <title> - yanghx blog</title><meta name="Description" content="yanghx blog"><meta property="og:title" content="" />
+<meta property="og:description" content="类的加载过程（类的生命周期）详解 一、概述在Java中数据类型分为基本数据类型和引用数据类型。基本数据类型由虚拟机预先定义，引用数据类型则需要" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://yanghx.vip/3-%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E7%B1%BB%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E8%AF%A6%E8%A7%A3/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
+
+<meta property="og:site_name" content="yanghx blog" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
+
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="类的加载过程（类的生命周期）详解 一、概述在Java中数据类型分为基本数据类型和引用数据类型。基本数据类型由虚拟机预先定义，引用数据类型则需要"/>
+<meta name="application-name" content="DoIt">
+<meta name="apple-mobile-web-app-title" content="DoIt">
+
+<meta name="theme-color" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" href="http://yanghx.vip/3-%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E7%B1%BB%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E8%AF%A6%E8%A7%A3/" /><link rel="prev" href="http://yanghx.vip/4-%E5%86%8D%E8%B0%88%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E5%99%A8/" /><link rel="next" href="http://yanghx.vip/2-%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/color.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/fontawesome-free/all.min.css">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/animate/animate.min.css">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/yanghx.vip\/3-%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E7%B1%BB%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E8%AF%A6%E8%A7%A3\/"
+        },"genre": "posts","wordcount":  8185 ,
+        "url": "http:\/\/yanghx.vip\/3-%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E7%B1%BB%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E8%AF%A6%E8%A7%A3\/","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "yanghx"
+            },"description": ""
+    }
+    </script><script src="//instant.page/5.1.1" defer type="module" integrity="sha384-MWfCL6g1OTGsbSwfuMHc8+8J2u71/LA8dzlIN3ycajckxuZZmF+DNjdm7O6H3PSq"></script>
+</head>
+
+<body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">
+        function setTheme(theme) {document.body.setAttribute('theme', theme); document.documentElement.style.setProperty('color-scheme', theme === 'light' ? 'light' : 'dark');}
+        function saveTheme(theme) {window.localStorage && localStorage.setItem('theme', theme);}
+        function getMeta(metaName) {const metas = document.getElementsByTagName('meta'); for (let i = 0; i < metas.length; i++) if (metas[i].getAttribute('name') === metaName) return metas[i]; return '';}
+        if (window.localStorage && localStorage.getItem('theme')) {let theme = localStorage.getItem('theme');theme === 'light' || theme === 'dark' || theme === 'black' ? setTheme(theme) : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? setTheme('dark') : setTheme('light')); } else { if ('auto' === 'light' || 'auto' === 'dark' || 'auto' === 'black') setTheme('auto'), saveTheme('auto'); else saveTheme('auto'), window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? setTheme('dark') : setTheme('light');}
+        let metaColors = {'light': '#f8f8f8','dark': '#252627','black': '#000000'}
+        getMeta('theme-color').content = metaColors[document.body.getAttribute('theme')];
+    </script>
+    <div id="back-to-top"></div>
+    <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="yanghx blog">yanghx blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="#" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="#" class="menu-item theme-select" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                    <select class="color-theme-select" id="theme-select-desktop" title="切换主题">
+                        <option value="light">浅色</option>
+                        <option value="dark">深色</option>
+                        <option value="black">黑色</option>
+                        <option value="auto">跟随系统</option>
+                    </select>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="yanghx blog">yanghx blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="#" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="#" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="#" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+                <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
+                    <option value="light">浅色</option>
+                    <option value="dark">深色</option>
+                    <option value="black">黑色</option>
+                    <option value="auto">跟随系统</option>
+                </select>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="post-meta-line">
+                <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
+                </span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 8185 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 17 分钟&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  kept="true">
+                <div class="details-summary toc-title">
+                    <span>目录</span>
+                    <span><i class="details-icon fas fa-angle-right"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#类的加载过程类的生命周期详解">类的加载过程（类的生命周期）详解</a>
+      <ul>
+        <li><a href="#一概述">一、概述</a>
+          <ul>
+            <li><a href="#11-大厂面试题">1.1 大厂面试题</a></li>
+          </ul>
+        </li>
+        <li><a href="#二过程一loading加载阶段">二、过程一：Loading（加载）阶段</a>
+          <ul>
+            <li><a href="#21-加载完成的操作">2.1 加载完成的操作</a>
+              <ul>
+                <li><a href="#211-加载的理解">2.1.1 <strong>加载的理解</strong></a></li>
+                <li><a href="#212-加载完成的操作">2.1.2 <strong>加载完成的操作</strong></a></li>
+              </ul>
+            </li>
+            <li><a href="#22-二进制流的获取方式">2.2 二进制流的获取方式</a></li>
+            <li><a href="#23-类模型与class实例的位置">2.3 类模型与Class实例的位置</a>
+              <ul>
+                <li><a href="#231-类模型的位置">2.3.1 类模型的位置</a></li>
+                <li><a href="#232-实例的位置">2.3.2 实例的位置</a></li>
+              </ul>
+            </li>
+            <li><a href="#24-数组类的加载">2.4 数组类的加载</a></li>
+          </ul>
+        </li>
+        <li><a href="#三-过程二linking链接阶段">三、 过程二：Linking（链接）阶段</a>
+          <ul>
+            <li><a href="#31-环节-1链接阶段之-verification验证">3.1 环节 1：链接阶段之 Verification（验证）</a>
+              <ul>
+                <li><a href="#311-整体说明">3.1.1 整体说明</a></li>
+                <li><a href="#312-具体说明">3.1.2 具体说明</a></li>
+              </ul>
+            </li>
+            <li><a href="#32-环节-2链接阶段之-preparation准备">3.2 环节 2：链接阶段之 Preparation（准备）</a></li>
+            <li><a href="#33-环节-3链接阶段之-resolution解析">3.3 环节 3：链接阶段之 Resolution（解析）</a>
+              <ul>
+                <li><a href="#331-具体描述">3.3.1 <strong>具体描述</strong>：</a></li>
+                <li><a href="#332-举例">3.3.2 <strong>举例</strong>：</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#四过程三initialization初始化阶段">四、过程三：Initialization（初始化）阶段</a>
+          <ul>
+            <li><a href="#41-static-与-final-的搭配问题">4.1. static 与 final 的搭配问题</a></li>
+            <li><a href="#42-clinit的线程安全性">4.2 <clinit>()的线程安全性</a></li>
+            <li><a href="#43-类的初始化情况主动使用-vs-被动使用">4.3 类的初始化情况：主动使用 vs 被动使用</a>
+              <ul>
+                <li><a href="#431-主动使用">4.3.1 <strong>主动使用</strong></a></li>
+                <li><a href="#432-被动使用">4.3.2 <strong>被动使用</strong></a></li>
+              </ul>
+            </li>
+            <li><a href="#44-扩展">4.4 <strong>扩展</strong></a></li>
+          </ul>
+        </li>
+        <li><a href="#五过程四类的-using使用">五、过程四：类的 Using（使用）</a></li>
+        <li><a href="#六过程五类的-unloading卸载">六、过程五：类的 Unloading（卸载）</a>
+          <ul>
+            <li><a href="#61-类类的加载器类的实例之间的引用关系">6.1 类、类的加载器、类的实例之间的引用关系</a></li>
+            <li><a href="#62-类的生命周期">6.2 类的生命周期</a></li>
+            <li><a href="#63-具体例子">6.3 具体例子</a></li>
+            <li><a href="#64-类的卸载">6.4 类的卸载</a></li>
+            <li><a href="#65-回顾方法区的垃圾回收">6.5 回顾：方法区的垃圾回收</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="类的加载过程类的生命周期详解" class="headerLink">
+    <a href="#%e7%b1%bb%e7%9a%84%e5%8a%a0%e8%bd%bd%e8%bf%87%e7%a8%8b%e7%b1%bb%e7%9a%84%e7%94%9f%e5%91%bd%e5%91%a8%e6%9c%9f%e8%af%a6%e8%a7%a3" class="header-mark"></a>类的加载过程（类的生命周期）详解</h2><h3 id="一概述" class="headerLink">
+    <a href="#%e4%b8%80%e6%a6%82%e8%bf%b0" class="header-mark"></a>一、概述</h3><p>在Java中数据类型分为基本数据类型和引用数据类型。基本数据类型由虚拟机预先定义，引用数据类型则需要进行类的加载。</p>
+<p>按照Java虚拟机规范，从class文件到加载内存中的类，到类卸载出内存为止，它的整个生命周期包括如下7个阶段：</p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/b73db20eea59665fa3de67e1dec6d4e5.png" title="image-20210430215050746" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/b73db20eea59665fa3de67e1dec6d4e5.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/b73db20eea59665fa3de67e1dec6d4e5.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/b73db20eea59665fa3de67e1dec6d4e5.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/b73db20eea59665fa3de67e1dec6d4e5.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/b73db20eea59665fa3de67e1dec6d4e5.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/b73db20eea59665fa3de67e1dec6d4e5.png">
+    </a></p>
+<p>其中，验证、准备、解析 3 个部分统称为链接（Linking）</p>
+<p>从程序中类的使用过程看</p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/c6e5a63339bb2574b9b52a9ed14ee9c5.png" title="image-20210430215236716" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/c6e5a63339bb2574b9b52a9ed14ee9c5.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/c6e5a63339bb2574b9b52a9ed14ee9c5.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/c6e5a63339bb2574b9b52a9ed14ee9c5.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/c6e5a63339bb2574b9b52a9ed14ee9c5.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/c6e5a63339bb2574b9b52a9ed14ee9c5.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/c6e5a63339bb2574b9b52a9ed14ee9c5.png">
+    </a></p>
+<h4 id="11-大厂面试题" class="headerLink">
+    <a href="#11-%e5%a4%a7%e5%8e%82%e9%9d%a2%e8%af%95%e9%a2%98" class="header-mark"></a>1.1 大厂面试题</h4><blockquote>
+<p>蚂蚁金服：</p>
+<p>描述一下 JVM 加载 Class 文件的原理机制？</p>
+<p>一面：类加载过程</p>
+<p>百度：</p>
+<p>类加载的时机</p>
+<p>java 类加载过程？</p>
+<p>简述 java 类加载机制？</p>
+<p>腾讯：</p>
+<p>JVM 中类加载机制，类加载过程？</p>
+<p>滴滴：</p>
+<p>JVM 类加载机制</p>
+<p>美团：</p>
+<p>Java 类加载过程</p>
+<p>描述一下 jvm 加载 class 文件的原理机制</p>
+<p>京东：</p>
+<p>什么是类的加载？</p>
+<p>哪些情况会触发类的加载？</p>
+<p>讲一下 JVM 加载一个类的过程 JVM 的类加载机制是什么？</p>
+</blockquote>
+<h3 id="二过程一loading加载阶段" class="headerLink">
+    <a href="#%e4%ba%8c%e8%bf%87%e7%a8%8b%e4%b8%80loading%e5%8a%a0%e8%bd%bd%e9%98%b6%e6%ae%b5" class="header-mark"></a>二、过程一：Loading（加载）阶段</h3><h4 id="21-加载完成的操作" class="headerLink">
+    <a href="#21-%e5%8a%a0%e8%bd%bd%e5%ae%8c%e6%88%90%e7%9a%84%e6%93%8d%e4%bd%9c" class="header-mark"></a>2.1 加载完成的操作</h4><h5 id="211-加载的理解" class="headerLink">
+    <a href="#211-%e5%8a%a0%e8%bd%bd%e7%9a%84%e7%90%86%e8%a7%a3" class="header-mark"></a>2.1.1 <strong>加载的理解</strong></h5><p>所谓加载，简而言之就是将Java类的字节码文件加载到机器内存中，并在内存中构建出Java类的原型&mdash;-类模板对象。所谓模板对象，其实就是Java类在JVM内存中的一个快照，JVM将从字节码文件中解析出的常量池、类字段、类方法等信息存储到类模板中，这样JVM在运行期便能通过类末班而获取Java类中的任意信息，能够堆Java类的成员变量进行遍历，也能进行Java方法的调用。</p>
+<p>反射的机制即基于这一基础。如果JVM没有将Java类的声明信息存储起来，则JVM在运行期也无法反射。</p>
+<h5 id="212-加载完成的操作" class="headerLink">
+    <a href="#212-%e5%8a%a0%e8%bd%bd%e5%ae%8c%e6%88%90%e7%9a%84%e6%93%8d%e4%bd%9c" class="header-mark"></a>2.1.2 <strong>加载完成的操作</strong></h5><p>加载阶段，简而言之，查找并加载类的二进制数据，生成Class的实例。</p>
+<p>在加载类时，Java虚拟机必须完成以下3件事情：</p>
+<ul>
+<li>通过类的全名， 获取类的二进制数据流。</li>
+<li>解析类的二进制数据流为方法区内的数据结构（Java类模型）</li>
+<li>创建java.lang.Class类的实例，表示该类型。作为方法区这个类的各种数据的访问入口。</li>
+</ul>
+<h4 id="22-二进制流的获取方式" class="headerLink">
+    <a href="#22-%e4%ba%8c%e8%bf%9b%e5%88%b6%e6%b5%81%e7%9a%84%e8%8e%b7%e5%8f%96%e6%96%b9%e5%bc%8f" class="header-mark"></a>2.2 二进制流的获取方式</h4><p>对于类的二进制数据流，虚拟机可以通过多种途径产生或获得。（只要所读取的字节码符合JVM规范即可）</p>
+<ul>
+<li>虚拟机可能通过文件系统读入一个class后缀的文件（最常见）</li>
+<li>读入jar、zip等归档数据包，提取类文件。</li>
+<li>实现存放在数据库中的类的二进制数据。</li>
+<li>使用类似于HTTP之类的协议通过网络进行加载。</li>
+<li>在运行时生成一段class的二进制信息等。</li>
+<li>在获取到类的二进制信息后，Java虚拟机就会处理这些数据，应最终转为一个java.lang.Class的实例。</li>
+</ul>
+<p>如果输入数据不是ClassFile的结构，则会抛出ClassFormatError</p>
+<h4 id="23-类模型与class实例的位置" class="headerLink">
+    <a href="#23-%e7%b1%bb%e6%a8%a1%e5%9e%8b%e4%b8%8eclass%e5%ae%9e%e4%be%8b%e7%9a%84%e4%bd%8d%e7%bd%ae" class="header-mark"></a>2.3 类模型与Class实例的位置</h4><h5 id="231-类模型的位置" class="headerLink">
+    <a href="#231-%e7%b1%bb%e6%a8%a1%e5%9e%8b%e7%9a%84%e4%bd%8d%e7%bd%ae" class="header-mark"></a>2.3.1 类模型的位置</h5><p>加载的类在JVM中创建相应的类结构，类结构会存储在方法区（JDK1.8之前：永久代；JDK1.8之后：元空间）。</p>
+<h5 id="232-实例的位置" class="headerLink">
+    <a href="#232-%e5%ae%9e%e4%be%8b%e7%9a%84%e4%bd%8d%e7%bd%ae" class="header-mark"></a>2.3.2 实例的位置</h5><p>类将.class文件加载至元空间之后，会在堆中创建一个Java.lang.Class对象，用来封装类位于方法区内的数据结构，该Class对象是在加载类的过程中创建的，每个类都对应有一个Class类型的对象。</p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/10969de50477655b954b23bfe550fb1d.png" title="image-20210430221037898" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/10969de50477655b954b23bfe550fb1d.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/10969de50477655b954b23bfe550fb1d.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/10969de50477655b954b23bfe550fb1d.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/10969de50477655b954b23bfe550fb1d.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/10969de50477655b954b23bfe550fb1d.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/10969de50477655b954b23bfe550fb1d.png">
+    </a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">Class</span> <span class="n">clazz</span> <span class="o">=</span> <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="s">&#34;java.lang.String&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//获取当前运行时类声明的所有方法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">Method</span><span class="o">[]</span> <span class="n">ms</span> <span class="o">=</span> <span class="n">clazz</span><span class="o">.</span><span class="na">getDecla</span><span class="err">#</span><span class="n">FF0000Methods</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="o">(</span><span class="n">Method</span> <span class="n">m</span> <span class="o">:</span> <span class="n">ms</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//获取方法的修饰符
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">String</span> <span class="n">mod</span> <span class="o">=</span> <span class="n">Modifier</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">m</span><span class="o">.</span><span class="na">getModifiers</span><span class="o">());</span>
+</span></span><span class="line"><span class="cl">    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="n">mod</span> <span class="o">+</span> <span class="s">&#34;&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//获取方法的返回值类型
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">String</span> <span class="n">returnType</span> <span class="o">=</span> <span class="o">(</span><span class="n">m</span><span class="o">.</span><span class="na">getReturnType</span><span class="o">()).</span><span class="na">getSimpleName</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="n">returnType</span> <span class="o">+</span> <span class="s">&#34;&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//获取方法名
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="n">m</span><span class="o">.</span><span class="na">getName</span><span class="o">()</span> <span class="o">+</span> <span class="s">&#34;(&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//获取方法的参数列表
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">Class</span><span class="o">&lt;?&gt;[]</span> <span class="n">ps</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="na">getParameterTypes</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="o">(</span><span class="n">ps</span><span class="o">.</span><span class="na">length</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="sc">&#39;)&#39;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">ps</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">char</span> <span class="n">end</span> <span class="o">=</span> <span class="o">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">ps</span><span class="o">.</span><span class="na">length</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span> <span class="o">?</span> <span class="sc">&#39;)&#39;</span> <span class="o">:</span> <span class="sc">&#39;,&#39;</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">//获取参教的类型
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="n">ps</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">getSimpleName</span><span class="o">()</span> <span class="o">+</span> <span class="n">end</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="24-数组类的加载" class="headerLink">
+    <a href="#24-%e6%95%b0%e7%bb%84%e7%b1%bb%e7%9a%84%e5%8a%a0%e8%bd%bd" class="header-mark"></a>2.4 数组类的加载</h4><p>创建数组类的情况下稍微有些特殊，因为数组类本身并不是由类加载器负责创建，而是由JVM在运行时根据需要而直接创建的，但数组的元素类型仍然需要依靠类加载器去创建。创建数组类（下述简称A）的过程：</p>
+<ul>
+<li>如果数组的元素类型是引用类型，那么久尊徐定义的加载过程递归加载过程和创建数组A的元素类型；</li>
+<li>JVM使用指定的元素类型和数组维度来创建新的数组类。</li>
+</ul>
+<p>如果数组的元素类型是引用类型，数组类的可访问性就由元素类型的可访问性决定。否则数据类型的可访问性被缺省定义为public。</p>
+<h3 id="三-过程二linking链接阶段" class="headerLink">
+    <a href="#%e4%b8%89-%e8%bf%87%e7%a8%8b%e4%ba%8clinking%e9%93%be%e6%8e%a5%e9%98%b6%e6%ae%b5" class="header-mark"></a>三、 过程二：Linking（链接）阶段</h3><h4 id="31-环节-1链接阶段之-verification验证" class="headerLink">
+    <a href="#31-%e7%8e%af%e8%8a%82-1%e9%93%be%e6%8e%a5%e9%98%b6%e6%ae%b5%e4%b9%8b-verification%e9%aa%8c%e8%af%81" class="header-mark"></a>3.1 环节 1：链接阶段之 Verification（验证）</h4><p>当类加载到系统后，就开始链接操作，验证是链接操作的第一步。</p>
+<p>它的目的是保证加载的字节码是合法、合理并符合规范的。它的目的是保证加载的字节码是合法、合理并符合规范的。</p>
+<p>验证的步骤比较复杂，实际要验证的项目也很繁多，大体上 Java 虚拟机需要做以下检查，如图所示。</p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/2309ce7d4bdbffb86ae462e967af5dc9.png" title="image-20210430221736546" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/2309ce7d4bdbffb86ae462e967af5dc9.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/2309ce7d4bdbffb86ae462e967af5dc9.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/2309ce7d4bdbffb86ae462e967af5dc9.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/2309ce7d4bdbffb86ae462e967af5dc9.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/2309ce7d4bdbffb86ae462e967af5dc9.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/2309ce7d4bdbffb86ae462e967af5dc9.png">
+    </a></p>
+<h5 id="311-整体说明" class="headerLink">
+    <a href="#311-%e6%95%b4%e4%bd%93%e8%af%b4%e6%98%8e" class="header-mark"></a>3.1.1 整体说明</h5><p>验证的内容则涵盖了数据信息的格式验证，语义检查，字节码验证，以及符号引用验证等。</p>
+<ul>
+<li>其中格式验证会和加载阶段一起执行。验证童工之后，类加载器才会成功将类的二进制数据信息加载到方法区中。</li>
+<li>格式验证室外的验证操作将会在方法区中进行。</li>
+</ul>
+<p>连接阶段的验证虽然拖慢了加载速度，但是它避免了在字节码运行时还需要进行各种检查。（磨刀不误砍柴工）</p>
+<h5 id="312-具体说明" class="headerLink">
+    <a href="#312-%e5%85%b7%e4%bd%93%e8%af%b4%e6%98%8e" class="header-mark"></a>3.1.2 具体说明</h5><ol>
+<li>
+<p>格式验证：是否以魔术 0XCAFEBABE 开头，主版本和副版本号是否在当前 Java 虚拟机的支持范围内，数据中每一个项是否都拥有正确的长度等。</p>
+</li>
+<li>
+<p>语义检查：Java 虚拟机会进行字节码的语义检查，但凡在语义上不符合规范的，虚拟机也不会给予验证通过。比如：</p>
+</li>
+</ol>
+<ul>
+<li>是否所有的类都有父类的存在（在 Java 里，除了 object 外，其他类都应该有父类）</li>
+<li>是否一些被定义为 final 的方法或者类被重写或继承了</li>
+<li>非抽象类是否实现了所有抽象方法或者接口方法</li>
+</ul>
+<ol start="3">
+<li>字节码验证：Java 虚拟机还会进行字节码验证，字节码验证也是验证过程中最为复杂的一个过程字节码验证也是验证过程中最为复杂的一个过程。它试图通过对字节码流的分析，判断字节码是否可以被正确地执行。比如：</li>
+</ol>
+<ul>
+<li>在字节码的执行过程中，是否会跳转到一条不存在的指令</li>
+<li>函数的调用是否传递了正确类型的参数</li>
+<li>变量的赋值是不是给了正确的数据类型等</li>
+</ul>
+<p>**栈映射帧（StackMapTable）**就是在这个阶段，用于检测在特定的字节码处，其局部变量表和操作数栈是否有着正确的数据类型。但遗憾的是，100%准确地判断一段字节码是否可以被安全执行是无法实现的，因此，该过程只是尽可能地检查出可以预知的明显的问题。如果在这个阶段无法通过检查，虚拟机也不会正确装载这个类。但是，如果通过了这个阶段的检查，也不能说明这个类是完全没有问题的。</p>
+<p>在前面3次检查中，已经排除了文件格式错误、语义错误以及字节码的不正确性。但是依然不能确保类是没有问题的。在前面3次检查中，已经排除了文件格式错误、语义错误以及字节码的不正确性。但是依然不能确保类是没有问题的。</p>
+<ol start="4">
+<li>符号引用的验证：校验器还将进符号引用的验证。Class 文件在其常量池会通过字符串记录自己将要使用的其他类或者方法。因此，在验证阶段，虚拟机就会检查这些类或者方法确实是存在的虚拟机就会检查这些类或者方法确实是存在的，并且当前类有权限访问这些数据，如果一个需要使用类无法在系统中找到，则会抛出 NoClassDefFoundError，如果一个方法无法被找到，则会抛出 NoSuchMethodError。此阶段在解析环节才会执行。</li>
+</ol>
+<h4 id="32-环节-2链接阶段之-preparation准备" class="headerLink">
+    <a href="#32-%e7%8e%af%e8%8a%82-2%e9%93%be%e6%8e%a5%e9%98%b6%e6%ae%b5%e4%b9%8b-preparation%e5%87%86%e5%a4%87" class="header-mark"></a>3.2 环节 2：链接阶段之 Preparation（准备）</h4><p>准备阶段（Preparation），简言之，为类的静态变分配内存，并将其初始化为默认值。准备阶段（Preparation），简言之，为类的静态变分配内存，并将其初始化为默认值。</p>
+<p>当一个类验证通过时，虚拟机就会进入准备阶段。在这个阶段，虚拟机就会为这个类分配相应的内存空间，并设置默认初始值。Java 虚拟机为各类型变量默认的初始值如表所示。</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>默认初始值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>byte</td>
+<td>(byte)0</td>
+</tr>
+<tr>
+<td>short</td>
+<td>(short)0</td>
+</tr>
+<tr>
+<td>int</td>
+<td>0</td>
+</tr>
+<tr>
+<td>long</td>
+<td>0L</td>
+</tr>
+<tr>
+<td>float</td>
+<td>0.0f</td>
+</tr>
+<tr>
+<td>double</td>
+<td>0.0</td>
+</tr>
+<tr>
+<td>char</td>
+<td>\u0000</td>
+</tr>
+<tr>
+<td>boolean</td>
+<td>false</td>
+</tr>
+<tr>
+<td>reference</td>
+<td>null</td>
+</tr>
+</tbody>
+</table>
+<p>Java 并不支持 boolean 类型，对于 boolean 类型，内部实现是 int，由于 int 的默认值是 0，故对应的，boolean 的默认值就是 false。</p>
+<p><strong>注意</strong></p>
+<ul>
+<li>
+<p>这里不包含基本数据类型的字段用staticfinal修饰的情况，因为final在编译的时候就会分配了，准备阶段会显式赋值。这里不包含基本数据类型的字段用staticfinal修饰的情况，因为final在编译的时候就会分配了，准备阶段会显式赋值。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">// 一般情况：static final修饰的基本数据类型、字符串类型字面量会在准备阶段赋值
+</span></span><span class="line"><span class="cl">private static final String str = &#34;Hello world&#34;;
+</span></span><span class="line"><span class="cl">// 特殊情况：static final修饰的引用类型不会在准备阶段赋值，而是在初始化阶段赋值
+</span></span><span class="line"><span class="cl">private static final String str = new String(&#34;Hello world&#34;);
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>注意这里不会为实例变量分配初始化，类变量会分配在方法区中，而实例变量是会随着对象一起分配到 Java 堆中。</p>
+</li>
+<li>
+<p>在这个阶段并不会像初始化阶段中那样会有初始化或者代码被执行。</p>
+</li>
+</ul>
+<h4 id="33-环节-3链接阶段之-resolution解析" class="headerLink">
+    <a href="#33-%e7%8e%af%e8%8a%82-3%e9%93%be%e6%8e%a5%e9%98%b6%e6%ae%b5%e4%b9%8b-resolution%e8%a7%a3%e6%9e%90" class="header-mark"></a>3.3 环节 3：链接阶段之 Resolution（解析）</h4><p>在准备阶段完成后，就进入了解析阶段。解析阶段（Resolution），简言之，将类、接口、字段和方法的符号引用转为直接引用。</p>
+<h5 id="331-具体描述" class="headerLink">
+    <a href="#331-%e5%85%b7%e4%bd%93%e6%8f%8f%e8%bf%b0" class="header-mark"></a>3.3.1 <strong>具体描述</strong>：</h5><p>符号引用就是一些字面量的引用，和虚拟机的内部数据结构和和内存布局无关。比较容易理解的就是在 Class 类文件中，通过常量池进行了大量的符号引用。但是在程序实际运行时，只有符号引用是不够的，比如当如下 println()方法被调用时，系统需要明确知道该方法的位置。</p>
+<h5 id="332-举例" class="headerLink">
+    <a href="#332-%e4%b8%be%e4%be%8b" class="header-mark"></a>3.3.2 <strong>举例</strong>：</h5><p>输出操作 System.out.println()对应的字节码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">invokevirtual</span> <span class="err">#</span><span class="mi">24</span> <span class="o">&lt;</span><span class="n">java</span><span class="o">/</span><span class="n">io</span><span class="o">/</span><span class="n">PrintStream</span><span class="o">.</span><span class="na">println</span><span class="o">&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/b223d288b413f0ed0732357023a1dc7e.png" title="image-20210430225015932" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/b223d288b413f0ed0732357023a1dc7e.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/b223d288b413f0ed0732357023a1dc7e.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/b223d288b413f0ed0732357023a1dc7e.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/b223d288b413f0ed0732357023a1dc7e.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/b223d288b413f0ed0732357023a1dc7e.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/b223d288b413f0ed0732357023a1dc7e.png">
+    </a></p>
+<p>以方法为例，Java 虚拟机为每个类都准备了一张方法表，将其所有的方法都列在表中，当需要调用一个类的方法的时候，只要知道这个方法在方法表中的偏移量就可以直接调用该方法。通过解析操作，符号引用就可以转变为目标方法在类中方法表中的位置，从而使得方法被成功调用。</p>
+<h3 id="四过程三initialization初始化阶段" class="headerLink">
+    <a href="#%e5%9b%9b%e8%bf%87%e7%a8%8b%e4%b8%89initialization%e5%88%9d%e5%a7%8b%e5%8c%96%e9%98%b6%e6%ae%b5" class="header-mark"></a>四、过程三：Initialization（初始化）阶段</h3><h4 id="41-static-与-final-的搭配问题" class="headerLink">
+    <a href="#41-static-%e4%b8%8e-final-%e7%9a%84%e6%90%ad%e9%85%8d%e9%97%ae%e9%a2%98" class="header-mark"></a>4.1. static 与 final 的搭配问题</h4><p><strong>说明</strong>：使用 static+ final 修饰的字段的显式赋值的操作，到底是在哪个阶段进行的赋值？</p>
+<ul>
+<li>情况 1：在链接阶段的准备环节赋值</li>
+<li>情况 2：在初始化阶段<clinit>()中赋值</li>
+</ul>
+<p><strong>结论</strong>： 在链接阶段的准备环节赋值的情况：</p>
+<ul>
+<li>对于基本数据类型的字段来说，如果使用 static final 修饰，则显式赋值(直接赋值常量，而非调用方法通常是在链接阶段的准备环节进行</li>
+<li>对于 String 来说，如果使用字面量的方式赋值，使用 static final 修饰的话，则显式赋值通常是在链接阶段的准备环节进行</li>
+<li>在初始化阶段<clinit>()中赋值的情况： 排除上述的在准备环节赋值的情况之外的情况。</li>
+</ul>
+<p><strong>最终结论</strong>：使用 static+final 修饰，且显示赋值中不涉及到方法或构造器调用的基本数据类到或 String 类型的显式财值，是在链接阶段的准备环节进行。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">INT_CONSTANT</span> <span class="o">=</span> <span class="mi">10</span><span class="o">;</span>                                <span class="c1">// 在链接阶段的准备环节赋值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">NUM1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Random</span><span class="o">().</span><span class="na">nextInt</span><span class="o">(</span><span class="mi">10</span><span class="o">);</span>                  <span class="c1">// 在初始化阶段clinit&gt;()中赋值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>                                                  <span class="c1">// 在初始化阶段&lt;clinit&gt;()中赋值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Integer</span> <span class="n">INTEGER_CONSTANT1</span> <span class="o">=</span> <span class="n">Integer</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="mi">100</span><span class="o">);</span>     <span class="c1">// 在初始化阶段&lt;clinit&gt;()中赋值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">public</span> <span class="kd">static</span> <span class="n">Integer</span> <span class="n">INTEGER_CONSTANT2</span> <span class="o">=</span> <span class="n">Integer</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="mi">100</span><span class="o">);</span>           <span class="c1">// 在初始化阶段&lt;clinit&gt;()中概值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">s0</span> <span class="o">=</span> <span class="s">&#34;helloworld0&#34;</span><span class="o">;</span>                            <span class="c1">// 在链接阶段的准备环节赋值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">s1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="s">&#34;helloworld1&#34;</span><span class="o">);</span>                <span class="c1">// 在初始化阶段&lt;clinit&gt;()中赋值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="n">s2</span> <span class="o">=</span> <span class="s">&#34;hellowrold2&#34;</span><span class="o">;</span>                                  <span class="c1">// 在初始化阶段&lt;clinit&gt;()中赋值
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="42-clinit的线程安全性" class="headerLink">
+    <a href="#42-clinit%e7%9a%84%e7%ba%bf%e7%a8%8b%e5%ae%89%e5%85%a8%e6%80%a7" class="header-mark"></a>4.2 <clinit>()的线程安全性</h4><p>对于<clinit>()方法的调用，也就是类的初始化，虚拟机会在内部确保其多线程环境中的安全性。</p>
+<p>虚拟机会保证一个类的()方法在多线程环境中被正确地加锁、同步，如果多个线程同时去初始化一个类，那么只会有一个线程去执行这个类的<clinit>()方法，其他线程都需要阻塞等待，直到活动线程执行<clinit>()方法完毕。</p>
+<p>正是因为函数()带锁线程安全的函数()带锁线程安全的，因此，如果在一个类的<clinit>()方法中有耗时很长的操作，就可能造成多个线程阻塞，引发死锁。并且这种死锁是很难发现的，因为看起来它们并没有可用的锁信息。</p>
+<p>如果之前的线程成功加载了类，则等在队列中的线程就没有机会再执行<clinit>()方法了。那么，当需要使用这个类时，虚拟机会直接返回给它已经准备好的信息。</p>
+<h4 id="43-类的初始化情况主动使用-vs-被动使用" class="headerLink">
+    <a href="#43-%e7%b1%bb%e7%9a%84%e5%88%9d%e5%a7%8b%e5%8c%96%e6%83%85%e5%86%b5%e4%b8%bb%e5%8a%a8%e4%bd%bf%e7%94%a8-vs-%e8%a2%ab%e5%8a%a8%e4%bd%bf%e7%94%a8" class="header-mark"></a>4.3 类的初始化情况：主动使用 vs 被动使用</h4><p>Java 程序对类的使用分为两种：主动使用和被动使用。</p>
+<h5 id="431-主动使用" class="headerLink">
+    <a href="#431-%e4%b8%bb%e5%8a%a8%e4%bd%bf%e7%94%a8" class="header-mark"></a>4.3.1 <strong>主动使用</strong></h5><p>Class 只有在必须要首次使用的时候才会被装载，Java 虚拟机不会无条件地装载 Class 类型。Java 虚拟机规定，一个类或接口在初次使用前，必须要进行初始化。这里指的“使用”，是指主动使用，主动使用只有下列几种情况：（即：如果出现如下的情况，则会对类进行初始化操作。而初始化操作之前的加载、验证、准备已经完成。</p>
+<ol>
+<li>
+<p>实例化：当创建一个类的实例时，比如使用 new 关键字，或者通过反射、克隆、反序列化。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm"> * 反序列化
+</span></span></span><span class="line"><span class="cl"><span class="cm"> */</span>
+</span></span><span class="line"><span class="cl"><span class="n">Class</span> <span class="n">Order</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">static</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&#34;Order类的初始化&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">test</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ObjectOutputStream</span> <span class="n">oos</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ObjectInputStream</span> <span class="n">ois</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">try</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 序列化
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">oos</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ObjectOutputStream</span><span class="o">(</span><span class="k">new</span> <span class="n">FileOutputStream</span><span class="o">(</span><span class="s">&#34;order.dat&#34;</span><span class="o">));</span>
+</span></span><span class="line"><span class="cl">        <span class="n">oos</span><span class="o">.</span><span class="na">writeObject</span><span class="o">(</span><span class="k">new</span> <span class="n">Order</span><span class="o">());</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 反序列化
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">ois</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ObjectInputStream</span><span class="o">(</span><span class="k">new</span> <span class="n">FileOutputStream</span><span class="o">(</span><span class="s">&#34;order.dat&#34;</span><span class="o">));</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Order</span> <span class="n">order</span> <span class="o">=</span> <span class="n">ois</span><span class="o">.</span><span class="na">readObject</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">catch</span> <span class="o">(</span><span class="n">ClassNotFoundException</span> <span class="n">e</span><span class="o">){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">finally</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">try</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="o">(</span><span class="n">oos</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">oos</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">            <span class="o">}</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="o">(</span><span class="n">ois</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">ois</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">            <span class="o">}</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">){</span>
+</span></span><span class="line"><span class="cl">            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>静态方法：当调用类的静态方法时，即当使用了字节码 invokestatic 指令。</p>
+</li>
+<li>
+<p>静态字段：当使用类、接口的静态字段时（final 修饰特殊考虑），比如，使用 getstatic 或者 putstatic 指令。（对应访问变量、赋值变量操作）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ActiveUse</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nd">@Test</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">test</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">User</span><span class="o">.</span><span class="na">num</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">class</span> <span class="nc">User</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">static</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&#34;User类的初始化&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">num</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>反射：当使用 java.lang.reflect 包中的方法反射类的方法时。比如：Class.forName(&ldquo;com.atguigu.java.Test&rdquo;)</p>
+</li>
+<li>
+<p>继承：当初始化子类时，如果发现其父类还没有进行过初始化，则需要先触发其父类的初始化。</p>
+<blockquote>
+<p>当 Java 虚拟机初始化一个类时，要求它的所有父类都已经被初始化，但是这条规则并不适用于接口。</p>
+<ul>
+<li>在初始化一个类时，并不会先初始化它所实现的接口</li>
+<li>在初始化一个接口时，并不会先初始化它的父接口</li>
+<li>因此，一个父接口并不会因为它的子接口或者实现类的初始化而初始化。只有当程序首次使用特定接口的静态字段时，才会导致该接口的初始化。</li>
+</ul>
+</blockquote>
+</li>
+<li>
+<p>default 方法：如果一个接口定义了 default 方法，那么直接实现或者间接实现该接口的类的初始化，该接口要在其之前被初始化。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">interface</span> <span class="nc">Compare</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Thread</span> <span class="n">t</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Thread</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&#34;Compare接口的初始化&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>main 方法：当虚拟机启动时，用户需要指定一个要执行的主类（包含 main()方法的那个类），虚拟机会先初始化这个主类。</p>
+<blockquote>
+<p>VM 启动的时候通过引导类加载器加载一个初始类。这个类在调用 public static void main(String[])方法之前被链接和初始化。这个方法的执行将依次导致所需的类的加载，链接和初始化。</p>
+</blockquote>
+</li>
+<li>
+<p>MethodHandle：当初次调用 MethodHandle 实例时，初始化该 MethodHandle 指向的方法所在的类。（涉及解析 REF getStatic、REF_putStatic、REF invokeStatic 方法句柄对应的类）</p>
+</li>
+</ol>
+<h5 id="432-被动使用" class="headerLink">
+    <a href="#432-%e8%a2%ab%e5%8a%a8%e4%bd%bf%e7%94%a8" class="header-mark"></a>4.3.2 <strong>被动使用</strong></h5><p>除了以上的情况属于主动使用，其他的情况均属于被动使用。被动使用不会引起类的初始化。被动使用不会引起类的初始化。</p>
+<p>也就是说：并不是在代码中出现的类，就一定会被加载或者初始化。并不是在代码中出现的类，就一定会被加载或者初始化。如果不符合主动使用的条件，类就不会初始化。</p>
+<ol>
+<li>
+<p>静态字段：当通过子类引用父类的静态变量，不会导致子类初始化，只有真正声明这个字段的类才会被初始化。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PassiveUse</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl"> 	<span class="nd">@Test</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">test</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">Child</span><span class="o">.</span><span class="na">num</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">class</span> <span class="nc">Child</span> <span class="kd">extends</span> <span class="n">Parent</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">static</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&#34;Child类的初始化&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">class</span> <span class="nc">Parent</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">static</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&#34;Parent类的初始化&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="n">num</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>数组定义：通过数组定义类引用，不会触发此类的初始化</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">Parent</span><span class="o">[]</span> <span class="n">parents</span><span class="o">=</span> <span class="k">new</span> <span class="n">Parent</span><span class="o">[</span><span class="mi">10</span><span class="o">];</span>
+</span></span><span class="line"><span class="cl"><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">parents</span><span class="o">.</span><span class="na">getClass</span><span class="o">());</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// new的话才会初始化
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">parents</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Parent</span><span class="o">();</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>引用常量：引用常量不会触发此类或接口的初始化。因为常量在链接阶段就已经被显式赋值了。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PassiveUse</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">Serival</span><span class="o">.</span><span class="na">num</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 但引用其他类的话还是会初始化
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">Serival</span><span class="o">.</span><span class="na">num2</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">interface</span> <span class="nc">Serival</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Thread</span> <span class="n">t</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Thread</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&#34;Serival初始化&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="n">num</span> <span class="o">=</span> <span class="mi">10</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">num2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Random</span><span class="o">().</span><span class="na">nextInt</span><span class="o">(</span><span class="mi">10</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>loadClass 方法：调用 ClassLoader 类的 loadClass()方法加载一个类，并不是对类的主动使用，不会导致类的初始化。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">Class</span> <span class="n">clazz</span> <span class="o">=</span> <span class="n">ClassLoader</span><span class="o">.</span><span class="na">getSystemClassLoader</span><span class="o">().</span><span class="na">loadClass</span><span class="o">(</span><span class="s">&#34;com.test.java.Person&#34;</span><span class="o">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ol>
+<h4 id="44-扩展" class="headerLink">
+    <a href="#44-%e6%89%a9%e5%b1%95" class="header-mark"></a>4.4 <strong>扩展</strong></h4><blockquote>
+<p>-XX:+TraceClassLoading：追踪打印类的加载信息</p>
+</blockquote>
+<hr>
+<h3 id="五过程四类的-using使用" class="headerLink">
+    <a href="#%e4%ba%94%e8%bf%87%e7%a8%8b%e5%9b%9b%e7%b1%bb%e7%9a%84-using%e4%bd%bf%e7%94%a8" class="header-mark"></a>五、过程四：类的 Using（使用）</h3><p>任何一个类型在使用之前都必须经历过完整的加载、链接和初始化 3 个类加载步骤。一旦一个类型成功经历过这 3 个步骤之后，便“厉事俱备只欠东风”，就等着开发者使用了。</p>
+<p>开发人员可以在程序中访问和调用它的静态类成员信息（比如：静态字段、静态方法），或者使用 new 关键字为其创建对象实例。</p>
+<h3 id="六过程五类的-unloading卸载" class="headerLink">
+    <a href="#%e5%85%ad%e8%bf%87%e7%a8%8b%e4%ba%94%e7%b1%bb%e7%9a%84-unloading%e5%8d%b8%e8%bd%bd" class="header-mark"></a>六、过程五：类的 Unloading（卸载）</h3><h4 id="61-类类的加载器类的实例之间的引用关系" class="headerLink">
+    <a href="#61-%e7%b1%bb%e7%b1%bb%e7%9a%84%e5%8a%a0%e8%bd%bd%e5%99%a8%e7%b1%bb%e7%9a%84%e5%ae%9e%e4%be%8b%e4%b9%8b%e9%97%b4%e7%9a%84%e5%bc%95%e7%94%a8%e5%85%b3%e7%b3%bb" class="header-mark"></a>6.1 类、类的加载器、类的实例之间的引用关系</h4><p>在类加载器的内部实现中，用一个 Java 集合来存放所加载类的引用。另一方面，一个 Class 对象总是会引用它的类加载器，调用 Class 对象的 getClassLoader()方法，就能获得它的类加载器。由此可见，代表某个类的 Class 实例与其类的加载器之间为双向关联关系。</p>
+<p>一个类的实例总是引用代表这个类的 Class 对象。在 Object 类中定义了 getClass()方法，这个方法返回代表对象所属类的 Class 对象的引用。此外，所有的 java 类都有一个静态属性 class，它引用代表这个类的 Class 对象。</p>
+<h4 id="62-类的生命周期" class="headerLink">
+    <a href="#62-%e7%b1%bb%e7%9a%84%e7%94%9f%e5%91%bd%e5%91%a8%e6%9c%9f" class="header-mark"></a>6.2 类的生命周期</h4><p>当 Sample 类被加载、链接和初始化后，它的生命周期就开始了。当代表 Sample 类的 Class 对象不再被引用，即不可触及时，Class 对象就会结束生命周期，Sample 类在方法区内的数据也会被卸载，从而结束 Sample 类的生命周期。</p>
+<p>一个类何时结束生命周期，取决于代表它的Class对象何时结束生命周期。一个类何时结束生命周期，取决于代表它的Class对象何时结束生命周期。</p>
+<h4 id="63-具体例子" class="headerLink">
+    <a href="#63-%e5%85%b7%e4%bd%93%e4%be%8b%e5%ad%90" class="header-mark"></a>6.3 具体例子</h4><p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/5aaa031ab1ffc8071fb92a32ead888ef.png" title="image-20210430235455086" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/5aaa031ab1ffc8071fb92a32ead888ef.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/5aaa031ab1ffc8071fb92a32ead888ef.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/5aaa031ab1ffc8071fb92a32ead888ef.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/5aaa031ab1ffc8071fb92a32ead888ef.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/5aaa031ab1ffc8071fb92a32ead888ef.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/5aaa031ab1ffc8071fb92a32ead888ef.png">
+    </a></p>
+<p>loader1 变量和 obj 变量间接应用代表 Sample 类的 Class 对象，而 objClass 变量则直接引用它。</p>
+<p>如果程序运行过程中，将上图左侧三个引用变量都置为 null，此时 Sample 对象结束生命周期，MyClassLoader 对象结束生命周期，代表 Sample 类的 Class 对象也结束生命周期，Sample 类在方法区内的二进制数据被卸载。</p>
+<p>当再次有需要时，会检查 Sample 类的 Class 对象是否存在，如果存在会直接使用，不再重新加载；如果不存在 Sample 类会被重新加载，在 Java 虚拟机的堆区会生成一个新的代表 Sample 类的 Class 实例（可以通过哈希码查看是否是同一个实例）</p>
+<h4 id="64-类的卸载" class="headerLink">
+    <a href="#64-%e7%b1%bb%e7%9a%84%e5%8d%b8%e8%bd%bd" class="header-mark"></a>6.4 类的卸载</h4><p>（1）启动类加载器加载的类型在整个运行期间是不可能被卸载的（jvm 和 jls 规范）</p>
+<p>（2）被系统类加载器和扩展类加载器加载的类型在运行期间不太可能被卸载，因为系统类加载器实例或者扩展类的实例基本上在整个运行期间总能直接或者间接的访问的到，其达到 unreachable 的可能性极小。</p>
+<p>（3）被开发者自定义的类加载器实例加载的类型只有在很简单的上下文环境中才能被卸载，而且一般还要借助于强制调用虚拟机的垃圾收集功能才可以做到。可以预想，稍微复杂点的应用场景中（比如：很多时候用户在开发自定义类加载器实例的时候采用缓存的策略以提高系统性能），被加载的类型在运行期间也是几乎不太可能被卸载的（至少卸载的时间是不确定的）。</p>
+<p>综合以上三点，一个已经加载的类型被卸载的几率很小至少被卸载的时间是不确定的。同时我们可以看的出来，开发者在开发代码时候，不应该对虚拟机的类型卸载做任何假设的前提下，来实现系统中的特定功能。</p>
+<h4 id="65-回顾方法区的垃圾回收" class="headerLink">
+    <a href="#65-%e5%9b%9e%e9%a1%be%e6%96%b9%e6%b3%95%e5%8c%ba%e7%9a%84%e5%9e%83%e5%9c%be%e5%9b%9e%e6%94%b6" class="header-mark"></a>6.5 回顾：方法区的垃圾回收</h4><p>方法区的垃圾收集主要回收两部分内容：常量池中废弃的常量和不再使用的类型。</p>
+<p>HotSpot 虚拟机对常量池的回收策略是很明确的，只要常量池中的常量没有被任何地方引用，就可以被回收。</p>
+<p>判定一个常量是否“废弃”还是相对简单，而要判定一个类型是否属于“不再使用的类”的条件就比较苛刻了。需要同时满足下面三个条件：</p>
+<ul>
+<li>该类所有的实例都已经被回收。也就是Java堆中不存在该类及其任何派生子类的实例。该类所有的实例都已经被回收。也就是Java堆中不存在该类及其任何派生子类的实例。</li>
+<li>加载该类的类加载器已经被回收。这个条件除非是经过精心设计的可替换类加载器的场景，如OSGi、JSP的重加载等，否则通常是很难达成的。加载该类的类加载器已经被回收。这个条件除非是经过精心设计的可替换类加载器的场景，如OSGi、JSP的重加载等，否则通常是很难达成的。</li>
+<li>该类对应的java.lang.Class对象没有在任何地方被引用，无法在任何地方通过反射访问该类的方法。该类对应的java.lang.Class对象没有在任何地方被引用，无法在任何地方通过反射访问该类的方法。</li>
+</ul>
+<p>Java 虚拟机被允许对满足上述三个条件的无用类进行回收，这里说的仅仅是“被允许”，而并不是和对象一样，没有引用了就必然会回收。</p>
+</div>
+
+        
+
+<div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 0001-01-01</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span><a class="link-to-mardown" href=/3-%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E7%B1%BB%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E8%AF%A6%E8%A7%A3/index.md target="_blank" rel="noopener noreferrer">阅读原始文档</a>
+                    </span></div>
+            <div class="post-info-share">
+                <span><a href="#" title="分享到 Twitter" data-sharer="twitter" data-url="http://yanghx.vip/3-%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E7%B1%BB%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E8%AF%A6%E8%A7%A3/" data-title="" data-via="xxxx"><i class="fab fa-twitter fa-fw"></i></a><a href="#" title="分享到 Facebook" data-sharer="facebook" data-url="http://yanghx.vip/3-%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E7%B1%BB%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E8%AF%A6%E8%A7%A3/"><i class="fab fa-facebook-square fa-fw"></i></a><a href="#" title="分享到 WhatsApp" data-sharer="whatsapp" data-url="http://yanghx.vip/3-%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E7%B1%BB%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E8%AF%A6%E8%A7%A3/" data-title="" data-web><i class="fab fa-whatsapp fa-fw"></i></a><a href="#" title="分享到 Line" data-sharer="line" data-url="http://yanghx.vip/3-%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E7%B1%BB%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E8%AF%A6%E8%A7%A3/" data-title=""><i data-svg-src="/lib/simple-icons/icons/line.min.svg"></i></a><a href="#" title="分享到 微博" data-sharer="weibo" data-url="http://yanghx.vip/3-%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E7%B1%BB%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E8%AF%A6%E8%A7%A3/" data-title=""><i class="fab fa-weibo fa-fw"></i></a><a href="#" title="分享到 Myspace" data-sharer="myspace" data-url="http://yanghx.vip/3-%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E7%B1%BB%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E8%AF%A6%E8%A7%A3/" data-title="" data-description=""><i data-svg-src="/lib/simple-icons/icons/myspace.min.svg"></i></a><a href="#" title="分享到 Blogger" data-sharer="blogger" data-url="http://yanghx.vip/3-%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E7%B1%BB%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E8%AF%A6%E8%A7%A3/" data-title="" data-description=""><i class="fab fa-blogger fa-fw"></i></a><a href="#" title="分享到 Evernote" data-sharer="evernote" data-url="http://yanghx.vip/3-%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E7%B1%BB%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E8%AF%A6%E8%A7%A3/" data-title=""><i class="fab fa-evernote fa-fw"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/4-%E5%86%8D%E8%B0%88%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E5%99%A8/" class="prev" rel="prev" title=""><i class="fas fa-angle-left fa-fw"></i></a>
+            <a href="/2-%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/" class="next" rel="next" title=""><i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+        </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">
+                    由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+            <div class="footer-line"></div>
+            <div class="footer-line">
+            </div>
+        </div></footer></div>
+
+    <div id="fixed-buttons"><a href="#back-to-top" id="back-to-top-button" class="fixed-button" title="回到顶部">
+            <i class="fas fa-arrow-up fa-fw"></i>
+        </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+            <i class="fas fa-comment fa-fw"></i>
+        </a>
+    </div><div id="cookieconsent-container"></div><div class="assets"><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/katex/copy-tex.min.css">
+        <noscript><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"></noscript><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"distance":100,"findAllMatches":false,"fuseIndexURL":"/index.json","highlightTag":"em","ignoreFieldNorm":false,"ignoreLocation":false,"isCaseSensitive":false,"location":0,"maxResultLength":10,"minMatchCharLength":2,"noResultsFound":"没有找到结果","snippetLength":50,"threshold":0.3,"type":"fuse","useExtendedSearch":false},"sharerjs":true,"table":{"sort":true}};</script><script type="text/javascript" src="/lib/tablesort/tablesort.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js" defer></script><script type="text/javascript" src="/lib/katex/auto-render.min.js" defer></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js" defer></script><script type="text/javascript" src="/lib/katex/mhchem.min.js" defer></script><script type="text/javascript" src="/js/katex.min.js" defer></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script type="text/javascript" src="/js/cookieconsent.min.js" defer></script><script type="text/javascript" src="/js/theme.min.js" defer></script></div>
+</body>
+
+</html>

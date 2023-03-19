@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noodp" />
+    <title> - yanghx blog</title><meta name="Description" content="yanghx blog"><meta property="og:title" content="" />
+<meta property="og:description" content="tomcat源码学习 参考 https://www.cnblogs.com/java-chen-hao/category/1516344.html 整体架构和组件 整体架构图 Connector(连接器): 用于处理连接相关的事情，并提供 Socket 与 Request 和 Response 相关的转化。 Cont" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://yanghx.vip/tomcat%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
+
+<meta property="og:site_name" content="yanghx blog" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
+
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="tomcat源码学习 参考 https://www.cnblogs.com/java-chen-hao/category/1516344.html 整体架构和组件 整体架构图 Connector(连接器): 用于处理连接相关的事情，并提供 Socket 与 Request 和 Response 相关的转化。 Cont"/>
+<meta name="application-name" content="DoIt">
+<meta name="apple-mobile-web-app-title" content="DoIt">
+
+<meta name="theme-color" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" href="http://yanghx.vip/tomcat%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/" /><link rel="prev" href="http://yanghx.vip/k8s%E5%85%A5%E9%97%A8/" /><link rel="next" href="http://yanghx.vip/readme/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/color.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/fontawesome-free/all.min.css">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/animate/animate.min.css">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/yanghx.vip\/tomcat%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0\/"
+        },"genre": "posts","wordcount":  2747 ,
+        "url": "http:\/\/yanghx.vip\/tomcat%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0\/","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "yanghx"
+            },"description": ""
+    }
+    </script><script src="//instant.page/5.1.1" defer type="module" integrity="sha384-MWfCL6g1OTGsbSwfuMHc8+8J2u71/LA8dzlIN3ycajckxuZZmF+DNjdm7O6H3PSq"></script>
+</head>
+
+<body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">
+        function setTheme(theme) {document.body.setAttribute('theme', theme); document.documentElement.style.setProperty('color-scheme', theme === 'light' ? 'light' : 'dark');}
+        function saveTheme(theme) {window.localStorage && localStorage.setItem('theme', theme);}
+        function getMeta(metaName) {const metas = document.getElementsByTagName('meta'); for (let i = 0; i < metas.length; i++) if (metas[i].getAttribute('name') === metaName) return metas[i]; return '';}
+        if (window.localStorage && localStorage.getItem('theme')) {let theme = localStorage.getItem('theme');theme === 'light' || theme === 'dark' || theme === 'black' ? setTheme(theme) : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? setTheme('dark') : setTheme('light')); } else { if ('auto' === 'light' || 'auto' === 'dark' || 'auto' === 'black') setTheme('auto'), saveTheme('auto'); else saveTheme('auto'), window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? setTheme('dark') : setTheme('light');}
+        let metaColors = {'light': '#f8f8f8','dark': '#252627','black': '#000000'}
+        getMeta('theme-color').content = metaColors[document.body.getAttribute('theme')];
+    </script>
+    <div id="back-to-top"></div>
+    <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="yanghx blog">yanghx blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="#" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="#" class="menu-item theme-select" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                    <select class="color-theme-select" id="theme-select-desktop" title="切换主题">
+                        <option value="light">浅色</option>
+                        <option value="dark">深色</option>
+                        <option value="black">黑色</option>
+                        <option value="auto">跟随系统</option>
+                    </select>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="yanghx blog">yanghx blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="#" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="#" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="#" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+                <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
+                    <option value="light">浅色</option>
+                    <option value="dark">深色</option>
+                    <option value="black">黑色</option>
+                    <option value="auto">跟随系统</option>
+                </select>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="post-meta-line">
+                <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
+                </span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 2747 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 6 分钟&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  kept="true">
+                <div class="details-summary toc-title">
+                    <span>目录</span>
+                    <span><i class="details-icon fas fa-angle-right"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#整体架构和组件">整体架构和组件</a>
+      <ul>
+        <li><a href="#整体架构图">整体架构图</a></li>
+        <li><a href="#connector和container-的微妙关系"><code>Connector和Container 的微妙关系</code></a></li>
+        <li><a href="#connector架构分析"><code>Connector</code>架构分析</a></li>
+        <li><a href="#container如何处理请求的"><code>Container</code>如何处理请求的</a></li>
+      </ul>
+    </li>
+    <li><a href="#tomcat-的生命周期机制">tomcat 的生命周期机制</a>
+      <ul>
+        <li><a href="#什么是-lifecycle">什么是 Lifecycle</a></li>
+        <li><a href="#lifecycle方法">Lifecycle方法</a></li>
+        <li><a href="#lifecyclebase">LifecycleBase</a></li>
+        <li><a href="#模板方法">模板方法</a></li>
+      </ul>
+    </li>
+    <li><a href="#源码-tomcat的启动流程">源码-tomcat的启动流程</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="tomcat源码学习" class="headerLink">
+    <a href="#tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0" class="header-mark"></a>tomcat源码学习</h1><blockquote>
+<p>参考 <a href="https://www.cnblogs.com/java-chen-hao/category/1516344.html" target="_blank" rel="noopener noreferrer">https://www.cnblogs.com/java-chen-hao/category/1516344.html</a></p>
+</blockquote>
+<h2 id="整体架构和组件" class="headerLink">
+    <a href="#%e6%95%b4%e4%bd%93%e6%9e%b6%e6%9e%84%e5%92%8c%e7%bb%84%e4%bb%b6" class="header-mark"></a>整体架构和组件</h2><h3 id="整体架构图" class="headerLink">
+    <a href="#%e6%95%b4%e4%bd%93%e6%9e%b6%e6%9e%84%e5%9b%be" class="header-mark"></a>整体架构图</h3><p><a class="lightgallery" href="tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/webp.webp" title="img" data-thumbnail="tomcat源码学习.assets/webp.webp">
+        <img
+            
+            loading="lazy"
+            src="tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/webp.webp"
+            srcset="tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/webp.webp, tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/webp.webp 1.5x, tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/webp.webp 2x"
+            sizes="auto"
+            alt="tomcat源码学习.assets/webp.webp">
+    </a></p>
+<ul>
+<li><code>Connector(连接器)</code>: 用于处理连接相关的事情，并提供 Socket 与 Request 和 Response 相关的转化。</li>
+<li><code>Container(容器)</code>:  用于封装和管理 Servlet ，以及具体处理 Request 请求。</li>
+</ul>
+<p>一个 tomcat 中只有一个 Server , 一个 Server 可以包含多个 Service , 一个 Service 只有一个 Container, 但是可以有多个 Connectors , 这是因为一个服务可以有多个连接，如同时提供 Http 和 Https 链接，也可以提供向相同协议不同端口的连接。</p>
+<p><a class="lightgallery" href="./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807172958351-1132740453.png" title="img" data-thumbnail="./tomcat源码学习.assets/1168971-20190807172958351-1132740453.png">
+        <img
+            
+            loading="lazy"
+            src="./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807172958351-1132740453.png"
+            srcset="./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807172958351-1132740453.png, ./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807172958351-1132740453.png 1.5x, ./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807172958351-1132740453.png 2x"
+            sizes="auto"
+            alt="./tomcat源码学习.assets/1168971-20190807172958351-1132740453.png">
+    </a></p>
+<p>多个 Connector 和一个 Container 就形成了一个 Serevice , 有了 Service 就可以对外提供服务了，但是 Service 还要一个生存的环境，必须要有人能够给她生命、掌控其生死大权，那就非 Service 莫属了！所以整个Tomcat 的生命周期由 Service 控制。</p>
+<p>另外，上述的包含关系或说是父子关系，都可以在 tomcat 的 conf 目录下的 <code>server.xml</code>配置文件中看出。</p>
+<p><a class="lightgallery" href="./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807173324906-2029196119.png" title="img" data-thumbnail="./tomcat源码学习.assets/1168971-20190807173324906-2029196119.png">
+        <img
+            
+            loading="lazy"
+            src="./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807173324906-2029196119.png"
+            srcset="./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807173324906-2029196119.png, ./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807173324906-2029196119.png 1.5x, ./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807173324906-2029196119.png 2x"
+            sizes="auto"
+            alt="./tomcat源码学习.assets/1168971-20190807173324906-2029196119.png">
+    </a></p>
+<p>上边的配置文件，还可以通过下边的一张结构图更清楚的理解：</p>
+<p><a class="lightgallery" href="./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807173511076-1097002698.png" title="img" data-thumbnail="./tomcat源码学习.assets/1168971-20190807173511076-1097002698.png">
+        <img
+            
+            loading="lazy"
+            src="./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807173511076-1097002698.png"
+            srcset="./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807173511076-1097002698.png, ./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807173511076-1097002698.png 1.5x, ./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807173511076-1097002698.png 2x"
+            sizes="auto"
+            alt="./tomcat源码学习.assets/1168971-20190807173511076-1097002698.png">
+    </a></p>
+<p><em><strong>组件</strong></em></p>
+<ol>
+<li>
+<p><code>Server</code> : 表示服务器,提供了一种优雅的方式来启动和停止整个系统，不必单独启停连接器和容器。</p>
+</li>
+<li>
+<p><code>Service</code>: 表示服务，Server 可以运行多个服务。比如一个 tomcat 里面可以运行订单服务、支付服务、用户服务等。</p>
+</li>
+<li>
+<p>每个 Service 可包含多个 Connector 和 一个 Container 。 因为每个服务允许同时支持多种协议，但是每种协议最终执行的 Servlet 却是相同的。</p>
+</li>
+<li>
+<p><code>Connector</code>: 表示连接器，比如一个服务可以同时支持 AJP 协议、Http 协议和 Https 协议，每种协议可使用一种连接器来支持。</p>
+</li>
+<li>
+<p><code>Container</code>: 表示容器，可以看做 Servlet 容器</p>
+<ol>
+<li><code>Engine</code> : 引擎</li>
+<li><code>HOST</code>:  主机</li>
+<li><code>Context</code>: 上下文</li>
+<li><code>Wrapper</code> : 包装器</li>
+</ol>
+</li>
+<li>
+<p>Service 服务之下还有各种 <code>支撑组件</code></p>
+<ol>
+<li><code>Manager</code> : 管理器，用于管理回话 Session</li>
+<li><code>Logger</code>: 日志器，用于管理日志</li>
+<li><code>Loader</code>: 加载器，和类加载有关，只会开放给 Context 所使用</li>
+<li><code>Pipeline</code>: 管道组件，配合 Valve 实现过滤器功能</li>
+<li><code>Valve</code>: 阀门组件，配合 Pipeline 实现过滤器功能</li>
+<li><code>Realm</code>: 认证授权组件</li>
+</ol>
+<p>除了连接器和容器，管道组件和阀门组件也很关键，我们通过一张图来看看这两个组件</p>
+</li>
+</ol>
+<p><a class="lightgallery" href="./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807174018910-1559786217.png" title="img" data-thumbnail="./tomcat源码学习.assets/1168971-20190807174018910-1559786217.png">
+        <img
+            
+            loading="lazy"
+            src="./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807174018910-1559786217.png"
+            srcset="./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807174018910-1559786217.png, ./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807174018910-1559786217.png 1.5x, ./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807174018910-1559786217.png 2x"
+            sizes="auto"
+            alt="./tomcat源码学习.assets/1168971-20190807174018910-1559786217.png">
+    </a></p>
+<h3 id="connector和container-的微妙关系" class="headerLink">
+    <a href="#connector%e5%92%8ccontainer-%e7%9a%84%e5%be%ae%e5%a6%99%e5%85%b3%e7%b3%bb" class="header-mark"></a><code>Connector和Container 的微妙关系</code></h3><p>由上述内容我们大致可以知道一个请求发送到 Tomcat 之后，首先经过 Service 然后交给我们 Connector, Connector 用于接收请求并将接收到的请求封装为 Request 和 Response 来具体处理，Request 和 Response 封装完之后再交给 Cotainer 进行处理， Container 处理完请求之后再返回给 Connector, 最后在由 Connector 通过 Socket 将处理的结果返回给客户端，这样整个请求就处理完了。</p>
+<p>Connector 最底层使用的是 Socket 进行连接的， Request 和 Response 是按照 Http 协议来封装的，所以Connector 同时需要实现 TCP/IP 协议和 Http 协议。</p>
+<h3 id="connector架构分析" class="headerLink">
+    <a href="#connector%e6%9e%b6%e6%9e%84%e5%88%86%e6%9e%90" class="header-mark"></a><code>Connector</code>架构分析</h3><p>Connector 用于接收请求并将请求封装成 Request 和 Response , 然后交给 Container 进行处理，Container 处理完之后再交给 Connector 返回给客户端。</p>
+<p>因此，我们可以将 Connector 分为四个方面进行理解：</p>
+<ol>
+<li>Connector 如何接收请求的？</li>
+<li>如何将请求封装成 Request 和 Response 的。</li>
+<li>封装完之后的 Request 和 Response 如何交给 Container 进行处理的？</li>
+</ol>
+<p><em><strong>connector 的结构图</strong></em></p>
+<p><a class="lightgallery" href="./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807174351299-521376669.png" title="img" data-thumbnail="./tomcat源码学习.assets/1168971-20190807174351299-521376669.png">
+        <img
+            
+            loading="lazy"
+            src="./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807174351299-521376669.png"
+            srcset="./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807174351299-521376669.png, ./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807174351299-521376669.png 1.5x, ./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807174351299-521376669.png 2x"
+            sizes="auto"
+            alt="./tomcat源码学习.assets/1168971-20190807174351299-521376669.png">
+    </a></p>
+<p>Connector 就是使用 ProtocolHandler 来处理请求的，不同的 ProtocolHandler 代表不同的连接类型，比如 Http11Protocol 使用的是Socket来连接的， Http11NioProtocol 使用的是 NioSocket来连接的。</p>
+<p>其中ProtocolHandler 包含了三个组件： Endpoint、Processor、Adapter。</p>
+<ol>
+<li><code>Endpoint</code> 用于处理底层 Socket 的网络连接，Processor 用于将 Endpoint 接收到的 Socket 封装成 Request, Adapter 用于将 Request 交给 Container 进行具体的处理。</li>
+<li>Endpoint 由于是处理底层 Socket 网络连接，因此Endpoint 是用来实现 TCP/IP 协议的，而Processor 用来实现 Http 协议的，Adapter 将请求适配到 Servlet 容器进行具体的处理。</li>
+<li>Endpoint 的抽象实现 AbstractEndpoint 里面定义的 Acceptor 和 AsyncTimout 两个内部类和一个 Handler 接口。Aceeptor 用于监听请求， AsyncTimout 用于检查异步 Request 的超时，Handler 用于处理接收到 Socket, 在内部调用 Processor 进行处理。</li>
+</ol>
+<h3 id="container如何处理请求的" class="headerLink">
+    <a href="#container%e5%a6%82%e4%bd%95%e5%a4%84%e7%90%86%e8%af%b7%e6%b1%82%e7%9a%84" class="header-mark"></a><code>Container</code>如何处理请求的</h3><p>Container 处理请求是使用 Pipeline-Valve管道来处理的 （Valve 是阀门的意思）</p>
+<p>Pipeline-Valve 使用的是责任链模式，责任链模式是指在一个请求处理过程中有很多处理者依次对请求进行处理，每个处理者负责做自己相应的处理，处理完之后将处理后的请求返回，再让下一个处理者继续处理。</p>
+<p>但是！Pipeline-Valve使用的责任链模式和普通的责任链模式有些不同，</p>
+<ol>
+<li>每个 Pipeline-Valve 都有特定的Valve, 而且是在管道的最后一个执行，这个Valve 叫做 BaseValve, BaseValve 是不可删除的；</li>
+<li>在上层容器的管道的BaseValve 中会调用下层容器的管道。</li>
+</ol>
+<p>我们知道 Container 包含四个子容器，而这个四个子容器对应的 BaseValve 分别在: <code>StandardEngineValve、StandardHostValve、StandardContextValve、StandardWrapperValve</code>。</p>
+<p>Pipeline 的处理流程图如下：</p>
+<p><a class="lightgallery" href="./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807174820042-2008919568.png" title="img" data-thumbnail="./tomcat源码学习.assets/1168971-20190807174820042-2008919568.png">
+        <img
+            
+            loading="lazy"
+            src="./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807174820042-2008919568.png"
+            srcset="./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807174820042-2008919568.png, ./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807174820042-2008919568.png 1.5x, ./tomcat%e6%ba%90%e7%a0%81%e5%ad%a6%e4%b9%a0.assets/1168971-20190807174820042-2008919568.png 2x"
+            sizes="auto"
+            alt="./tomcat源码学习.assets/1168971-20190807174820042-2008919568.png">
+    </a></p>
+<ol>
+<li>
+<p>Connector 在接收到请求后会首先调用最顶层容器的 Pipeline 来处理，这里的最顶层容器的 Pipeline 就是 EnginePipeline (Engine 的管道)；</p>
+</li>
+<li>
+<p>在 Engine 的管道中依次会执行 EngineValve1、EngineValve2等等，最后会执行 StandardEngineValve,在 StandardEngineValve 中会调用 Host 管道，然后再依次执行Host 的 HostValve1, HostValve2 等，最后在执行StandardHostValve,然后再依次调用 Context 的管道和 Wrapper 的管道，最后执行到 StandardWrapperValve。</p>
+</li>
+<li>
+<p>当执行到 StandardWrapperValve的时候，会在 StandardWrapperValve 中创建 FilterChain, 并调用其 doFilter 方法来处理请求，这个FilterChain 包含着我们配置的与请求相匹配的 Filter 和 Servlet, 其 doFilter 方法会依次调用所有的 Filter 方法 和 Servlet 的 service 方法，这样请求就得到处理了。</p>
+</li>
+<li>
+<p>当所有的 Pipeline-Valve 都执行完毕之后，并且处理完了具体的请求，这个时候就可以将返回的结果交给 Connector 了，Connector 在通过 Socket 的方式将结果返回给客户端。</p>
+</li>
+</ol>
+<h2 id="tomcat-的生命周期机制" class="headerLink">
+    <a href="#tomcat-%e7%9a%84%e7%94%9f%e5%91%bd%e5%91%a8%e6%9c%9f%e6%9c%ba%e5%88%b6" class="header-mark"></a>tomcat 的生命周期机制</h2><h3 id="什么是-lifecycle" class="headerLink">
+    <a href="#%e4%bb%80%e4%b9%88%e6%98%af-lifecycle" class="header-mark"></a>什么是 Lifecycle</h3><blockquote>
+<p>Lifecycle ,其实就是一个状态机，对组件的由生到死状态的管理。</p>
+</blockquote>
+<ul>
+<li>当组件在 <code>STARTING_PREP、STARTING、STARTED</code> 时，调用 <code>start()</code>方法没有任何效果。</li>
+<li>当组件在 <code>NEW</code>状态时调用 <code>start()</code>方法会导致<code>init()</code> 方法被立即执行，随后<code>start()</code>方法被执行。</li>
+<li>当组件在 <code>STOPING_PREP、STOPING、STOPED</code>时，调用<code>stop()</code>方法没有任何效果。</li>
+<li>当一个组件在 <code>NEW</code>状态时，调用 <code>stop()</code>方法会将组件状态更新为 <code>STOPED</code>,比较典型的场景就是组件启动失败，其子组件还没有启动。当一个组件停止的时候，它将尝试停止它下面的所有子组件，即使子组件还没有启动。</li>
+</ul>
+<h3 id="lifecycle方法" class="headerLink">
+    <a href="#lifecycle%e6%96%b9%e6%b3%95" class="header-mark"></a>Lifecycle方法</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Lifecycle</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 添加监听器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">addLifecycleListener</span><span class="o">(</span><span class="n">LifecycleListener</span> <span class="n">listener</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 获取所以监听器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">public</span> <span class="n">LifecycleListener</span><span class="o">[]</span> <span class="nf">findLifecycleListeners</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 移除某个监听器
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">removeLifecycleListener</span><span class="o">(</span><span class="n">LifecycleListener</span> <span class="n">listener</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 初始化方法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">init</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">LifecycleException</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 启动方法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">start</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">LifecycleException</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 停止方法，和start对应
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">stop</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">LifecycleException</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 销毁方法，和init对应
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">destroy</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">LifecycleException</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 获取生命周期状态
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">public</span> <span class="n">LifecycleState</span> <span class="nf">getState</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 获取字符串类型的生命周期状态
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getStateName</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="lifecyclebase" class="headerLink">
+    <a href="#lifecyclebase" class="header-mark"></a>LifecycleBase</h3><p><code>LifecycleBase</code> 是 <code>Lifecycle</code> 的基本实现。</p>
+<h3 id="模板方法" class="headerLink">
+    <a href="#%e6%a8%a1%e6%9d%bf%e6%96%b9%e6%b3%95" class="header-mark"></a>模板方法</h3><p>LifecycleBase 是使用了状态机+模板模式来实现的。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="c1">// 初始化方法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">protected</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">initInternal</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">LifecycleException</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 启动方法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">protected</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">startInternal</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">LifecycleException</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 停止方法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">protected</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">stopInternal</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">LifecycleException</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 销毁方法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">protected</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">destroyInternal</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">LifecycleException</span><span class="o">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="源码-tomcat的启动流程" class="headerLink">
+    <a href="#%e6%ba%90%e7%a0%81-tomcat%e7%9a%84%e5%90%af%e5%8a%a8%e6%b5%81%e7%a8%8b" class="header-mark"></a>源码-tomcat的启动流程</h2><p><code>org.apache.catalina.startup.Bootstrap</code></p>
+</div>
+
+        
+
+<div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 0001-01-01</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span><a class="link-to-mardown" href=/tomcat%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/index.md target="_blank" rel="noopener noreferrer">阅读原始文档</a>
+                    </span></div>
+            <div class="post-info-share">
+                <span><a href="#" title="分享到 Twitter" data-sharer="twitter" data-url="http://yanghx.vip/tomcat%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/" data-title="" data-via="xxxx"><i class="fab fa-twitter fa-fw"></i></a><a href="#" title="分享到 Facebook" data-sharer="facebook" data-url="http://yanghx.vip/tomcat%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/"><i class="fab fa-facebook-square fa-fw"></i></a><a href="#" title="分享到 WhatsApp" data-sharer="whatsapp" data-url="http://yanghx.vip/tomcat%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/" data-title="" data-web><i class="fab fa-whatsapp fa-fw"></i></a><a href="#" title="分享到 Line" data-sharer="line" data-url="http://yanghx.vip/tomcat%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/" data-title=""><i data-svg-src="/lib/simple-icons/icons/line.min.svg"></i></a><a href="#" title="分享到 微博" data-sharer="weibo" data-url="http://yanghx.vip/tomcat%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/" data-title=""><i class="fab fa-weibo fa-fw"></i></a><a href="#" title="分享到 Myspace" data-sharer="myspace" data-url="http://yanghx.vip/tomcat%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/" data-title="" data-description=""><i data-svg-src="/lib/simple-icons/icons/myspace.min.svg"></i></a><a href="#" title="分享到 Blogger" data-sharer="blogger" data-url="http://yanghx.vip/tomcat%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/" data-title="" data-description=""><i class="fab fa-blogger fa-fw"></i></a><a href="#" title="分享到 Evernote" data-sharer="evernote" data-url="http://yanghx.vip/tomcat%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0/" data-title=""><i class="fab fa-evernote fa-fw"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/k8s%E5%85%A5%E9%97%A8/" class="prev" rel="prev" title=""><i class="fas fa-angle-left fa-fw"></i></a>
+            <a href="/readme/" class="next" rel="next" title=""><i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+        </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">
+                    由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+            <div class="footer-line"></div>
+            <div class="footer-line">
+            </div>
+        </div></footer></div>
+
+    <div id="fixed-buttons"><a href="#back-to-top" id="back-to-top-button" class="fixed-button" title="回到顶部">
+            <i class="fas fa-arrow-up fa-fw"></i>
+        </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+            <i class="fas fa-comment fa-fw"></i>
+        </a>
+    </div><div id="cookieconsent-container"></div><div class="assets"><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/katex/copy-tex.min.css">
+        <noscript><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"></noscript><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"distance":100,"findAllMatches":false,"fuseIndexURL":"/index.json","highlightTag":"em","ignoreFieldNorm":false,"ignoreLocation":false,"isCaseSensitive":false,"location":0,"maxResultLength":10,"minMatchCharLength":2,"noResultsFound":"没有找到结果","snippetLength":50,"threshold":0.3,"type":"fuse","useExtendedSearch":false},"sharerjs":true,"table":{"sort":true}};</script><script type="text/javascript" src="/lib/tablesort/tablesort.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js" defer></script><script type="text/javascript" src="/lib/katex/auto-render.min.js" defer></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js" defer></script><script type="text/javascript" src="/lib/katex/mhchem.min.js" defer></script><script type="text/javascript" src="/js/katex.min.js" defer></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script type="text/javascript" src="/js/cookieconsent.min.js" defer></script><script type="text/javascript" src="/js/theme.min.js" defer></script></div>
+</body>
+
+</html>

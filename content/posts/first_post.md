@@ -1,42 +1,11 @@
 ---
-title: First_post
-subtitle:
-date: 2023-03-19T19:57:14+08:00
-draft: false
-author:
-  name:
-  link:
-  email:
-  avatar:
-description:
-keywords:
-license:
-comment: false
-weight: 0
-tags:
-  - draft
-categories:
-  - draft
-hiddenFromHomePage: false
-hiddenFromSearch: false
-summary:
-resources:
-  - name: featured-image
-    src: featured-image.jpg
-  - name: featured-image-preview
-    src: featured-image-preview.jpg
-toc: true
-math: false
-lightgallery: false
-password:
-message:
-repost:
-  enable: true
-  url:
+title: "First_post"
+date: 2023-03-20T02:42:30+08:00
 
-# See details front matter: https://fixit.lruihao.cn/documentation/content/#front-matter
+
+
+toc:
+  auto: false
 ---
 
-<!--more-->
-
-第一篇博客
+Z

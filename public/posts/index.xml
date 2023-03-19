@@ -1,23 +1,79 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
-  <channel>
-    <title>所有文章 - yanghx blog</title>
-    <link>http://yanghx.vip/posts/</link>
-    <description>所有文章 | yanghx blog</description>
-    <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Sun, 19 Mar 2023 19:57:14 &#43;0800</lastBuildDate><atom:link href="http://yanghx.vip/posts/" rel="self" type="application/rss+xml" /><item>
-  <title>Ectd 集群搭建</title>
-  <link>http://yanghx.vip/posts/etcd/etcd%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/</link>
-  <pubDate>Sun, 19 Mar 2023 19:57:14 &#43;0800</pubDate>
-  <author>map[avatar:&lt;nil&gt; email:&lt;nil&gt; link:&lt;nil&gt; name:&lt;nil&gt;]</author>
-  <guid>http://yanghx.vip/posts/etcd/etcd%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/</guid>
-  <description><![CDATA[Ectd 集群搭建 引导etcd群集：静态、etcd发现和DNS发现 一、Ectd 集群搭建 1.1 概述 静态启动etcd集群需要集群中的每个成员都知道另一个成员]]></description>
-</item>
-<item>
-  <title>First_post</title>
-  <link>http://yanghx.vip/posts/first_post/</link>
-  <pubDate>Sun, 19 Mar 2023 19:57:14 &#43;0800</pubDate>
-  <author>map[avatar:&lt;nil&gt; email:&lt;nil&gt; link:&lt;nil&gt; name:&lt;nil&gt;]</author>
-  <guid>http://yanghx.vip/posts/first_post/</guid>
-  <description><![CDATA[]]></description>
-</item>
-</channel>
+    <channel>
+        <title>所有文章 - yanghx blog</title>
+        <link>http://yanghx.vip/posts/</link>
+        <description>所有文章 | yanghx blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Mon, 20 Mar 2023 02:42:30 &#43;0800</lastBuildDate><atom:link href="http://yanghx.vip/posts/" rel="self" type="application/rss+xml" /><item>
+    <title>First_post</title>
+    <link>http://yanghx.vip/first_post/</link>
+    <pubDate>Mon, 20 Mar 2023 02:42:30 &#43;0800</pubDate><author>
+        <name>yanghx</name>
+    </author><guid>http://yanghx.vip/first_post/</guid>
+    <description><![CDATA[Z]]></description>
+</item><item>
+    <title>k8s基础-黑马 </title>
+    <link>http://yanghx.vip/k8s-%E9%BB%91%E9%A9%AC/</link>
+    <pubDate>Tue, 03 Mar 2020 21:40:32 &#43;0800</pubDate><author>
+                    <name>Dillon</name>
+                </author><author>
+                    <name>PCloud</name>
+                </author><guid>http://yanghx.vip/k8s-%E9%BB%91%E9%A9%AC/</guid>
+    <description><![CDATA[视频：https://www.bilibili.com/video/BV1Qv41167ck 文档： https://gitee.com/yoo]]></description>
+</item><item>
+    <title></title>
+    <link>http://yanghx.vip/readme/</link>
+    <pubDate>Mon, 01 Jan 0001 00:00:00 &#43;0000</pubDate><author>
+        <name>yanghx</name>
+    </author><guid>http://yanghx.vip/readme/</guid>
+    <description><![CDATA[go 相关文档 go项目学习]]></description>
+</item><item>
+    <title></title>
+    <link>http://yanghx.vip/1-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F/</link>
+    <pubDate>Mon, 01 Jan 0001 00:00:00 &#43;0000</pubDate><author>
+        <name>yanghx</name>
+    </author><guid>http://yanghx.vip/1-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F/</guid>
+    <description><![CDATA[类加载子系统 一、 概述 二、类加载子系统作用：类加载子系统负责从文件系统或者网络中加载 Class 文件，class 文件在文件开头有特定的文件标识。 ClassLoader 只负责]]></description>
+</item><item>
+    <title></title>
+    <link>http://yanghx.vip/10-%E7%9B%B4%E6%8E%A5%E5%86%85%E5%AD%98/</link>
+    <pubDate>Mon, 01 Jan 0001 00:00:00 &#43;0000</pubDate><author>
+        <name>yanghx</name>
+    </author><guid>http://yanghx.vip/10-%E7%9B%B4%E6%8E%A5%E5%86%85%E5%AD%98/</guid>
+    <description><![CDATA[一、直接内存 Direct Memory不是虚拟机运行时数据区的一部分，也不是《Java虚拟机规范》中定义的内存区域。 直接内存是在Java堆外的，直接向系]]></description>
+</item><item>
+    <title></title>
+    <link>http://yanghx.vip/11-%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E/</link>
+    <pubDate>Mon, 01 Jan 0001 00:00:00 &#43;0000</pubDate><author>
+        <name>yanghx</name>
+    </author><guid>http://yanghx.vip/11-%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E/</guid>
+    <description><![CDATA[一、执行引擎 1.1 执行引擎概述执行引擎属于JVM的下层，里面包括 解释器、即时编译器、垃圾回收器 执行引擎是Java虚拟机核心的组成部分之一。”虚拟]]></description>
+</item><item>
+    <title></title>
+    <link>http://yanghx.vip/12-stringtable/</link>
+    <pubDate>Mon, 01 Jan 0001 00:00:00 &#43;0000</pubDate><author>
+        <name>yanghx</name>
+    </author><guid>http://yanghx.vip/12-stringtable/</guid>
+    <description><![CDATA[一、StringTable 1.1 String的基本特性 String: 字符串，使用一对 &quot;&quot; 引起来表示 String s1 = &ldquo;mogublog&rdquo;; // 字面量的定义方式 String s2 = new String(&ldquo;moxi&rdquo;); String 声明为final的，不]]></description>
+</item><item>
+    <title></title>
+    <link>http://yanghx.vip/13-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%A6%82%E8%BF%B0/</link>
+    <pubDate>Mon, 01 Jan 0001 00:00:00 &#43;0000</pubDate><author>
+        <name>yanghx</name>
+    </author><guid>http://yanghx.vip/13-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%A6%82%E8%BF%B0/</guid>
+    <description><![CDATA[一、垃圾回收概述 1.1 概念这次我们主要关注的是黄色部分，内存的分配与回收 1.2 什么是垃圾在提到什么是垃圾之前，我先看下面一张图 从上图我们可以很明确的]]></description>
+</item><item>
+    <title></title>
+    <link>http://yanghx.vip/14-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95/</link>
+    <pubDate>Mon, 01 Jan 0001 00:00:00 &#43;0000</pubDate><author>
+        <name>yanghx</name>
+    </author><guid>http://yanghx.vip/14-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95/</guid>
+    <description><![CDATA[垃圾回收相关算法 一、标记阶段：引用计数算法在堆里存放着几乎所有的Java对象实例，在GC执行垃圾回收之前，首先需要区分出内存中那些是存活对象]]></description>
+</item><item>
+    <title></title>
+    <link>http://yanghx.vip/15-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5/</link>
+    <pubDate>Mon, 01 Jan 0001 00:00:00 &#43;0000</pubDate><author>
+        <name>yanghx</name>
+    </author><guid>http://yanghx.vip/15-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5/</guid>
+    <description><![CDATA[垃圾回收相关概念 一、System.gc()的理解在默认情况下，通过system.gc()或者Runtime.getRuntime().gc(]]></description>
+</item></channel>
 </rss>

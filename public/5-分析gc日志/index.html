@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noodp" />
+    <title> - yanghx blog</title><meta name="Description" content="yanghx blog"><meta property="og:title" content="" />
+<meta property="og:description" content="五. 分析 GC 日志 5.1. GC 分类针对 HotSpot VM 的实现，它里面的 GC 按照回收区域又分为两大种类型：一种是部分收集（Partial GC），一种是整堆收集（Full" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://yanghx.vip/5-%E5%88%86%E6%9E%90gc%E6%97%A5%E5%BF%97/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
+
+<meta property="og:site_name" content="yanghx blog" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
+
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="五. 分析 GC 日志 5.1. GC 分类针对 HotSpot VM 的实现，它里面的 GC 按照回收区域又分为两大种类型：一种是部分收集（Partial GC），一种是整堆收集（Full"/>
+<meta name="application-name" content="DoIt">
+<meta name="apple-mobile-web-app-title" content="DoIt">
+
+<meta name="theme-color" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" href="http://yanghx.vip/5-%E5%88%86%E6%9E%90gc%E6%97%A5%E5%BF%97/" /><link rel="prev" href="http://yanghx.vip/6-%E8%A1%A5%E5%85%85%E4%BD%BF%E7%94%A8-oql-%E8%AF%AD%E8%A8%80%E6%9F%A5%E8%AF%A2%E5%AF%B9%E8%B1%A1%E4%BF%A1%E6%81%AF/" /><link rel="next" href="http://yanghx.vip/4-jvm%E8%BF%90%E8%A1%8C%E6%97%B6%E5%8F%82%E6%95%B0/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/color.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/fontawesome-free/all.min.css">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/animate/animate.min.css">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/yanghx.vip\/5-%E5%88%86%E6%9E%90gc%E6%97%A5%E5%BF%97\/"
+        },"genre": "posts","wordcount":  1732 ,
+        "url": "http:\/\/yanghx.vip\/5-%E5%88%86%E6%9E%90gc%E6%97%A5%E5%BF%97\/","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "yanghx"
+            },"description": ""
+    }
+    </script><script src="//instant.page/5.1.1" defer type="module" integrity="sha384-MWfCL6g1OTGsbSwfuMHc8+8J2u71/LA8dzlIN3ycajckxuZZmF+DNjdm7O6H3PSq"></script>
+</head>
+
+<body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">
+        function setTheme(theme) {document.body.setAttribute('theme', theme); document.documentElement.style.setProperty('color-scheme', theme === 'light' ? 'light' : 'dark');}
+        function saveTheme(theme) {window.localStorage && localStorage.setItem('theme', theme);}
+        function getMeta(metaName) {const metas = document.getElementsByTagName('meta'); for (let i = 0; i < metas.length; i++) if (metas[i].getAttribute('name') === metaName) return metas[i]; return '';}
+        if (window.localStorage && localStorage.getItem('theme')) {let theme = localStorage.getItem('theme');theme === 'light' || theme === 'dark' || theme === 'black' ? setTheme(theme) : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? setTheme('dark') : setTheme('light')); } else { if ('auto' === 'light' || 'auto' === 'dark' || 'auto' === 'black') setTheme('auto'), saveTheme('auto'); else saveTheme('auto'), window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? setTheme('dark') : setTheme('light');}
+        let metaColors = {'light': '#f8f8f8','dark': '#252627','black': '#000000'}
+        getMeta('theme-color').content = metaColors[document.body.getAttribute('theme')];
+    </script>
+    <div id="back-to-top"></div>
+    <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="yanghx blog">yanghx blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="#" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="#" class="menu-item theme-select" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                    <select class="color-theme-select" id="theme-select-desktop" title="切换主题">
+                        <option value="light">浅色</option>
+                        <option value="dark">深色</option>
+                        <option value="black">黑色</option>
+                        <option value="auto">跟随系统</option>
+                    </select>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="yanghx blog">yanghx blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="#" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="#" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="#" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+                <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
+                    <option value="light">浅色</option>
+                    <option value="dark">深色</option>
+                    <option value="black">黑色</option>
+                    <option value="auto">跟随系统</option>
+                </select>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="post-meta-line">
+                <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
+                </span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 1732 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 4 分钟&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  kept="true">
+                <div class="details-summary toc-title">
+                    <span>目录</span>
+                    <span><i class="details-icon fas fa-angle-right"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#五-分析-gc-日志">五. 分析 GC 日志</a>
+          <ul>
+            <li><a href="#51-gc-分类">5.1. GC 分类</a></li>
+            <li><a href="#52-gc-日志分类">5.2. GC 日志分类</a></li>
+            <li><a href="#53-gc-日志结构剖析">5.3 GC 日志结构剖析</a></li>
+            <li><a href="#54-gc-日志分析工具">5.4 GC 日志分析工具</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h3 id="五-分析-gc-日志" class="headerLink">
+    <a href="#%e4%ba%94-%e5%88%86%e6%9e%90-gc-%e6%97%a5%e5%bf%97" class="header-mark"></a>五. 分析 GC 日志</h3><h4 id="51-gc-分类" class="headerLink">
+    <a href="#51-gc-%e5%88%86%e7%b1%bb" class="header-mark"></a>5.1. GC 分类</h4><p>针对 HotSpot VM 的实现，它里面的 GC 按照回收区域又分为两大种类型：一种是部分收集（Partial GC），一种是整堆收集（Full GC）</p>
+<ul>
+<li>部分收集（Partial GC）：不是完整收集整个 Java 堆的垃圾收集。其中又分为：
+<ul>
+<li>新生代收集（Minor GC / Young GC）：只是新生代（Eden / S0, S1）的垃圾收集</li>
+<li>老年代收集（Major GC / Old GC）：只是老年代的垃圾收集。目前，只有 CMS GC 会有单独收集老年代的行为。注意，很多时候 Major GC 会和 Full GC 混淆使用，需要具体分辨是老年代回收还是整堆回收。</li>
+</ul>
+</li>
+<li>混合收集（Mixed GC）：收集整个新生代以及部分老年代的垃圾收集。目前，只有 G1 GC 会有这种行为</li>
+<li>整堆收集（Full GC）：收集整个 java 堆和方法区的垃圾收集。</li>
+</ul>
+<h4 id="52-gc-日志分类" class="headerLink">
+    <a href="#52-gc-%e6%97%a5%e5%bf%97%e5%88%86%e7%b1%bb" class="header-mark"></a>5.2. GC 日志分类</h4><p><strong>MinorGC</strong></p>
+<p>MinorGC（或 young GC 或 YGC）日志：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[GC (Allocation Failure) [PSYoungGen: 31744K-&gt;2192K (36864K) ] 31744K-&gt;2200K (121856K), 0.0139308 secs] [Times: user=0.05 sys=0.01, real=0.01 secs]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/df81757685ca21a927d9335273f561c5.png" title="image-20210506202126562" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/df81757685ca21a927d9335273f561c5.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/df81757685ca21a927d9335273f561c5.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/df81757685ca21a927d9335273f561c5.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/df81757685ca21a927d9335273f561c5.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/df81757685ca21a927d9335273f561c5.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/df81757685ca21a927d9335273f561c5.png">
+    </a></p>
+<p><a class="lightgallery" href="https://img-blog.csdnimg.cn/img_convert/b9a7575380bcdb91b54c0556557d8ad9.png" title="image-20210506202156090" data-thumbnail="https://img-blog.csdnimg.cn/img_convert/b9a7575380bcdb91b54c0556557d8ad9.png">
+        <img
+            
+            loading="lazy"
+            src="https://img-blog.csdnimg.cn/img_convert/b9a7575380bcdb91b54c0556557d8ad9.png"
+            srcset="https://img-blog.csdnimg.cn/img_convert/b9a7575380bcdb91b54c0556557d8ad9.png, https://img-blog.csdnimg.cn/img_convert/b9a7575380bcdb91b54c0556557d8ad9.png 1.5x, https://img-blog.csdnimg.cn/img_convert/b9a7575380bcdb91b54c0556557d8ad9.png 2x"
+            sizes="auto"
+            alt="https://img-blog.csdnimg.cn/img_convert/b9a7575380bcdb91b54c0556557d8ad9.png">
+    </a></p>
+<p><strong>FullGC</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">[</span>Full GC <span class="o">(</span>Metadata GC Threshold<span class="o">)</span> 
+</span></span><span class="line"><span class="cl"><span class="o">[</span>PSYoungGen: 5104K-&gt;0K <span class="o">(</span>132096K<span class="o">)</span> <span class="o">]</span> 
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Par01dGen: 416K-&gt;5453K <span class="o">(</span>50176K<span class="o">)</span> <span class="o">]</span>5520K-&gt;5453K <span class="o">(</span>182272K<span class="o">)</span>, 
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Metaspace: 20637K-&gt;20637K <span class="o">(</span>1067008K<span class="o">)</span> <span class="o">]</span>, 0.0245883 secs<span class="o">]</span> 
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Times: <span class="nv">user</span><span class="o">=</span>0.06 <span class="nv">sys</span><span class="o">=</span>0.00, <span class="nv">real</span><span class="o">=</span>0.02 secs<span class="o">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/0dcb239f0928bc374ac1b376b4189295.png" title="image-20210506202330868" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/0dcb239f0928bc374ac1b376b4189295.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/0dcb239f0928bc374ac1b376b4189295.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/0dcb239f0928bc374ac1b376b4189295.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/0dcb239f0928bc374ac1b376b4189295.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/0dcb239f0928bc374ac1b376b4189295.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/0dcb239f0928bc374ac1b376b4189295.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/7817f28a52c836d5ed08a4b992823f64.png" title="image-20210506202349072" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/7817f28a52c836d5ed08a4b992823f64.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/7817f28a52c836d5ed08a4b992823f64.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/7817f28a52c836d5ed08a4b992823f64.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/7817f28a52c836d5ed08a4b992823f64.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/7817f28a52c836d5ed08a4b992823f64.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/7817f28a52c836d5ed08a4b992823f64.png">
+    </a></p>
+<h4 id="53-gc-日志结构剖析" class="headerLink">
+    <a href="#53-gc-%e6%97%a5%e5%bf%97%e7%bb%93%e6%9e%84%e5%89%96%e6%9e%90" class="header-mark"></a>5.3 GC 日志结构剖析</h4><p><strong>透过日志看垃圾收集器</strong></p>
+<ul>
+<li>Serial 收集器：新生代显示 &ldquo;[DefNew&rdquo;，即 Default New Generation</li>
+<li>ParNew 收集器：新生代显示 &ldquo;[ParNew&rdquo;，即 Parallel New Generation</li>
+<li>Parallel Scavenge 收集器：新生代显示&quot;[PSYoungGen&quot;，JDK1.7 使用的即 PSYoungGen</li>
+<li>Parallel Old 收集器：老年代显示&quot;[ParoldGen&quot;</li>
+<li>G1 收集器：显示”garbage-first heap“</li>
+</ul>
+<p><strong>透过日志看 GC 原因</strong></p>
+<ul>
+<li>Allocation Failure：表明本次引起 GC 的原因是因为新生代中没有足够的区域存放需要分配的数据</li>
+<li>Metadata GCThreshold：Metaspace 区不够用了</li>
+<li>FErgonomics：JVM 自适应调整导致的 GC</li>
+<li>System：调用了 System.gc()方法</li>
+</ul>
+<p><strong>透过日志看 GC 前后情况</strong></p>
+<p>通过图示，我们可以发现 GC 日志格式的规律一般都是：GC 前内存占用-＞ GC 后内存占用（该区域内存总大小）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="o">[</span><span class="n">PSYoungGen</span><span class="o">:</span> <span class="mi">5986</span><span class="n">K</span><span class="o">-&gt;</span><span class="mi">696</span><span class="n">K</span> <span class="o">(</span><span class="mi">8704</span><span class="n">K</span><span class="o">)</span> <span class="o">]</span> <span class="mi">5986</span><span class="n">K</span><span class="o">-&gt;</span><span class="mi">704</span><span class="n">K</span> <span class="o">(</span><span class="mi">9216</span><span class="n">K</span><span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>中括号内：GC 回收前年轻代堆大小，回收后大小，（年轻代堆总大小）</li>
+<li>括号外：GC 回收前年轻代和老年代大小，回收后大小，（年轻代和老年代总大小）</li>
+</ul>
+<p>注意：Minor GC 堆内存总容量 = 9/10 年轻代 + 老年代。原因是 Survivor 区只计算 from 部分，而 JVM 默认年轻代中 Eden 区和 Survivor 区的比例关系，Eden:S0:S1=8:1:1。</p>
+<p><strong>透过日志看 GC 时间</strong></p>
+<p>GC 日志中有三个时间：user，sys 和 real</p>
+<ul>
+<li>user：进程执行用户态代码（核心之外）所使用的时间。这是执行此进程所使用的实际 CPU 时间，其他进程和此进程阻塞的时间并不包括在内。在垃圾收集的情况下，表示 GC 线程执行所使用的 CPU 总时间。</li>
+<li>sys：进程在内核态消耗的 CPU 时间，即在内核执行系统调用或等待系统事件所使用的 CPU 时间</li>
+<li>real：程序从开始到结束所用的时钟时间。这个时间包括其他进程使用的时间片和进程阻塞的时间（比如等待 I/O 完成）。对于并行 gc，这个数字应该接近（用户时间＋系统时间）除以垃圾收集器使用的线程数。</li>
+</ul>
+<p>由于多核的原因，一般的 GC 事件中，real time 是小于 sys time ＋ user time 的，因为一般是多个线程并发的去做 GC，所以 real time 是要小于 sys ＋ user time 的。如果 real ＞ sys ＋ user 的话，则你的应用可能存在下列问题：IO 负载非常重或 CPU 不够用。</p>
+<h4 id="54-gc-日志分析工具" class="headerLink">
+    <a href="#54-gc-%e6%97%a5%e5%bf%97%e5%88%86%e6%9e%90%e5%b7%a5%e5%85%b7" class="header-mark"></a>5.4 GC 日志分析工具</h4><p><strong>GCEasy</strong></p>
+<p>GCEasy 是一款在线的 GC 日志分析器，可以通过 GC 日志分析进行内存泄露检测、GC 暂停原因分析、JVM 配置建议优化等功能，大多数功能是免费的。</p>
+<p>官网地址：<a href="https://gitee.com/link?target=https%3A%2F%2Fgceasy.io%2F" target="_blank" rel="noopener noreferrer">https://gceasy.io/</a></p>
+<p><strong>GCViewer</strong></p>
+<p>GCViewer 是一款离线的 GC 日志分析器，用于可视化 Java VM 选项 -verbose:gc 和 .NET 生成的数据 -Xloggc:<file>。还可以计算与垃圾回收相关的性能指标（吞吐量、累积的暂停、最长的暂停等）。当通过更改世代大小或设置初始堆大小来调整特定应用程序的垃圾回收时，此功能非常有用。</p>
+<p>源码下载：<a href="https://gitee.com/link?target=https%3A%2F%2Fgithub.com%2Fchewiebug%2FGCViewer" target="_blank" rel="noopener noreferrer">https://github.com/chewiebug/GCViewer</a></p>
+<p>运行版本下载：<a href="https://gitee.com/link?target=https%3A%2F%2Fgithub.com%2Fchewiebug%2FGCViewer%2Fwiki%2FChangelog" target="_blank" rel="noopener noreferrer">https://github.com/chewiebug/GCViewer/wiki/Changelog</a></p>
+<p><strong>GChisto</strong></p>
+<ul>
+<li>官网上没有下载的地方，需要自己从 SVN 上拉下来编译</li>
+<li>不过这个工具似乎没怎么维护了，存在不少 bug</li>
+</ul>
+<p><strong>HPjmeter</strong></p>
+<ul>
+<li>工具很强大，但是只能打开由以下参数生成的 GC log，-verbose:gc -Xloggc:gc.log。添加其他参数生成的 gc.log 无法打开</li>
+<li>HPjmeter 集成了以前的 HPjtune 功能，可以分析在 HP 机器上产生的垃圾回收日志文件</li>
+</ul>
+</div>
+
+        
+
+<div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 0001-01-01</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span><a class="link-to-mardown" href=/5-%E5%88%86%E6%9E%90gc%E6%97%A5%E5%BF%97/index.md target="_blank" rel="noopener noreferrer">阅读原始文档</a>
+                    </span></div>
+            <div class="post-info-share">
+                <span><a href="#" title="分享到 Twitter" data-sharer="twitter" data-url="http://yanghx.vip/5-%E5%88%86%E6%9E%90gc%E6%97%A5%E5%BF%97/" data-title="" data-via="xxxx"><i class="fab fa-twitter fa-fw"></i></a><a href="#" title="分享到 Facebook" data-sharer="facebook" data-url="http://yanghx.vip/5-%E5%88%86%E6%9E%90gc%E6%97%A5%E5%BF%97/"><i class="fab fa-facebook-square fa-fw"></i></a><a href="#" title="分享到 WhatsApp" data-sharer="whatsapp" data-url="http://yanghx.vip/5-%E5%88%86%E6%9E%90gc%E6%97%A5%E5%BF%97/" data-title="" data-web><i class="fab fa-whatsapp fa-fw"></i></a><a href="#" title="分享到 Line" data-sharer="line" data-url="http://yanghx.vip/5-%E5%88%86%E6%9E%90gc%E6%97%A5%E5%BF%97/" data-title=""><i data-svg-src="/lib/simple-icons/icons/line.min.svg"></i></a><a href="#" title="分享到 微博" data-sharer="weibo" data-url="http://yanghx.vip/5-%E5%88%86%E6%9E%90gc%E6%97%A5%E5%BF%97/" data-title=""><i class="fab fa-weibo fa-fw"></i></a><a href="#" title="分享到 Myspace" data-sharer="myspace" data-url="http://yanghx.vip/5-%E5%88%86%E6%9E%90gc%E6%97%A5%E5%BF%97/" data-title="" data-description=""><i data-svg-src="/lib/simple-icons/icons/myspace.min.svg"></i></a><a href="#" title="分享到 Blogger" data-sharer="blogger" data-url="http://yanghx.vip/5-%E5%88%86%E6%9E%90gc%E6%97%A5%E5%BF%97/" data-title="" data-description=""><i class="fab fa-blogger fa-fw"></i></a><a href="#" title="分享到 Evernote" data-sharer="evernote" data-url="http://yanghx.vip/5-%E5%88%86%E6%9E%90gc%E6%97%A5%E5%BF%97/" data-title=""><i class="fab fa-evernote fa-fw"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/6-%E8%A1%A5%E5%85%85%E4%BD%BF%E7%94%A8-oql-%E8%AF%AD%E8%A8%80%E6%9F%A5%E8%AF%A2%E5%AF%B9%E8%B1%A1%E4%BF%A1%E6%81%AF/" class="prev" rel="prev" title=""><i class="fas fa-angle-left fa-fw"></i></a>
+            <a href="/4-jvm%E8%BF%90%E8%A1%8C%E6%97%B6%E5%8F%82%E6%95%B0/" class="next" rel="next" title=""><i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+        </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">
+                    由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+            <div class="footer-line"></div>
+            <div class="footer-line">
+            </div>
+        </div></footer></div>
+
+    <div id="fixed-buttons"><a href="#back-to-top" id="back-to-top-button" class="fixed-button" title="回到顶部">
+            <i class="fas fa-arrow-up fa-fw"></i>
+        </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+            <i class="fas fa-comment fa-fw"></i>
+        </a>
+    </div><div id="cookieconsent-container"></div><div class="assets"><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/katex/copy-tex.min.css">
+        <noscript><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"></noscript><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"distance":100,"findAllMatches":false,"fuseIndexURL":"/index.json","highlightTag":"em","ignoreFieldNorm":false,"ignoreLocation":false,"isCaseSensitive":false,"location":0,"maxResultLength":10,"minMatchCharLength":2,"noResultsFound":"没有找到结果","snippetLength":50,"threshold":0.3,"type":"fuse","useExtendedSearch":false},"sharerjs":true,"table":{"sort":true}};</script><script type="text/javascript" src="/lib/tablesort/tablesort.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js" defer></script><script type="text/javascript" src="/lib/katex/auto-render.min.js" defer></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js" defer></script><script type="text/javascript" src="/lib/katex/mhchem.min.js" defer></script><script type="text/javascript" src="/js/katex.min.js" defer></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script type="text/javascript" src="/js/cookieconsent.min.js" defer></script><script type="text/javascript" src="/js/theme.min.js" defer></script></div>
+</body>
+
+</html>

@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noodp" />
+    <title> - yanghx blog</title><meta name="Description" content="yanghx blog"><meta property="og:title" content="" />
+<meta property="og:description" content="一、JVM 监控及诊断工具-命令行篇 1.1 概述性能诊断是软件工程师在日常工作中需要经常面对和解决的问题，在用户体验至上的今天，解决好应用的性能问题" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://yanghx.vip/2-jvm%E7%9B%91%E6%8E%A7%E5%8F%8A%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-%E5%91%BD%E4%BB%A4%E8%A1%8C/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
+
+<meta property="og:site_name" content="yanghx blog" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
+
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="一、JVM 监控及诊断工具-命令行篇 1.1 概述性能诊断是软件工程师在日常工作中需要经常面对和解决的问题，在用户体验至上的今天，解决好应用的性能问题"/>
+<meta name="application-name" content="DoIt">
+<meta name="apple-mobile-web-app-title" content="DoIt">
+
+<meta name="theme-color" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" href="http://yanghx.vip/2-jvm%E7%9B%91%E6%8E%A7%E5%8F%8A%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-%E5%91%BD%E4%BB%A4%E8%A1%8C/" /><link rel="prev" href="http://yanghx.vip/3-jvm%E7%9B%91%E6%8E%A7%E5%8F%8A%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-gui/" /><link rel="next" href="http://yanghx.vip/1-%E6%A6%82%E8%BF%B0/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/color.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/fontawesome-free/all.min.css">
+        <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/animate/animate.min.css">
+        <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/yanghx.vip\/2-jvm%E7%9B%91%E6%8E%A7%E5%8F%8A%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-%E5%91%BD%E4%BB%A4%E8%A1%8C\/"
+        },"genre": "posts","wordcount":  5142 ,
+        "url": "http:\/\/yanghx.vip\/2-jvm%E7%9B%91%E6%8E%A7%E5%8F%8A%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-%E5%91%BD%E4%BB%A4%E8%A1%8C\/","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "yanghx"
+            },"description": ""
+    }
+    </script><script src="//instant.page/5.1.1" defer type="module" integrity="sha384-MWfCL6g1OTGsbSwfuMHc8+8J2u71/LA8dzlIN3ycajckxuZZmF+DNjdm7O6H3PSq"></script>
+</head>
+
+<body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">
+        function setTheme(theme) {document.body.setAttribute('theme', theme); document.documentElement.style.setProperty('color-scheme', theme === 'light' ? 'light' : 'dark');}
+        function saveTheme(theme) {window.localStorage && localStorage.setItem('theme', theme);}
+        function getMeta(metaName) {const metas = document.getElementsByTagName('meta'); for (let i = 0; i < metas.length; i++) if (metas[i].getAttribute('name') === metaName) return metas[i]; return '';}
+        if (window.localStorage && localStorage.getItem('theme')) {let theme = localStorage.getItem('theme');theme === 'light' || theme === 'dark' || theme === 'black' ? setTheme(theme) : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? setTheme('dark') : setTheme('light')); } else { if ('auto' === 'light' || 'auto' === 'dark' || 'auto' === 'black') setTheme('auto'), saveTheme('auto'); else saveTheme('auto'), window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? setTheme('dark') : setTheme('light');}
+        let metaColors = {'light': '#f8f8f8','dark': '#252627','black': '#000000'}
+        getMeta('theme-color').content = metaColors[document.body.getAttribute('theme')];
+    </script>
+    <div id="back-to-top"></div>
+    <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="yanghx blog">yanghx blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="#" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="#" class="menu-item theme-select" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                    <select class="color-theme-select" id="theme-select-desktop" title="切换主题">
+                        <option value="light">浅色</option>
+                        <option value="dark">深色</option>
+                        <option value="black">黑色</option>
+                        <option value="auto">跟随系统</option>
+                    </select>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="yanghx blog">yanghx blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="#" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="#" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="#" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+                <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
+                    <option value="light">浅色</option>
+                    <option value="dark">深色</option>
+                    <option value="black">黑色</option>
+                    <option value="auto">跟随系统</option>
+                </select>
+            </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="post-meta-line">
+                <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
+                </span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 5142 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 11 分钟&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  kept="true">
+                <div class="details-summary toc-title">
+                    <span>目录</span>
+                    <span><i class="details-icon fas fa-angle-right"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#一jvm-监控及诊断工具-命令行篇">一、JVM 监控及诊断工具-命令行篇</a>
+          <ul>
+            <li><a href="#11-概述">1.1 概述</a></li>
+            <li><a href="#12-jps查看正在运行的java进程">1.2 jps：查看正在运行的Java进程</a></li>
+            <li><a href="#13-jstat查看-jvm-统计信息">1.3 jstat：查看 JVM 统计信息</a></li>
+            <li><a href="#14-jinfo实时查看和修改-jvm-配置参数">1.4 jinfo：实时查看和修改 JVM 配置参数</a></li>
+            <li><a href="#15-jmap导出内存映像文件内存使用情况">1.5 jmap：导出内存映像文件&amp;内存使用情况</a></li>
+            <li><a href="#16-jhatjdk-自带堆分析工具">1.6 jhat：JDK 自带堆分析工具</a></li>
+            <li><a href="#17-jstack打印-jvm-中线程快照">1.7 jstack：打印 JVM 中线程快照</a></li>
+            <li><a href="#18-jcmd多功能命令行">1.8 jcmd：多功能命令行</a></li>
+            <li><a href="#19-jstatd远程主机信息收集">1.9 jstatd：远程主机信息收集</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h3 id="一jvm-监控及诊断工具-命令行篇" class="headerLink">
+    <a href="#%e4%b8%80jvm-%e7%9b%91%e6%8e%a7%e5%8f%8a%e8%af%8a%e6%96%ad%e5%b7%a5%e5%85%b7-%e5%91%bd%e4%bb%a4%e8%a1%8c%e7%af%87" class="header-mark"></a>一、JVM 监控及诊断工具-命令行篇</h3><h4 id="11-概述" class="headerLink">
+    <a href="#11-%e6%a6%82%e8%bf%b0" class="header-mark"></a>1.1 概述</h4><p>性能诊断是软件工程师在日常工作中需要经常面对和解决的问题，在用户体验至上的今天，解决好应用的性能问题能带来非常大的收益。</p>
+<p>Java 作为最流行的编程语言之一，其应用性能诊断一直受到业界广泛关注。可能造成 Java 应用出现性能问题的因素非常多，例如线程控制、磁盘读写、数据库访问、网络 I/O、垃圾收集等。想要定位这些问题，一款优秀的性能诊断工具必不可少。</p>
+<p>体会 1：使用数据说明问题，使用知识分析问题，使用工具处理问题。</p>
+<p>体会 2：无监控、不调优！</p>
+<p><strong>简单命令行工具</strong></p>
+<p>在我们刚接触 java 学习的时候，大家肯定最先了解的两个命令就是 javac，java，那么除此之外，还有没有其他的命令可以供我们使用呢？</p>
+<p>我们进入到安装 jdk 的 bin 目录，发现还有一系列辅助工具。这些辅助工具用来获取目标 JVM 不同方面、不同层次的信息，帮助开发人员很好地解决 Java 应用程序的一些疑难杂症。</p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/5b7c5d239e4da192ba65edb0800055c5.png" title="image-20210504195803526" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/5b7c5d239e4da192ba65edb0800055c5.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/5b7c5d239e4da192ba65edb0800055c5.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/5b7c5d239e4da192ba65edb0800055c5.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/5b7c5d239e4da192ba65edb0800055c5.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/5b7c5d239e4da192ba65edb0800055c5.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/5b7c5d239e4da192ba65edb0800055c5.png">
+    </a></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/fa3c5e41cbf999d261bcf32851731565.png" title="image-20210504195836342" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/fa3c5e41cbf999d261bcf32851731565.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/fa3c5e41cbf999d261bcf32851731565.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/fa3c5e41cbf999d261bcf32851731565.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/fa3c5e41cbf999d261bcf32851731565.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/fa3c5e41cbf999d261bcf32851731565.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/fa3c5e41cbf999d261bcf32851731565.png">
+    </a></p>
+<p>官方源码地址：<a href="https://gitee.com/link?target=http%3A%2F%2Fhg.openjdk.java.net%2Fjdk%2Fjdk11%2Ffile%2F1ddf9a99e4ad%2Fsrc%2Fjdk.jcmd%2Fshare%2Fclasses%2Fsun%2Ftools" target="_blank" rel="noopener noreferrer">http://hg.openjdk.java.net/jdk/jdk11/file/1ddf9a99e4ad/src/jdk.jcmd/share/classes/sun/tools</a></p>
+<h4 id="12-jps查看正在运行的java进程" class="headerLink">
+    <a href="#12-jps%e6%9f%a5%e7%9c%8b%e6%ad%a3%e5%9c%a8%e8%bf%90%e8%a1%8c%e7%9a%84java%e8%bf%9b%e7%a8%8b" class="header-mark"></a>1.2 jps：查看正在运行的Java进程</h4><p>jps（Java Process Status）：显示指定系统内所有的HotSpot虚拟机进程（查看虚拟机进程信息），可用于查询正咋运行的虚拟机进程。</p>
+<p>说明：对于本地虚拟机进程来说，进程的本地虚拟机ID与操作系统进程ID是一致的，是唯一的。</p>
+<p>基本使用语法为：jps [options] [hostid]</p>
+<p>我们还可以通过追加参数，来打印额外的信息。</p>
+<p>options 参数</p>
+<ul>
+<li>-q：仅仅显示LVMID（local virtual machine id），即本地虚拟机唯一id。不显示主类的名称等。</li>
+<li>-l：输出应用程序主类的全类名 或 如果进程执行的是jar 包，则输出jar完整路径。</li>
+<li>-m：输出虚拟机进程启动时传递给主类 main()的参数。</li>
+<li>-v：列出虚拟机进程启动时的JVM参数。比如： -Xms20m   -Xmx50m是启动程序指定的jvm参数。</li>
+</ul>
+<p>说明：以上参数可以综合使用。</p>
+<p>补充：如果某 Java 进程关闭了默认开启的 UsePerfData 参数（即使用参数-XX：-UsePerfData），那么 jps 命令（以及下面介绍的 jstat）将无法探知该 Java 进程。</p>
+<p><strong>hostid 参数</strong></p>
+<p>RMI 注册表中注册的主机名。如果想要远程监控主机上的 java 程序，需要安装 jstatd。</p>
+<p>对于具有更严格的安全实践的网络场所而言，可能使用一个自定义的策略文件来显示对特定的可信主机或网络的访问，尽管这种技术容易受到 IP 地址欺诈攻击。</p>
+<p>如果安全问题无法使用一个定制的策略文件来处理，那么最安全的操作是不运行 jstatd 服务器，而是在本地使用 jstat 和 jps 工具。</p>
+<h4 id="13-jstat查看-jvm-统计信息" class="headerLink">
+    <a href="#13-jstat%e6%9f%a5%e7%9c%8b-jvm-%e7%bb%9f%e8%ae%a1%e4%bf%a1%e6%81%af" class="header-mark"></a>1.3 jstat：查看 JVM 统计信息</h4><p>jstat（JVM Statistics Monitoring Tool）：用于监视虚拟机各种运行状态信息的命令行工具。它可以显示本地或者远程虚拟机进程中的类装载、内存、垃圾收集、JIT 编译等运行数据。在没有 GUI 图形界面，只提供了纯文本控制台环境的服务器上，它将是运行期定位虚拟机性能问题的首选工具。常用于检测垃圾回收问题以及内存泄漏问题。</p>
+<p>官方文档：<a href="https://gitee.com/link?target=https%3A%2F%2Fdocs.oracle.com%2Fjavase%2F8%2Fdocs%2Ftechnotes%2Ftools%2Funix%2Fjstat.html" target="_blank" rel="noopener noreferrer">https://docs.oracle.com/javase/8/docs/technotes/tools/unix/jstat.html</a></p>
+<p>基本使用语法为：jstat -<option> [-t] [-h<lines>] <vmid> [<interval> [<count>]]</p>
+<p>查看命令相关参数：jstat-h 或 jstat-help</p>
+<p>其中 vmid 是进程 id 号，也就是 jps 之后看到的前面的号码，如下：</p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/83dddc874824b88d7fd03dab2b3889f1.png" title="image-20210504201703222" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/83dddc874824b88d7fd03dab2b3889f1.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/83dddc874824b88d7fd03dab2b3889f1.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/83dddc874824b88d7fd03dab2b3889f1.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/83dddc874824b88d7fd03dab2b3889f1.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/83dddc874824b88d7fd03dab2b3889f1.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/83dddc874824b88d7fd03dab2b3889f1.png">
+    </a></p>
+<p><strong>option 参数</strong></p>
+<p>选项 option 可以由以下值构成。</p>
+<p>类装载相关的：</p>
+<ul>
+<li>-class：显示 ClassLoader 的相关信息：类的装载、卸载数量、总空间、类装载所消耗的时间等</li>
+</ul>
+<p>垃圾回收相关的：</p>
+<ul>
+<li>-gc：显示与 GC 相关的堆信息。包括 Eden 区、两个 Survivor 区、老年代、永久代等的容量、已用空间、GC 时间合计等信息。</li>
+<li>-gccapacity：显示内容与-gc 基本相同，但输出主要关注 Java 堆各个区域使用到的最大、最小空间。</li>
+<li>-gcutil：显示内容与-gc 基本相同，但输出主要关注已使用空间占总空间的百分比。</li>
+<li>-gccause：与-gcutil 功能一样，但是会额外输出导致最后一次或当前正在发生的 GC 产生的原因。</li>
+<li>-gcnew：显示新生代 GC 状况</li>
+<li>-gcnewcapacity：显示内容与-gcnew 基本相同，输出主要关注使用到的最大、最小空间</li>
+<li>-geold：显示老年代 GC 状况</li>
+<li>-gcoldcapacity：显示内容与-gcold 基本相同，输出主要关注使用到的最大、最小空间</li>
+<li>-gcpermcapacity：显示永久代使用到的最大、最小空间。</li>
+</ul>
+<p>JIT 相关的：</p>
+<ul>
+<li>-compiler：显示 JIT 编译器编译过的方法、耗时等信息</li>
+<li>-printcompilation：输出已经被 JIT 编译的方法</li>
+</ul>
+<p><strong>jstat -class</strong></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/9f2cea8b0a9b1bc47c10281b5c140cc4.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/9f2cea8b0a9b1bc47c10281b5c140cc4.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/9f2cea8b0a9b1bc47c10281b5c140cc4.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/9f2cea8b0a9b1bc47c10281b5c140cc4.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/9f2cea8b0a9b1bc47c10281b5c140cc4.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/9f2cea8b0a9b1bc47c10281b5c140cc4.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/9f2cea8b0a9b1bc47c10281b5c140cc4.png">
+    </a></p>
+<p><strong>jstat -compiler</strong></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4e11a07ce9b8ff2f73ba5585e11e1da3.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4e11a07ce9b8ff2f73ba5585e11e1da3.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4e11a07ce9b8ff2f73ba5585e11e1da3.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4e11a07ce9b8ff2f73ba5585e11e1da3.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/4e11a07ce9b8ff2f73ba5585e11e1da3.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/4e11a07ce9b8ff2f73ba5585e11e1da3.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/4e11a07ce9b8ff2f73ba5585e11e1da3.png">
+    </a></p>
+<p><strong>jstat -printcompilation</strong></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/2a2553eef35293d28ef095feee3bb3b7.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/2a2553eef35293d28ef095feee3bb3b7.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/2a2553eef35293d28ef095feee3bb3b7.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/2a2553eef35293d28ef095feee3bb3b7.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/2a2553eef35293d28ef095feee3bb3b7.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/2a2553eef35293d28ef095feee3bb3b7.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/2a2553eef35293d28ef095feee3bb3b7.png">
+    </a></p>
+<p><strong>jstat -gc</strong></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/6ea2aa6665c49b4bd35d46152dd2f1aa.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/6ea2aa6665c49b4bd35d46152dd2f1aa.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/6ea2aa6665c49b4bd35d46152dd2f1aa.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/6ea2aa6665c49b4bd35d46152dd2f1aa.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/6ea2aa6665c49b4bd35d46152dd2f1aa.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/6ea2aa6665c49b4bd35d46152dd2f1aa.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/6ea2aa6665c49b4bd35d46152dd2f1aa.png">
+    </a></p>
+<p><strong>jstat -gccapacity</strong></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/be1dbc9fb1100c4ab76fdf802171c000.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/be1dbc9fb1100c4ab76fdf802171c000.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/be1dbc9fb1100c4ab76fdf802171c000.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/be1dbc9fb1100c4ab76fdf802171c000.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/be1dbc9fb1100c4ab76fdf802171c000.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/be1dbc9fb1100c4ab76fdf802171c000.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/be1dbc9fb1100c4ab76fdf802171c000.png">
+    </a></p>
+<p><strong>jstat -gcutil</strong></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/527f347102e0f48036f4e643103a735f.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/527f347102e0f48036f4e643103a735f.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/527f347102e0f48036f4e643103a735f.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/527f347102e0f48036f4e643103a735f.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/527f347102e0f48036f4e643103a735f.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/527f347102e0f48036f4e643103a735f.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/527f347102e0f48036f4e643103a735f.png">
+    </a></p>
+<p><strong>jstat -gccause</strong></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/2e5d220a3ceb094b3d6aee8b46867942.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/2e5d220a3ceb094b3d6aee8b46867942.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/2e5d220a3ceb094b3d6aee8b46867942.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/2e5d220a3ceb094b3d6aee8b46867942.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/2e5d220a3ceb094b3d6aee8b46867942.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/2e5d220a3ceb094b3d6aee8b46867942.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/2e5d220a3ceb094b3d6aee8b46867942.png">
+    </a></p>
+<p><strong>jstat -gcnew</strong></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/766a9d8c98c1add9ff60f001fcbe552b.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/766a9d8c98c1add9ff60f001fcbe552b.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/766a9d8c98c1add9ff60f001fcbe552b.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/766a9d8c98c1add9ff60f001fcbe552b.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/766a9d8c98c1add9ff60f001fcbe552b.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/766a9d8c98c1add9ff60f001fcbe552b.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/766a9d8c98c1add9ff60f001fcbe552b.png">
+    </a></p>
+<p><strong>jstat -gcnewcapacity</strong></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/d26356900de541c149df9c00852245a1.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/d26356900de541c149df9c00852245a1.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/d26356900de541c149df9c00852245a1.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/d26356900de541c149df9c00852245a1.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/d26356900de541c149df9c00852245a1.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/d26356900de541c149df9c00852245a1.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/d26356900de541c149df9c00852245a1.png">
+    </a></p>
+<p><strong>jstat -gcold</strong></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/64f18adec84996fec58edf7052440610.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/64f18adec84996fec58edf7052440610.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/64f18adec84996fec58edf7052440610.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/64f18adec84996fec58edf7052440610.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/64f18adec84996fec58edf7052440610.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/64f18adec84996fec58edf7052440610.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/64f18adec84996fec58edf7052440610.png">
+    </a></p>
+<p><strong>jstat -gcoldcapacity</strong></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/52bf3b50ba4a48247742caa0aa30be7e.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/52bf3b50ba4a48247742caa0aa30be7e.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/52bf3b50ba4a48247742caa0aa30be7e.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/52bf3b50ba4a48247742caa0aa30be7e.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/52bf3b50ba4a48247742caa0aa30be7e.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/52bf3b50ba4a48247742caa0aa30be7e.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/52bf3b50ba4a48247742caa0aa30be7e.png">
+    </a></p>
+<p><strong>jstat -t</strong></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/61a5c6b9c421ba9ec38db1f132ef4161.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/61a5c6b9c421ba9ec38db1f132ef4161.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/61a5c6b9c421ba9ec38db1f132ef4161.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/61a5c6b9c421ba9ec38db1f132ef4161.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/61a5c6b9c421ba9ec38db1f132ef4161.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/61a5c6b9c421ba9ec38db1f132ef4161.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/61a5c6b9c421ba9ec38db1f132ef4161.png">
+    </a></p>
+<p><strong>jstat -t -h</strong></p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/73a294c043f770940daa6a501c1e8d2c.png" title="img" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/73a294c043f770940daa6a501c1e8d2c.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/73a294c043f770940daa6a501c1e8d2c.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/73a294c043f770940daa6a501c1e8d2c.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/73a294c043f770940daa6a501c1e8d2c.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/73a294c043f770940daa6a501c1e8d2c.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/73a294c043f770940daa6a501c1e8d2c.png">
+    </a></p>
+<table>
+<thead>
+<tr>
+<th>表头</th>
+<th>含义（字节）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EC</td>
+<td>Eden 区的大小</td>
+</tr>
+<tr>
+<td>EU</td>
+<td>Eden 区已使用的大小</td>
+</tr>
+<tr>
+<td>S0C</td>
+<td>幸存者 0 区的大小</td>
+</tr>
+<tr>
+<td>S1C</td>
+<td>幸存者 1 区的大小</td>
+</tr>
+<tr>
+<td>S0U</td>
+<td>幸存者 0 区已使用的大小</td>
+</tr>
+<tr>
+<td>S1U</td>
+<td>幸存者 1 区已使用的大小</td>
+</tr>
+<tr>
+<td>MC</td>
+<td>元空间的大小</td>
+</tr>
+<tr>
+<td>MU</td>
+<td>元空间已使用的大小</td>
+</tr>
+<tr>
+<td>OC</td>
+<td>老年代的大小</td>
+</tr>
+<tr>
+<td>OU</td>
+<td>老年代已使用的大小</td>
+</tr>
+<tr>
+<td>CCSC</td>
+<td>压缩类空间的大小</td>
+</tr>
+<tr>
+<td>CCSU</td>
+<td>压缩类空间已使用的大小</td>
+</tr>
+<tr>
+<td>YGC</td>
+<td>从应用程序启动到采样时 young gc 的次数</td>
+</tr>
+<tr>
+<td>YGCT</td>
+<td>从应用程序启动到采样时 young gc 消耗时间（秒）</td>
+</tr>
+<tr>
+<td>FGC</td>
+<td>从应用程序启动到采样时 full gc 的次数</td>
+</tr>
+<tr>
+<td>FGCT</td>
+<td>从应用程序启动到采样时的 full gc 的消耗时间（秒）</td>
+</tr>
+<tr>
+<td>GCT</td>
+<td>从应用程序启动到采样时 gc 的总时间</td>
+</tr>
+</tbody>
+</table>
+<p><strong>interval 参数：</strong> 用于指定输出统计数据的周期，单位为毫秒。即：查询间隔</p>
+<p><strong>count 参数：</strong> 用于指定查询的总次数</p>
+<p><strong>-t 参数：</strong> 可以在输出信息前加上一个 Timestamp 列，显示程序的运行时间。单位：秒</p>
+<p><strong>-h 参数：</strong> 可以在周期性数据输出时，输出多少行数据后输出一个表头信息</p>
+<p><strong>补充：</strong> jstat 还可以用来判断是否出现内存泄漏。</p>
+<p>第 1 步：在长时间运行的 Java 程序中，我们可以运行 jstat 命令连续获取多行性能数据，并取这几行数据中 OU 列（即已占用的老年代内存）的最小值。</p>
+<p>第 2 步：然后，我们每隔一段较长的时间重复一次上述操作，来获得多组 OU 最小值。如果这些值呈上涨趋势，则说明该 Java 程序的老年代内存已使用量在不断上涨，这意味着无法回收的对象在不断增加，因此很有可能存在内存泄漏。</p>
+<h4 id="14-jinfo实时查看和修改-jvm-配置参数" class="headerLink">
+    <a href="#14-jinfo%e5%ae%9e%e6%97%b6%e6%9f%a5%e7%9c%8b%e5%92%8c%e4%bf%ae%e6%94%b9-jvm-%e9%85%8d%e7%bd%ae%e5%8f%82%e6%95%b0" class="header-mark"></a>1.4 jinfo：实时查看和修改 JVM 配置参数</h4><p>jinfo(Configuration Info for Java)：查看虚拟机配置参数信息，也可用于调整虚拟机的配置参数。在很多情况卡，Java 应用程序不会指定所有的 Java 虚拟机参数。而此时，开发人员可能不知道某一个具体的 Java 虚拟机参数的默认值。在这种情况下，可能需要通过查找文档获取某个参数的默认值。这个查找过程可能是非常艰难的。但有了 jinfo 工具，开发人员可以很方便地找到 Java 虚拟机参数的当前值。</p>
+<p>基本使用语法为：jinfo [options] pid</p>
+<p>说明：java 进程 ID 必须要加上</p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>选项说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>no option</td>
+<td>输出全部的参数和系统属性</td>
+</tr>
+<tr>
+<td>-flag name</td>
+<td>输出对应名称的参数</td>
+</tr>
+<tr>
+<td>-flag [+-]name</td>
+<td>开启或者关闭对应名称的参数 只有被标记为 manageable 的参数才可以被动态修改</td>
+</tr>
+<tr>
+<td>-flag name=value</td>
+<td>设定对应名称的参数</td>
+</tr>
+<tr>
+<td>-flags</td>
+<td>输出全部的参数</td>
+</tr>
+<tr>
+<td>-sysprops</td>
+<td>输出系统属性</td>
+</tr>
+</tbody>
+</table>
+<p><strong>jinfo -sysprops</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&gt; jinfo -sysprops
+</span></span><span class="line"><span class="cl">jboss.modules.system.pkgs = com.intellij.rt
+</span></span><span class="line"><span class="cl">java.vendor = Oracle Corporation
+</span></span><span class="line"><span class="cl">sun.java.launcher = SUN_STANDARD
+</span></span><span class="line"><span class="cl">sun.management.compiler = HotSpot 64-Bit Tiered Compilers
+</span></span><span class="line"><span class="cl">catalina.useNaming = true
+</span></span><span class="line"><span class="cl">os.name = Windows 10
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>jinfo -flags</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&gt; jinfo -flags 25592
+</span></span><span class="line"><span class="cl">Non-default VM flags: -XX:CICompilerCount=4 -XX:InitialHeapSize=333447168 -XX:MaxHeapSize=5324668928 -XX:MaxNewSize=1774714880 -XX:MinHeapDeltaBytes=524288 -XX:NewSize=111149056 -XX:OldSize=222298112 -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseFastUnorderedTimeStamps -XX:-UseLargePagesIndividualAllocation -XX:+UseParallelGC
+</span></span><span class="line"><span class="cl">Command line:  -agentlib:jdwp=transport=dt_socket,address=127.0.0.1:8040,suspend=y,server=n -Drebel.base=C:\Users\Vector\.jrebel -Drebel.env.ide.plugin.version=2021.1.2 -Drebel.env.ide.version=2020.3.3 -Drebel.env.ide.product=IU -Drebel.env.ide=intellij -Drebel.notification.url=http://localhost:7976 -agentpath:C:\Users\Vector\AppData\Roaming\JetBrains\IntelliJIdea2020.3\plugins\jr-ide-idea\lib\jrebel6\lib\jrebel64.dll -Dmaven.home=D:\eclipse\env\maven -Didea.modules.paths.file=C:\Users\Vector\AppData\Local\JetBrains\IntelliJIdea2020.3\Maven\idea-projects-state-596682c7.properties -Dclassworlds.conf=C:\Users\Vector\AppData\Local\Temp\idea-6755-mvn.conf -Dmaven.ext.class.path=D:\IDEA\plugins\maven\lib\maven-event-listener.jar -javaagent:D:\IDEA\plugins\java\lib\rt\debugger-agent.jar -Dfile.encoding=UTF-8
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>jinfo -flag</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&gt; jinfo -flag UseParallelGC 25592
+</span></span><span class="line"><span class="cl">-XX:+UseParallelGC
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&gt; jinfo -flag UseG1GC 25592
+</span></span><span class="line"><span class="cl">-XX:-UseG1GC
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>jinfo -flag name</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&gt; jinfo -flag UseParallelGC 25592
+</span></span><span class="line"><span class="cl">-XX:+UseParallelGC
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&gt; jinfo -flag UseG1GC 25592
+</span></span><span class="line"><span class="cl">-XX:-UseG1GC
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>jinfo -flag [+-]name</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&gt; jinfo -flag +PrintGCDetails 25592
+</span></span><span class="line"><span class="cl">&gt; jinfo -flag PrintGCDetails 25592
+</span></span><span class="line"><span class="cl">-XX:+PrintGCDetails
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">&gt; jinfo -flag -PrintGCDetails 25592
+</span></span><span class="line"><span class="cl">&gt; jinfo -flag PrintGCDetails 25592
+</span></span><span class="line"><span class="cl">-XX:-PrintGCDetails
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>拓展：</p>
+<ul>
+<li>
+<p>java -XX:+PrintFlagsInitial 查看所有 JVM 参数启动的初始值</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[Global flags]
+</span></span><span class="line"><span class="cl">     intx ActiveProcessorCount                      = -1                                  {product}
+</span></span><span class="line"><span class="cl">    uintx AdaptiveSizeDecrementScaleFactor          = 4                                   {product}
+</span></span><span class="line"><span class="cl">    uintx AdaptiveSizeMajorGCDecayTimeScale         = 10                                  {product}
+</span></span><span class="line"><span class="cl">    uintx AdaptiveSizePausePolicy                   = 0                                   {product}
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>java -XX:+PrintFlagsFinal 查看所有 JVM 参数的最终值</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[Global flags]
+</span></span><span class="line"><span class="cl">     intx ActiveProcessorCount                      = -1                                  {product}
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">     intx CICompilerCount                          := 4                                   {product}
+</span></span><span class="line"><span class="cl">    uintx InitialHeapSize                          := 333447168                           {product}
+</span></span><span class="line"><span class="cl">    uintx MaxHeapSize                              := 1029701632                          {product}
+</span></span><span class="line"><span class="cl">    uintx MaxNewSize                               := 1774714880                          {product}
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>java -XX:+PrintCommandLineFlags 查看哪些已经被用户或者 JVM 设置过的详细的 XX 参数的名称和值</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">-XX:InitialHeapSize=332790016 -XX:MaxHeapSize=5324640256 -XX:+PrintCommandLineFlags -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:-UseLargePagesIndividualAllocation -XX:+UseParallelGC
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<h4 id="15-jmap导出内存映像文件内存使用情况" class="headerLink">
+    <a href="#15-jmap%e5%af%bc%e5%87%ba%e5%86%85%e5%ad%98%e6%98%a0%e5%83%8f%e6%96%87%e4%bb%b6%e5%86%85%e5%ad%98%e4%bd%bf%e7%94%a8%e6%83%85%e5%86%b5" class="header-mark"></a>1.5 jmap：导出内存映像文件&amp;内存使用情况</h4><p>jmap（JVM Memory Map）：作用一方面是获取 dump 文件（堆转储快照文件，二进制文件），它还可以获取目标 Java 进程的内存相关信息，包括 Java 堆各区域的使用情况、堆中对象的统计信息、类加载信息等。开发人员可以在控制台中输入命令“jmap -help”查阅 jmap 工具的具体使用方式和一些标准选项配置。</p>
+<p>官方帮助文档：<a href="https://gitee.com/link?target=https%3A%2F%2Fdocs.oracle.com%2Fen%2Fjava%2Fjavase%2F11%2Ftools%2Fjmap.html" target="_blank" rel="noopener noreferrer">https://docs.oracle.com/en/java/javase/11/tools/jmap.html</a></p>
+<p>基本使用语法为：</p>
+<ul>
+<li>jmap [option] <pid></li>
+<li>jmap [option] &lt;executable <core></li>
+<li>jmap [option] [server_id@] <remote server IP or hostname></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-dump</td>
+<td>生成 dump 文件（Java 堆转储快照），-dump:live 只保存堆中的存活对象</td>
+</tr>
+<tr>
+<td>-heap</td>
+<td>输出整个堆空间的详细信息，包括 GC 的使用、堆配置信息，以及内存的使用信息等</td>
+</tr>
+<tr>
+<td>-histo</td>
+<td>输出堆空间中对象的统计信息，包括类、实例数量和合计容量，-histo:live 只统计堆中的存活对象</td>
+</tr>
+<tr>
+<td>-J <flag></td>
+<td>传递参数给 jmap 启动的 jvm</td>
+</tr>
+<tr>
+<td>-finalizerinfo</td>
+<td>显示在 F-Queue 中等待 Finalizer 线程执行 finalize 方法的对象，仅 linux/solaris 平台有效</td>
+</tr>
+<tr>
+<td>-permstat</td>
+<td>以 ClassLoader 为统计口径输出永久代的内存状态信息，仅 linux/solaris 平台有效</td>
+</tr>
+<tr>
+<td>-F</td>
+<td>当虚拟机进程对-dump 选项没有任何响应时，强制执行生成 dump 文件，仅 linux/solaris 平台有效</td>
+</tr>
+</tbody>
+</table>
+<p>说明：这些参数和 linux 下输入显示的命令多少会有不同，包括也受 jdk 版本的影响。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">&gt; jmap -dump:format=b,file=&lt;filename.hprof&gt; &lt;pid&gt;&gt; jmap -dump:live,format=b,file=&lt;filename.hprof&gt; &lt;pid&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>由于 jmap 将访问堆中的所有对象，为了保证在此过程中不被应用线程干扰，jmap 需要借助安全点机制，让所有线程停留在不改变堆中数据的状态。也就是说，由 jmap 导出的堆快照必定是安全点位置的。这可能导致基于该堆快照的分析结果存在偏差。</p>
+<p>举个例子，假设在编译生成的机器码中，某些对象的生命周期在两个安全点之间，那么:live 选项将无法探知到这些对象。</p>
+<p>另外，如果某个线程长时间无法跑到安全点，jmap 将一直等下去。与前面讲的 jstat 则不同，垃圾回收器会主动将 jstat 所需要的摘要数据保存至固定位置之中，而 jstat 只需直接读取即可。</p>
+<h4 id="16-jhatjdk-自带堆分析工具" class="headerLink">
+    <a href="#16-jhatjdk-%e8%87%aa%e5%b8%a6%e5%a0%86%e5%88%86%e6%9e%90%e5%b7%a5%e5%85%b7" class="header-mark"></a>1.6 jhat：JDK 自带堆分析工具</h4><p>jhat(JVM Heap Analysis Tool)：Sun JDK 提供的 jhat 命令与 jmap 命令搭配使用，用于分析 jmap 生成的 heap dump 文件（堆转储快照）。jhat 内置了一个微型的 HTTP/HTML 服务器，生成 dump 文件的分析结果后，用户可以在浏览器中查看分析结果（分析虚拟机转储快照信息）。</p>
+<p>使用了 jhat 命令，就启动了一个 http 服务，端口是 7000，即 <a href="https://gitee.com/link?target=http%3A%2F%2Flocalhost%3A7000%2F%EF%BC%8C%E5%B0%B1%E5%8F%AF%E4%BB%A5%E5%9C%A8%E6%B5%8F%E8%A7%88%E5%99%A8%E9%87%8C%E5%88%86%E6%9E%90%E3%80%82" target="_blank" rel="noopener noreferrer">http://localhost:7000/，就可以在浏览器里分析。</a></p>
+<p>说明：jhat 命令在 JDK9、JDK10 中已经被删除，官方建议用 VisualVM 代替。</p>
+<p>基本适用语法：jhat <option> <dumpfile></p>
+<table>
+<thead>
+<tr>
+<th>option 参数</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-stack false ｜ true</td>
+<td>关闭｜打开对象分配调用栈跟踪</td>
+</tr>
+<tr>
+<td>-refs false ｜ true</td>
+<td>关闭｜打开对象引用跟踪</td>
+</tr>
+<tr>
+<td>-port port-number</td>
+<td>设置 jhat HTTP Server 的端口号，默认 7000</td>
+</tr>
+<tr>
+<td>-exclude exclude-file</td>
+<td>执行对象查询时需要排除的数据成员</td>
+</tr>
+<tr>
+<td>-baseline exclude-file</td>
+<td>指定一个基准堆转储</td>
+</tr>
+<tr>
+<td>-debug int</td>
+<td>设置 debug 级别</td>
+</tr>
+<tr>
+<td>-version</td>
+<td>启动后显示版本信息就退出</td>
+</tr>
+<tr>
+<td>-J <flag></td>
+<td>传入启动参数，比如-J-Xmx512m</td>
+</tr>
+</tbody>
+</table>
+<h4 id="17-jstack打印-jvm-中线程快照" class="headerLink">
+    <a href="#17-jstack%e6%89%93%e5%8d%b0-jvm-%e4%b8%ad%e7%ba%bf%e7%a8%8b%e5%bf%ab%e7%85%a7" class="header-mark"></a>1.7 jstack：打印 JVM 中线程快照</h4><p>jstack（JVM Stack Trace）：用于生成虚拟机指定进程当前时刻的线程快照（虚拟机堆栈跟踪）。线程快照就是当前虚拟机内指定进程的每一条线程正在执行的方法堆栈的集合。</p>
+<p>生成线程快照的作用：可用于定位线程出现长时间停顿的原因，如线程间死锁、死循环、请求外部资源导致的长时间等待等问题。这些都是导致线程长时间停顿的常见原因。当线程出现停顿时，就可以用 jstack 显示各个线程调用的堆栈情况。</p>
+<p>官方帮助文档：<a href="https://gitee.com/link?target=https%3A%2F%2Fdocs.oracle.com%2Fen%2Fjava%2Fjavase%2F11%2Ftools%2Fjstack.html" target="_blank" rel="noopener noreferrer">https://docs.oracle.com/en/java/javase/11/tools/jstack.html</a></p>
+<p>在 thread dump 中，要留意下面几种状态</p>
+<ul>
+<li>死锁，Deadlock（重点关注）</li>
+<li>等待资源，Waiting on condition（重点关注）</li>
+<li>等待获取监视器，Waiting on monitor entry（重点关注）</li>
+<li>阻塞，Blocked（重点关注）</li>
+<li>执行中，Runnable</li>
+<li>暂停，Suspended</li>
+<li>对象等待中，Object.wait() 或 TIMED＿WAITING</li>
+<li>停止，Parked</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>option 参数</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-F</td>
+<td>当正常输出的请求不被响应时，强制输出线程堆栈</td>
+</tr>
+<tr>
+<td>-l</td>
+<td>除堆栈外，显示关于锁的附加信息</td>
+</tr>
+<tr>
+<td>-m</td>
+<td>如果调用本地方法的话，可以显示 C/C++的堆栈</td>
+</tr>
+</tbody>
+</table>
+<h4 id="18-jcmd多功能命令行" class="headerLink">
+    <a href="#18-jcmd%e5%a4%9a%e5%8a%9f%e8%83%bd%e5%91%bd%e4%bb%a4%e8%a1%8c" class="header-mark"></a>1.8 jcmd：多功能命令行</h4><p>在 JDK 1.7 以后，新增了一个命令行工具 jcmd。它是一个多功能的工具，可以用来实现前面除了 jstat 之外所有命令的功能。比如：用它来导出堆、内存使用、查看 Java 进程、导出线程信息、执行 GC、JVM 运行时间等。</p>
+<p>官方帮助文档：<a href="https://gitee.com/link?target=https%3A%2F%2Fdocs.oracle.com%2Fen%2Fjava%2Fjavase%2F11%2Ftools%2Fjcmd.html" target="_blank" rel="noopener noreferrer">https://docs.oracle.com/en/java/javase/11/tools/jcmd.html</a></p>
+<p>jcmd 拥有 jmap 的大部分功能，并且在 Oracle 的官方网站上也推荐使用 jcmd 命令代 jmap 命令</p>
+<p>**jcmd -l：**列出所有的 JVM 进程</p>
+<p>**jcmd 进程号 help：**针对指定的进程，列出支持的所有具体命令</p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/f3507ac3e24d40625f6c3d54c25c743b.png" title="image-20210504213044819" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/f3507ac3e24d40625f6c3d54c25c743b.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/f3507ac3e24d40625f6c3d54c25c743b.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/f3507ac3e24d40625f6c3d54c25c743b.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/f3507ac3e24d40625f6c3d54c25c743b.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/f3507ac3e24d40625f6c3d54c25c743b.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/f3507ac3e24d40625f6c3d54c25c743b.png">
+    </a></p>
+<p>**jcmd 进程号 具体命令：**显示指定进程的指令命令的数据</p>
+<ul>
+<li>Thread.print 可以替换 jstack 指令</li>
+<li>GC.class_histogram 可以替换 jmap 中的-histo 操作</li>
+<li>GC.heap_dump 可以替换 jmap 中的-dump 操作</li>
+<li>GC.run 可以查看 GC 的执行情况</li>
+<li>VM.uptime 可以查看程序的总执行时间，可以替换 jstat 指令中的-t 操作</li>
+<li>VM.system_properties 可以替换 jinfo -sysprops 进程 id</li>
+<li>VM.flags 可以获取 JVM 的配置参数信息</li>
+</ul>
+<h4 id="19-jstatd远程主机信息收集" class="headerLink">
+    <a href="#19-jstatd%e8%bf%9c%e7%a8%8b%e4%b8%bb%e6%9c%ba%e4%bf%a1%e6%81%af%e6%94%b6%e9%9b%86" class="header-mark"></a>1.9 jstatd：远程主机信息收集</h4><p>之前的指令只涉及到监控本机的 Java 应用程序，而在这些工具中，一些监控工具也支持对远程计算机的监控（如 jps、jstat）。为了启用远程监控，则需要配合使用 jstatd 工具。命令 jstatd 是一个 RMI 服务端程序，它的作用相当于代理服务器，建立本地计算机与远程监控工具的通信。jstatd 服务器将本机的 Java 应用程序信息传递到远程计算机。</p>
+<p><a class="lightgallery" href="https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160447066.png" title="image-20230310160447066" data-thumbnail="https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160447066.png">
+        <img
+            
+            loading="lazy"
+            src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160447066.png"
+            srcset="https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160447066.png, https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160447066.png 1.5x, https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160447066.png 2x"
+            sizes="auto"
+            alt="https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230310160447066.png">
+    </a></p>
+</div>
+
+        
+
+<div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 0001-01-01</span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span><a class="link-to-mardown" href=/2-jvm%E7%9B%91%E6%8E%A7%E5%8F%8A%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-%E5%91%BD%E4%BB%A4%E8%A1%8C/index.md target="_blank" rel="noopener noreferrer">阅读原始文档</a>
+                    </span></div>
+            <div class="post-info-share">
+                <span><a href="#" title="分享到 Twitter" data-sharer="twitter" data-url="http://yanghx.vip/2-jvm%E7%9B%91%E6%8E%A7%E5%8F%8A%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-%E5%91%BD%E4%BB%A4%E8%A1%8C/" data-title="" data-via="xxxx"><i class="fab fa-twitter fa-fw"></i></a><a href="#" title="分享到 Facebook" data-sharer="facebook" data-url="http://yanghx.vip/2-jvm%E7%9B%91%E6%8E%A7%E5%8F%8A%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-%E5%91%BD%E4%BB%A4%E8%A1%8C/"><i class="fab fa-facebook-square fa-fw"></i></a><a href="#" title="分享到 WhatsApp" data-sharer="whatsapp" data-url="http://yanghx.vip/2-jvm%E7%9B%91%E6%8E%A7%E5%8F%8A%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-%E5%91%BD%E4%BB%A4%E8%A1%8C/" data-title="" data-web><i class="fab fa-whatsapp fa-fw"></i></a><a href="#" title="分享到 Line" data-sharer="line" data-url="http://yanghx.vip/2-jvm%E7%9B%91%E6%8E%A7%E5%8F%8A%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-%E5%91%BD%E4%BB%A4%E8%A1%8C/" data-title=""><i data-svg-src="/lib/simple-icons/icons/line.min.svg"></i></a><a href="#" title="分享到 微博" data-sharer="weibo" data-url="http://yanghx.vip/2-jvm%E7%9B%91%E6%8E%A7%E5%8F%8A%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-%E5%91%BD%E4%BB%A4%E8%A1%8C/" data-title=""><i class="fab fa-weibo fa-fw"></i></a><a href="#" title="分享到 Myspace" data-sharer="myspace" data-url="http://yanghx.vip/2-jvm%E7%9B%91%E6%8E%A7%E5%8F%8A%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-%E5%91%BD%E4%BB%A4%E8%A1%8C/" data-title="" data-description=""><i data-svg-src="/lib/simple-icons/icons/myspace.min.svg"></i></a><a href="#" title="分享到 Blogger" data-sharer="blogger" data-url="http://yanghx.vip/2-jvm%E7%9B%91%E6%8E%A7%E5%8F%8A%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-%E5%91%BD%E4%BB%A4%E8%A1%8C/" data-title="" data-description=""><i class="fab fa-blogger fa-fw"></i></a><a href="#" title="分享到 Evernote" data-sharer="evernote" data-url="http://yanghx.vip/2-jvm%E7%9B%91%E6%8E%A7%E5%8F%8A%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-%E5%91%BD%E4%BB%A4%E8%A1%8C/" data-title=""><i class="fab fa-evernote fa-fw"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/3-jvm%E7%9B%91%E6%8E%A7%E5%8F%8A%E8%AF%8A%E6%96%AD%E5%B7%A5%E5%85%B7-gui/" class="prev" rel="prev" title=""><i class="fas fa-angle-left fa-fw"></i></a>
+            <a href="/1-%E6%A6%82%E8%BF%B0/" class="next" rel="next" title=""><i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+        </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">
+                    由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+            <div class="footer-line"></div>
+            <div class="footer-line">
+            </div>
+        </div></footer></div>
+
+    <div id="fixed-buttons"><a href="#back-to-top" id="back-to-top-button" class="fixed-button" title="回到顶部">
+            <i class="fas fa-arrow-up fa-fw"></i>
+        </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+            <i class="fas fa-comment fa-fw"></i>
+        </a>
+    </div><div id="cookieconsent-container"></div><div class="assets"><link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/katex/copy-tex.min.css">
+        <noscript><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"></noscript><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验."},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"distance":100,"findAllMatches":false,"fuseIndexURL":"/index.json","highlightTag":"em","ignoreFieldNorm":false,"ignoreLocation":false,"isCaseSensitive":false,"location":0,"maxResultLength":10,"minMatchCharLength":2,"noResultsFound":"没有找到结果","snippetLength":50,"threshold":0.3,"type":"fuse","useExtendedSearch":false},"sharerjs":true,"table":{"sort":true}};</script><script type="text/javascript" src="/lib/tablesort/tablesort.min.js"></script><script type="text/javascript" src="/lib/clipboard/clipboard.min.js"></script><script type="text/javascript" src="/lib/sharer/sharer.min.js"></script><script type="text/javascript" src="/lib/katex/katex.min.js" defer></script><script type="text/javascript" src="/lib/katex/auto-render.min.js" defer></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js" defer></script><script type="text/javascript" src="/lib/katex/mhchem.min.js" defer></script><script type="text/javascript" src="/js/katex.min.js" defer></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script type="text/javascript" src="/js/cookieconsent.min.js" defer></script><script type="text/javascript" src="/js/theme.min.js" defer></script></div>
+</body>
+
+</html>
