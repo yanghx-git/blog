@@ -11,7 +11,6 @@
 <meta property="og:url" content="http://yanghx.vip/etcd%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
 
 <meta property="og:site_name" content="yanghx blog" />
-
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
 
@@ -22,7 +21,7 @@
 
 <meta name="theme-color" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" href="http://yanghx.vip/etcd%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/" /><link rel="prev" href="http://yanghx.vip/grpc/" /><link rel="next" href="http://yanghx.vip/readme/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/color.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/fontawesome-free/all.min.css">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" href="http://yanghx.vip/etcd%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/" /><link rel="prev" href="http://yanghx.vip/grpc/" /><link rel="next" href="http://yanghx.vip/k8s%E5%85%A5%E9%97%A8/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/color.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/fontawesome-free/all.min.css">
         <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/animate/animate.min.css">
         <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
     {
@@ -59,7 +58,7 @@
             <a href="/" title="yanghx blog">yanghx blog</a>
         </div>
         <div class="menu">
-            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 所有文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/series/"> 系列 </a><a class="menu-item" href="/posts/mysql/mysql45/"> mysql45讲 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
                         <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
                         <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
                             <i class="fas fa-search fa-fw"></i>
@@ -107,7 +106,7 @@
                     <a href="#" class="search-cancel" id="search-cancel-mobile">
                         取消
                     </a>
-                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                </div><a class="menu-item" href="/posts/" title="">所有文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/series/" title="">系列</a><a class="menu-item" href="/posts/mysql/mysql45/" title="">mysql45讲</a><a href="#" class="menu-item theme-select" title="切换主题">
                 <i class="fas fa-adjust fa-fw"></i>
                 <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
                     <option value="light">浅色</option>
@@ -125,13 +124,128 @@
     <div id="search-dropdown-mobile"></div>
 </div>
 <main class="main">
-            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="container"><div class="toc" id="toc-auto">
+        <h2 class="toc-title">目录</h2>
+        <div class="toc-content" id="toc-content-auto"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#ectd-集群搭建">Ectd 集群搭建</a></li>
+        <li><a href="#一ectd-集群搭建">一、Ectd 集群搭建</a>
+          <ul>
+            <li><a href="#11-概述">1.1 概述</a></li>
+            <li><a href="#12-state">1.2 State</a></li>
+            <li><a href="#13-tls">1.3 TLS</a></li>
+            <li><a href="#14-自动证书">1.4 自动证书</a></li>
+            <li><a href="#15-发现-discovery">1.5 发现 （Discovery）</a>
+              <ul>
+                <li><a href="#151-etcd-发现">1.5.1 etcd 发现</a></li>
+                <li><a href="#152-发现-url-的生命周期">1.5.2 发现 URL 的生命周期</a></li>
+                <li><a href="#153-自定义-etcd-发现服务">1.5.3 自定义 etcd 发现服务</a></li>
+                <li><a href="#154-公共-etcd-发现服务">1.5.4 公共 etcd 发现服务</a></li>
+                <li><a href="#155-dns-发现">1.5.5 DNS 发现</a></li>
+                <li><a href="#156-创建-dns-srv-记录">1.5.6 创建 DNS SRV 记录</a></li>
+                <li><a href="#157-使用-dns-引导-etcd-集群">1.5.7 使用 DNS 引导 etcd 集群</a></li>
+              </ul>
+            </li>
+            <li><a href="#16-mac-m1---etcd-集群搭建">1.6 MAC M1   ETCD 集群搭建</a>
+              <ul>
+                <li><a href="#161-创建etcd1sh">1.6.1 <strong>创建etcd1.sh</strong></a></li>
+                <li><a href="#162-创建etcd2sh">1.6.2 <strong>创建etcd2.sh</strong></a></li>
+                <li><a href="#163-创建etcd3sh">1.6.3 <strong>创建etcd3.sh</strong></a></li>
+                <li><a href="#164-创建etcd_serversh用于启动其他三个脚本">1.6.4 <strong>创建etcd_server.sh</strong>，用于启动其他三个脚本</a></li>
+                <li><a href="#165-创建客户端连接服务端命令">1.6.5 <strong>创建客户端连接服务端命令</strong></a></li>
+                <li><a href="#166-结果如下表示etcd集群搭建成功">1.6.6 结果如下，表示ETCD集群搭建成功</a></li>
+              </ul>
+            </li>
+            <li><a href="#17-如何访问etcd">1.7 如何访问etcd</a>
+              <ul>
+                <li><a href="#171-put-写命令">1.7.1 put 写命令：</a></li>
+                <li><a href="#172-get-从etcd中读取">1.7.2 get 从etcd中读取：</a></li>
+              </ul>
+            </li>
+            <li><a href="#18-如何通过前缀批量获取-keys">1.8 如何通过前缀批量获取 keys</a></li>
+            <li><a href="#19-如何删除-keys">1.9 如何删除 keys</a></li>
+            <li><a href="#110-如何在事务中进行多次写入">1.10 如何在事务中进行多次写入</a></li>
+            <li><a href="#111-监控-keys">1.11 监控 keys</a></li>
+            <li><a href="#112-设置过期时间-keys">1.12 设置过期时间 keys</a></li>
+            <li><a href="#113-如何创建锁">1.13 如何创建锁</a></li>
+            <li><a href="#114-etcd集群中如何进行leader选举">1.14 etcd集群中如何进行leader选举</a></li>
+            <li><a href="#115-如何检查集群状态">1.15 如何检查集群状态</a></li>
+            <li><a href="#116-如何保存数据库">1.16 如何保存数据库</a></li>
+            <li><a href="#117-如何将-etcd-从-v2-迁移到-v3">1.17 如何将 etcd 从 v2 迁移到 v3</a></li>
+            <li><a href="#118-如何添加和删除成员">1.18 如何添加和删除成员</a></li>
+          </ul>
+        </li>
+        <li><a href="#二在容器中运行etcd">二、在容器中运行Etcd</a>
+          <ul>
+            <li><a href="#21-运行单节点-etcd">2.1 运行单节点 etcd</a></li>
+            <li><a href="#22-运行-3-节点-etcd-集群">2.2 运行 3 节点 etcd 集群</a></li>
+          </ul>
+        </li>
+        <li><a href="#三故障模式">三、故障模式</a>
+          <ul>
+            <li><a href="#31-minor-followers-failure">3.1 Minor followers failure</a></li>
+            <li><a href="#32-leader-failure">3.2 Leader failure</a></li>
+            <li><a href="#33-majority-failure">3.3 Majority failure</a></li>
+            <li><a href="#34-网络分区">3.4 网络分区</a></li>
+            <li><a href="#35-引导期间失败">3.5 引导期间失败</a></li>
+          </ul>
+        </li>
+        <li><a href="#四灾难恢复">四、灾难恢复</a>
+          <ul>
+            <li><a href="#41-对键空间进行快照">4.1 对键空间进行快照</a></li>
+            <li><a href="#42-恢复集群">4.2 恢复集群</a></li>
+            <li><a href="#43-使用错误的-url-从成员错误重新配置中恢复集群">4.3 使用错误的 URL 从成员错误重新配置中恢复集群</a></li>
+          </ul>
+        </li>
+        <li><a href="#五etcd-网关">五、etcd 网关</a>
+          <ul>
+            <li><a href="#51-什么是etcd网关">5.1 什么是etcd网关</a></li>
+            <li><a href="#52-何时使用-etcd-网关">5.2 何时使用 etcd 网关</a></li>
+            <li><a href="#53-何时不使用-etcd-网关">5.3 何时不使用 etcd 网关</a></li>
+            <li><a href="#54-启动-etcd-网关">5.4 启动 etcd 网关</a></li>
+            <li><a href="#55-配置标志">5.5 配置标志</a>
+              <ul>
+                <li><a href="#551-etcd-集群">5.5.1 etcd 集群</a></li>
+                <li><a href="#端点">–端点</a></li>
+                <li><a href="#--发现-srv">&ndash;发现-srv</a></li>
+                <li><a href="#网络">网络</a></li>
+                <li><a href="#--listen-addr">&ndash;listen-addr</a></li>
+                <li><a href="#--重试延迟">&ndash;重试延迟</a></li>
+                <li><a href="#安全">安全</a></li>
+                <li><a href="#不安全的发现">–不安全的发现</a></li>
+                <li><a href="#--trusted-ca-文件">&ndash;trusted-ca 文件</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#六grpc-代理">六、gRPC 代理</a>
+          <ul>
+            <li><a href="#61-可扩展的手表-api">6.1 可扩展的手表 API</a></li>
+            <li><a href="#62-限制">6.2 限制</a></li>
+            <li><a href="#63-可扩展的租赁-api">6.3 可扩展的租赁 API</a></li>
+            <li><a href="#64-滥用客户保护">6.4 滥用客户保护</a></li>
+            <li><a href="#65-启动-etcd-grpc-代理">6.5 启动 etcd gRPC 代理</a></li>
+            <li><a href="#66-客户端端点同步和名称解析">6.6 客户端端点同步和名称解析</a></li>
+            <li><a href="#67-命名空间">6.7 命名空间</a></li>
+            <li><a href="#68-tls-终止">6.8 TLS 终止</a></li>
+            <li><a href="#69-指标和健康">6.9 指标和健康</a></li>
+            <li><a href="#610-已知问题">6.10 已知问题</a></li>
+          </ul>
+        </li>
+        <li><a href="#配置文件和启动参数说明">。、配置文件和启动参数说明</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+    </div><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "true")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
             <div class="post-meta-line">
                 <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
                 </span></div>
             <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 12202 字&nbsp;
                 <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 25 分钟&nbsp;</div>
-        </div><div class="details toc" id="toc-static"  kept="true">
+        </div><div class="details toc" id="toc-static"  kept="">
                 <div class="details-summary toc-title">
                     <span>目录</span>
                     <span><i class="details-icon fas fa-angle-right"></i></span>
@@ -2449,13 +2563,14 @@
     </div>
 
     <div class="post-nav"><a href="/grpc/" class="prev" rel="prev" title=""><i class="fas fa-angle-left fa-fw"></i></a>
-            <a href="/readme/" class="next" rel="next" title=""><i class="fas fa-angle-right fa-fw"></i></a></div>
+            <a href="/k8s%E5%85%A5%E9%97%A8/" class="next" rel="next" title=""><i class="fas fa-angle-right fa-fw"></i></a></div>
 </div>
 <div id="comments"></div></article></div>
         </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">
                     由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
-                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span><span class="icp-splitter">&nbsp;|&nbsp;</span><br class="icp-br"/>
+                    <span class="icp"><a  target="_blank" href="https://beian.miit.gov.cn/">京ICP备2023005717号-1</a></span></div>
             <div class="footer-line"></div>
             <div class="footer-line">
             </div>

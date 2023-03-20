@@ -11,7 +11,6 @@
 <meta property="og:url" content="http://yanghx.vip/7-%E5%A0%86/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
 
 <meta property="og:site_name" content="yanghx blog" />
-
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
 
@@ -59,7 +58,7 @@
             <a href="/" title="yanghx blog">yanghx blog</a>
         </div>
         <div class="menu">
-            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 所有文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/series/"> 系列 </a><a class="menu-item" href="/posts/mysql/mysql45/"> mysql45讲 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
                         <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
                         <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
                             <i class="fas fa-search fa-fw"></i>
@@ -107,7 +106,7 @@
                     <a href="#" class="search-cancel" id="search-cancel-mobile">
                         取消
                     </a>
-                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                </div><a class="menu-item" href="/posts/" title="">所有文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/series/" title="">系列</a><a class="menu-item" href="/posts/mysql/mysql45/" title="">mysql45讲</a><a href="#" class="menu-item theme-select" title="切换主题">
                 <i class="fas fa-adjust fa-fw"></i>
                 <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
                     <option value="light">浅色</option>
@@ -125,13 +124,79 @@
     <div id="search-dropdown-mobile"></div>
 </div>
 <main class="main">
-            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="container"><div class="toc" id="toc-auto">
+        <h2 class="toc-title">目录</h2>
+        <div class="toc-content" id="toc-content-auto"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#堆">堆</a>
+      <ul>
+        <li><a href="#一堆的核心概念">一、堆的核心概念</a>
+          <ul>
+            <li><a href="#11-堆内存细分">1.1 堆内存细分</a></li>
+          </ul>
+        </li>
+        <li><a href="#二设置堆内存大小与oom">二、设置堆内存大小与OOM</a>
+          <ul>
+            <li><a href="#21--outofmemory举例">2.1  OutOfMemory举例</a></li>
+          </ul>
+        </li>
+        <li><a href="#三年轻代和老年代">三、年轻代和老年代</a></li>
+        <li><a href="#四图解对象分配过程">四、图解对象分配过程</a>
+          <ul>
+            <li><a href="#41-概念">4.1 概念</a></li>
+            <li><a href="#42-图解过程">4.2 图解过程</a></li>
+            <li><a href="#43-思考幸存区区满了后">4.3 思考：幸存区区满了后？</a></li>
+            <li><a href="#44--对象分配的特殊情况">4.4  对象分配的特殊情况</a></li>
+            <li><a href="#45-代码演示对象分配过程">4.5 代码演示对象分配过程</a></li>
+            <li><a href="#46-常用的调优工具">4.6 常用的调优工具</a></li>
+            <li><a href="#47-总结">4.7 总结</a></li>
+          </ul>
+        </li>
+        <li><a href="#五minor-gcmajor-gcfull-gc">五、Minor GC、Major GC、Full GC</a>
+          <ul>
+            <li><a href="#51-minor-gc">5.1 Minor GC</a></li>
+            <li><a href="#52-major-gc">5.2 Major GC</a></li>
+            <li><a href="#53-full-gc">5.3 Full GC</a></li>
+            <li><a href="#54-gc举例">5.4 GC举例</a></li>
+          </ul>
+        </li>
+        <li><a href="#六堆空间分代思想">六、堆空间分代思想</a></li>
+        <li><a href="#七内存分配策略">七、内存分配策略</a></li>
+        <li><a href="#八为对象分配内存tlab">八、为对象分配内存：TLAB</a>
+          <ul>
+            <li><a href="#81-问题堆空间都是共享的么">8.1 问题：堆空间都是共享的么？</a></li>
+            <li><a href="#82-为什么有tlab">8.2 为什么有TLAB？</a></li>
+            <li><a href="#83-什么是tlab">8.3 什么是TLAB</a></li>
+            <li><a href="#84-tlab分配过程">8.4 TLAB分配过程</a></li>
+          </ul>
+        </li>
+        <li><a href="#九小结堆空间的参数设置">九、小结：堆空间的参数设置</a></li>
+        <li><a href="#十堆是分配对象的唯一选择么">十、堆是分配对象的唯一选择么？</a>
+          <ul>
+            <li><a href="#101-逃逸分析">10.1 逃逸分析</a></li>
+            <li><a href="#102-逃逸分析举例">10.2 逃逸分析举例</a></li>
+            <li><a href="#103-参数设置">10.3 参数设置</a></li>
+            <li><a href="#104-结论">10.4 结论</a></li>
+            <li><a href="#105-栈上分配">10.5 栈上分配</a></li>
+            <li><a href="#106-举例">10.6 举例</a></li>
+            <li><a href="#107-同步省略">10.7 同步省略</a></li>
+            <li><a href="#108-分离对象和标量替换">10.8 分离对象和标量替换</a></li>
+            <li><a href="#109-代码优化之标量替换">10.9 代码优化之标量替换</a></li>
+            <li><a href="#1010-逃逸分析的不足">10.10 逃逸分析的不足</a></li>
+          </ul>
+        </li>
+        <li><a href="#十一小结">十一、小结</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+    </div><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "true")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
             <div class="post-meta-line">
                 <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
                 </span></div>
             <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 11693 字&nbsp;
                 <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 24 分钟&nbsp;</div>
-        </div><div class="details toc" id="toc-static"  kept="true">
+        </div><div class="details toc" id="toc-static"  kept="">
                 <div class="details-summary toc-title">
                     <span>目录</span>
                     <span><i class="details-icon fas fa-angle-right"></i></span>
@@ -1417,7 +1482,8 @@
         </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">
                     由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
-                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span><span class="icp-splitter">&nbsp;|&nbsp;</span><br class="icp-br"/>
+                    <span class="icp"><a  target="_blank" href="https://beian.miit.gov.cn/">京ICP备2023005717号-1</a></span></div>
             <div class="footer-line"></div>
             <div class="footer-line">
             </div>

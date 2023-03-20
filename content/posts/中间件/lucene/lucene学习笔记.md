@@ -821,7 +821,7 @@ public class AnalysisTest extends TestCase {
 
 **索引过程中的分析**
 
-![分析过程](./lucene学习笔记.assets/分析过程.jpg)
+![分析过程](lucene学习笔记.assets/分析过程.jpg)
 
 **QueryParser使用分析器**
 
@@ -852,7 +852,7 @@ QueryParser 会分3次调用分析器，首先是处理"stephen curry"，然后�
 语汇单元流（tokenStream）是分析过程中所产生的基本输出。在索引时，Lucene使用特定的分析器来处理需要被语汇单元化的域，
 而每个语汇单元相关的重要属性随即被编入索引中。
 
-![语汇单元流-案例](./lucene学习笔记.assets/语汇单元流-案例.jpg)
+![语汇单元流-案例](lucene学习笔记.assets/语汇单元流-案例.jpg)
 以“the quick brown fox”的分析为例。该文本中每个语汇单元都表示一个独立的单词。一个语汇单元携带了一个文本值（即单词本身）和其他一些元数据：
 偏移量、语汇单元类型（默认：word）、以及位置增量。语汇单元可以选择性包含一些由程序定义的标志位和任意字节数的有效负载，这样程序就能根据具体需要
 来处理这些语汇单元。

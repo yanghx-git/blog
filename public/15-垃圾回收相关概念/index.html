@@ -11,7 +11,6 @@
 <meta property="og:url" content="http://yanghx.vip/15-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
 
 <meta property="og:site_name" content="yanghx blog" />
-
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
 
@@ -59,7 +58,7 @@
             <a href="/" title="yanghx blog">yanghx blog</a>
         </div>
         <div class="menu">
-            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 所有文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/series/"> 系列 </a><a class="menu-item" href="/posts/mysql/mysql45/"> mysql45讲 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
                         <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
                         <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
                             <i class="fas fa-search fa-fw"></i>
@@ -107,7 +106,7 @@
                     <a href="#" class="search-cancel" id="search-cancel-mobile">
                         取消
                     </a>
-                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                </div><a class="menu-item" href="/posts/" title="">所有文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/series/" title="">系列</a><a class="menu-item" href="/posts/mysql/mysql45/" title="">mysql45讲</a><a href="#" class="menu-item theme-select" title="切换主题">
                 <i class="fas fa-adjust fa-fw"></i>
                 <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
                     <option value="light">浅色</option>
@@ -125,13 +124,59 @@
     <div id="search-dropdown-mobile"></div>
 </div>
 <main class="main">
-            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="container"><div class="toc" id="toc-auto">
+        <h2 class="toc-title">目录</h2>
+        <div class="toc-content" id="toc-content-auto"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#垃圾回收相关概念">垃圾回收相关概念</a>
+      <ul>
+        <li><a href="#一systemgc的理解">一、System.gc()的理解</a>
+          <ul>
+            <li><a href="#11-手动gc来理解不可达对象的回收">1.1 手动GC来理解不可达对象的回收</a></li>
+            <li><a href="#12-内存溢出">1.2 内存溢出</a></li>
+            <li><a href="#13-内存泄漏">1.3 内存泄漏</a></li>
+            <li><a href="#14-举例">1.4 举例</a></li>
+          </ul>
+        </li>
+        <li><a href="#二stop-the-world">二、Stop The World</a></li>
+        <li><a href="#三垃圾回收的并行与并发">三、垃圾回收的并行与并发</a>
+          <ul>
+            <li><a href="#31-并发">3.1 并发</a></li>
+            <li><a href="#32-并行">3.2 并行</a></li>
+            <li><a href="#33-并发和并行对比">3.3 并发和并行对比</a></li>
+            <li><a href="#34-垃圾回收的并行与并发">3.4 垃圾回收的并行与并发</a></li>
+          </ul>
+        </li>
+        <li><a href="#四安全点与安全区域">四、安全点与安全区域</a>
+          <ul>
+            <li><a href="#41-安全点">4.1 安全点</a></li>
+            <li><a href="#42-安全区域">4.2 安全区域</a></li>
+            <li><a href="#43-执行流程">4.3 执行流程：</a></li>
+          </ul>
+        </li>
+        <li><a href="#五再谈引用">五、再谈引用</a></li>
+        <li><a href="#六再谈引用强引用">六、再谈引用：强引用</a>
+          <ul>
+            <li><a href="#61-举例">6.1 举例</a></li>
+            <li><a href="#62-总结">6.2 总结</a></li>
+          </ul>
+        </li>
+        <li><a href="#七再谈引用-软引用">七、再谈引用： 软引用</a></li>
+        <li><a href="#八再谈引用弱引用">八、再谈引用：弱引用</a></li>
+        <li><a href="#九再谈引用虚引用">九、再谈引用：虚引用</a></li>
+        <li><a href="#十案例">十、案例</a></li>
+      </ul>
+    </li>
+    <li><a href="#十一终结器引用">十一、终结器引用</a></li>
+  </ul>
+</nav></div>
+    </div><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "true")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
             <div class="post-meta-line">
                 <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
                 </span></div>
             <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 8116 字&nbsp;
                 <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 17 分钟&nbsp;</div>
-        </div><div class="details toc" id="toc-static"  kept="true">
+        </div><div class="details toc" id="toc-static"  kept="">
                 <div class="details-summary toc-title">
                     <span>目录</span>
                     <span><i class="details-icon fas fa-angle-right"></i></span>
@@ -856,7 +901,8 @@
         </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">
                     由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
-                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span><span class="icp-splitter">&nbsp;|&nbsp;</span><br class="icp-br"/>
+                    <span class="icp"><a  target="_blank" href="https://beian.miit.gov.cn/">京ICP备2023005717号-1</a></span></div>
             <div class="footer-line"></div>
             <div class="footer-line">
             </div>

@@ -11,7 +11,6 @@
 <meta property="og:url" content="http://yanghx.vip/8-%E6%96%B9%E6%B3%95%E5%8C%BA/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
 
 <meta property="og:site_name" content="yanghx blog" />
-
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
 
@@ -59,7 +58,7 @@
             <a href="/" title="yanghx blog">yanghx blog</a>
         </div>
         <div class="menu">
-            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 所有文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/series/"> 系列 </a><a class="menu-item" href="/posts/mysql/mysql45/"> mysql45讲 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
                         <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
                         <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
                             <i class="fas fa-search fa-fw"></i>
@@ -107,7 +106,7 @@
                     <a href="#" class="search-cancel" id="search-cancel-mobile">
                         取消
                     </a>
-                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                </div><a class="menu-item" href="/posts/" title="">所有文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/series/" title="">系列</a><a class="menu-item" href="/posts/mysql/mysql45/" title="">mysql45讲</a><a href="#" class="menu-item theme-select" title="切换主题">
                 <i class="fas fa-adjust fa-fw"></i>
                 <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
                     <option value="light">浅色</option>
@@ -125,13 +124,69 @@
     <div id="search-dropdown-mobile"></div>
 </div>
 <main class="main">
-            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="container"><div class="toc" id="toc-auto">
+        <h2 class="toc-title">目录</h2>
+        <div class="toc-content" id="toc-content-auto"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#方法区">方法区</a>
+      <ul>
+        <li><a href="#一前言">一、前言</a></li>
+        <li><a href="#二栈堆方法区的">二、栈、堆、方法区的</a></li>
+        <li><a href="#三方法区的理解">三、方法区的理解</a>
+          <ul>
+            <li><a href="#31-hotspot中方法区的演进">3.1 HotSpot中方法区的演进</a></li>
+          </ul>
+        </li>
+        <li><a href="#四设置方法区大小与oom">四、设置方法区大小与OOM</a>
+          <ul>
+            <li><a href="#41-jdk7及以前">4.1 jdk7及以前</a></li>
+            <li><a href="#42-jdk8以后">4.2 JDK8以后</a></li>
+            <li><a href="#43-如何解决这些oom">4.3 如何解决这些OOM</a></li>
+          </ul>
+        </li>
+        <li><a href="#五方法区的内部结构">五、方法区的内部结构</a>
+          <ul>
+            <li><a href="#51-类型信息">5.1 类型信息</a></li>
+            <li><a href="#52-域信息">5.2 域信息</a></li>
+            <li><a href="#53-方法method信息">5.3 方法（Method）信息</a></li>
+            <li><a href="#54-non-final的类变量">5.4 non-final的类变量</a></li>
+            <li><a href="#55-全局常量">5.5 全局常量</a></li>
+            <li><a href="#56-运行时常量池-vs-常量池">5.6 运行时常量池 VS 常量池</a></li>
+            <li><a href="#57-常量池">5.7 常量池</a>
+              <ul>
+                <li><a href="#571-为什么需要常量池">5.7.1 为什么需要常量池</a></li>
+                <li><a href="#572-常量池中有什么">5.7.2 常量池中有什么</a></li>
+                <li><a href="#573-小结">5.7.3 小结</a></li>
+              </ul>
+            </li>
+            <li><a href="#58-运行时常量池">5.8 运行时常量池</a></li>
+            <li><a href="#六方法区使用举例">六、方法区使用举例</a></li>
+          </ul>
+        </li>
+        <li><a href="#七方法区的演进细节">七、方法区的演进细节</a>
+          <ul>
+            <li><a href="#71-为什么永久代要被元空间替代">7.1 为什么永久代要被元空间替代？</a></li>
+            <li><a href="#72-stringtable为什么要调整位置">7.2 StringTable为什么要调整位置</a></li>
+            <li><a href="#73-静态变量存放在那里">7.3 静态变量存放在那里？</a></li>
+          </ul>
+        </li>
+        <li><a href="#八方法区的垃圾回收">八、方法区的垃圾回收</a></li>
+        <li><a href="#九总结">九、总结</a>
+          <ul>
+            <li><a href="#81-常见面试题">8.1 常见面试题</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+    </div><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "true")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
             <div class="post-meta-line">
                 <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
                 </span></div>
             <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 7609 字&nbsp;
                 <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 16 分钟&nbsp;</div>
-        </div><div class="details toc" id="toc-static"  kept="true">
+        </div><div class="details toc" id="toc-static"  kept="">
                 <div class="details-summary toc-title">
                     <span>目录</span>
                     <span><i class="details-icon fas fa-angle-right"></i></span>
@@ -783,7 +838,8 @@
         </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">
                     由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
-                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span><span class="icp-splitter">&nbsp;|&nbsp;</span><br class="icp-br"/>
+                    <span class="icp"><a  target="_blank" href="https://beian.miit.gov.cn/">京ICP备2023005717号-1</a></span></div>
             <div class="footer-line"></div>
             <div class="footer-line">
             </div>

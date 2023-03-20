@@ -11,7 +11,6 @@
 <meta property="og:url" content="http://yanghx.vip/%E9%BB%91%E9%A9%AC%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
 
 <meta property="og:site_name" content="yanghx blog" />
-
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
 
@@ -22,7 +21,7 @@
 
 <meta name="theme-color" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" href="http://yanghx.vip/%E9%BB%91%E9%A9%AC%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/" /><link rel="prev" href="http://yanghx.vip/xpocket%E5%85%A5%E9%97%A8/" /><link rel="next" href="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/color.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/fontawesome-free/all.min.css">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" href="http://yanghx.vip/%E9%BB%91%E9%A9%AC%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/" /><link rel="prev" href="http://yanghx.vip/xpocket%E5%85%A5%E9%97%A8/" /><link rel="next" href="http://yanghx.vip/lucene%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/color.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/fontawesome-free/all.min.css">
         <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/animate/animate.min.css">
         <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
     {
@@ -59,7 +58,7 @@
             <a href="/" title="yanghx blog">yanghx blog</a>
         </div>
         <div class="menu">
-            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 所有文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/series/"> 系列 </a><a class="menu-item" href="/posts/mysql/mysql45/"> mysql45讲 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
                         <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
                         <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
                             <i class="fas fa-search fa-fw"></i>
@@ -107,7 +106,7 @@
                     <a href="#" class="search-cancel" id="search-cancel-mobile">
                         取消
                     </a>
-                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                </div><a class="menu-item" href="/posts/" title="">所有文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/series/" title="">系列</a><a class="menu-item" href="/posts/mysql/mysql45/" title="">mysql45讲</a><a href="#" class="menu-item theme-select" title="切换主题">
                 <i class="fas fa-adjust fa-fw"></i>
                 <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
                     <option value="light">浅色</option>
@@ -125,13 +124,141 @@
     <div id="search-dropdown-mobile"></div>
 </div>
 <main class="main">
-            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="container"><div class="toc" id="toc-auto">
+        <h2 class="toc-title">目录</h2>
+        <div class="toc-content" id="toc-content-auto"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#01学习目标">0.1.学习目标</a></li>
+    <li><a href="#02知识准备">0.2.知识准备</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#11本地事务">1.1.本地事务</a></li>
+    <li><a href="#12undo和redo">1.2.undo和redo</a>
+      <ul>
+        <li><a href="#121undo日志">1.2.1.undo日志</a></li>
+        <li><a href="#122redo日志">1.2.2.redo日志</a></li>
+        <li><a href="#123总结">1.2.3.总结</a></li>
+      </ul>
+    </li>
+    <li><a href="#13分布式事务">1.3.分布式事务</a>
+      <ul>
+        <li><a href="#1跨数据源">1）跨数据源</a></li>
+        <li><a href="#2跨服务">2）跨服务</a></li>
+        <li><a href="#3分布式系统的数据一致性问题">3）分布式系统的数据一致性问题</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li><a href="#21cap定理">2.1.CAP定理</a>
+      <ul>
+        <li><a href="#211partition-tolerance">2.1.1.Partition tolerance</a></li>
+        <li><a href="#212consistency">2.1.2.Consistency</a></li>
+        <li><a href="#213availability">2.1.3.Availability</a></li>
+        <li><a href="#214consistency-和-availability-的矛盾">2.1.4.Consistency 和 Availability 的矛盾</a></li>
+        <li><a href="#215几点疑问">2.1.5.几点疑问</a></li>
+      </ul>
+    </li>
+    <li><a href="#22base理论">2.2.Base理论</a></li>
+    <li><a href="#24分阶段提交">2.4.分阶段提交</a>
+      <ul>
+        <li><a href="#241dtp和xa">2.4.1DTP和XA</a></li>
+        <li><a href="#242二阶段提交">2.4.2.二阶段提交</a></li>
+        <li><a href="#243使用场景">2.4.3.使用场景</a></li>
+      </ul>
+    </li>
+    <li><a href="#25tcc">2.5.TCC</a>
+      <ul>
+        <li><a href="#251基本原理">2.5.1.基本原理</a></li>
+        <li><a href="#252实例">2.5.2.实例</a></li>
+        <li><a href="#253优势和缺点">2.5.3.优势和缺点</a></li>
+        <li><a href="#254使用场景">2.5.4.使用场景</a></li>
+      </ul>
+    </li>
+    <li><a href="#26可靠消息服务">2.6.可靠消息服务</a>
+      <ul>
+        <li><a href="#261基本原理">2.6.1.基本原理</a></li>
+        <li><a href="#262本地消息表">2.6.2.本地消息表</a>
+          <ul>
+            <li><a href="#1简化版本">1）简化版本</a></li>
+            <li><a href="#2独立消息服务">2）独立消息服务</a></li>
+          </ul>
+        </li>
+        <li><a href="#263rocketmq事务消息">2.6.3.RocketMQ事务消息</a></li>
+        <li><a href="#264rabbitmq的消息确认">2.6.4.RabbitMQ的消息确认</a></li>
+        <li><a href="#265消息事务的优缺点">2.6.5.消息事务的优缺点</a></li>
+      </ul>
+    </li>
+    <li><a href="#27at模式">2.7.AT模式</a>
+      <ul>
+        <li><a href="#271基本原理">2.7.1.基本原理</a></li>
+        <li><a href="#272详细架构和流程">2.7.2.详细架构和流程</a></li>
+        <li><a href="#273工作机制">2.7.3.工作机制</a>
+          <ul>
+            <li><a href="#场景">场景</a></li>
+            <li><a href="#一阶段">一阶段</a></li>
+            <li><a href="#二阶段-回滚">二阶段-回滚</a></li>
+            <li><a href="#二阶段-提交">二阶段-提交</a></li>
+          </ul>
+        </li>
+        <li><a href="#274优缺点">2.7.4.优缺点</a></li>
+      </ul>
+    </li>
+    <li><a href="#28saga模式">2.8.Saga模式</a>
+      <ul>
+        <li><a href="#基本模型">基本模型</a></li>
+        <li><a href="#适用场景">适用场景：</a></li>
+        <li><a href="#优势">优势：</a></li>
+        <li><a href="#缺点">缺点：</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li><a href="#31介绍">3.1.介绍</a>
+      <ul>
+        <li><a href="#311-seata-产品模块">3.1.1. Seata 产品模块</a></li>
+        <li><a href="#312seata支持的事务模型">3.1.2.Seata支持的事务模型</a></li>
+      </ul>
+    </li>
+    <li><a href="#32at模式实战">3.2.AT模式实战</a>
+      <ul>
+        <li><a href="#321准备数据">3.2.1.准备数据</a></li>
+        <li><a href="#322引入demo工程">3.2.2.引入Demo工程</a>
+          <ul>
+            <li><a href="#导入项目">导入项目</a></li>
+            <li><a href="#测试事务">测试事务</a></li>
+          </ul>
+        </li>
+        <li><a href="#323准备tc服务">3.2.3.准备TC服务</a>
+          <ul>
+            <li><a href="#1安装">1）安装</a></li>
+            <li><a href="#2配置">2）配置</a></li>
+            <li><a href="#3启动">3）启动</a></li>
+          </ul>
+        </li>
+        <li><a href="#324改造order服务">3.2.4.改造Order服务</a>
+          <ul>
+            <li><a href="#1引入依赖">1）引入依赖</a></li>
+            <li><a href="#2添加配置文件">2）添加配置文件</a></li>
+            <li><a href="#3代理datasource">3）代理DataSource</a></li>
+            <li><a href="#4添加事务注解">4）添加事务注解</a></li>
+          </ul>
+        </li>
+        <li><a href="#325改造storageaccount服务">3.2.5.改造Storage、Account服务</a></li>
+        <li><a href="#326测试">3.2.6.测试</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+    </div><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "true")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
             <div class="post-meta-line">
                 <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
                 </span></div>
             <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 18380 字&nbsp;
                 <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 37 分钟&nbsp;</div>
-        </div><div class="details toc" id="toc-static"  kept="true">
+        </div><div class="details toc" id="toc-static"  kept="">
                 <div class="details-summary toc-title">
                     <span>目录</span>
                     <span><i class="details-icon fas fa-angle-right"></i></span>
@@ -2525,13 +2652,14 @@ J. 事务提交</p>
     </div>
 
     <div class="post-nav"><a href="/xpocket%E5%85%A5%E9%97%A8/" class="prev" rel="prev" title=""><i class="fas fa-angle-left fa-fw"></i></a>
-            <a href="/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="next" rel="next" title=""><i class="fas fa-angle-right fa-fw"></i></a></div>
+            <a href="/lucene%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="next" rel="next" title=""><i class="fas fa-angle-right fa-fw"></i></a></div>
 </div>
 <div id="comments"></div></article></div>
         </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">
                     由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
-                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span><span class="icp-splitter">&nbsp;|&nbsp;</span><br class="icp-br"/>
+                    <span class="icp"><a  target="_blank" href="https://beian.miit.gov.cn/">京ICP备2023005717号-1</a></span></div>
             <div class="footer-line"></div>
             <div class="footer-line">
             </div>

@@ -113,7 +113,7 @@ theme = "DoIt"
     hugo = true
     #  托管服务信息 (支持 HTML 格式)
     # <a title="Github Pages" href="https://docs.github.com/en/pages/" target="_blank" rel="noopener noreffer">GitHub Pages</a>
-    hostedOn = '' 
+    hostedOn = ''
     #  是否显示版权信息
     copyright = true
     #  是否显示作者
@@ -254,7 +254,7 @@ theme = "DoIt"
     QQ = ""
     QQGroup = ""
     Email = "xxxx@xxxx.com"
-    RSS = true # 
+    RSS = true #
 
   #  文章页面配置
   [params.page]
@@ -382,13 +382,13 @@ theme = "DoIt"
       enable = true
       # Disqus 评论系统设置
       [params.page.comment.disqus]
-        # 
+        #
         enable = false
         # Disqus 的 shortname, 用来在文章中启用 Disqus 评论系统
         shortname = ""
       # Gitalk 评论系统设置
       [params.page.comment.gitalk]
-        # 
+        #
         enable = false
         owner = ""
         repo = ""
@@ -417,7 +417,7 @@ theme = "DoIt"
         emoji = ""
       # Waline 评论系统设置
       [params.page.comment.waline]
-        # 
+        #
         enable = false
         serverURL = ""
         pageview = true
@@ -542,7 +542,7 @@ theme = "DoIt"
     enable = false
     bio = "如果你觉得这篇文章对你有所帮助，欢迎赞赏~"
     link = "https://www.buymeacoffee.com" # 你的赞赏页面的地址
-    custom = "" # 自定义 HTML 
+    custom = "" # 自定义 HTML
 
   #  TypeIt 配置
   [params.typeit]
@@ -698,7 +698,7 @@ theme = "DoIt"
 
 # 用于 Hugo 输出文档的设置
 [outputs]
-  # 
+  #
   home = ["HTML", "RSS", "JSON"]
   page = ["HTML", "MarkDown"]
   section = ["HTML", "RSS"]
@@ -748,11 +748,11 @@ series = "series"
     url = "/series/"
     title = ""
     weight = 4
-  # [[menu.main]]
-  #   identifier = "java"
-  #   pre = ""
-  #   post = ""
-  #   name = "java"
-  #   url = "/posts/java/"
-  #   title = ""
-  #   weight = 5
+   [[menu.main]]
+     identifier = "mysql45"
+     pre = ""
+     post = ""
+     name = "mysql45讲"
+     url = "/posts/mysql/mysql45/"
+     title = ""
+     weight = 5

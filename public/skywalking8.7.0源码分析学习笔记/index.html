@@ -5,36 +5,35 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noodp" />
-    <title> - yanghx blog</title><meta name="Description" content="yanghx blog"><meta property="og:title" content="" />
+    <title>Skywalking 8.7.0 源码分析学习笔记 - yanghx blog</title><meta name="Description" content="yanghx blog"><meta property="og:title" content="Skywalking 8.7.0 源码分析学习笔记" />
 <meta property="og:description" content="Skywalking 8.7.0 源码分析学习笔记 https://www.bilibili.com/video/BV1dy4y1V7ck 一、源码环境准备 下载地址: https://archive.apache.org/dist/skywalking/8.7.0/apache-skywalking-apm-8.7.0-src.tgz 禁用两个插件代码风格检查插件 前端项目编译插件 mac M1芯片编译问题此时在根目录执行 mvn clean package &#39;-Dmaven.test.skip=true&#39; 大佬" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
-
-<meta property="og:site_name" content="yanghx blog" />
-
+<meta property="article:published_time" content="2023-03-20T02:42:30+08:00" />
+<meta property="article:modified_time" content="2023-03-20T02:42:30+08:00" /><meta property="og:site_name" content="yanghx blog" />
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
 
-<meta name="twitter:title" content=""/>
+<meta name="twitter:title" content="Skywalking 8.7.0 源码分析学习笔记"/>
 <meta name="twitter:description" content="Skywalking 8.7.0 源码分析学习笔记 https://www.bilibili.com/video/BV1dy4y1V7ck 一、源码环境准备 下载地址: https://archive.apache.org/dist/skywalking/8.7.0/apache-skywalking-apm-8.7.0-src.tgz 禁用两个插件代码风格检查插件 前端项目编译插件 mac M1芯片编译问题此时在根目录执行 mvn clean package &#39;-Dmaven.test.skip=true&#39; 大佬"/>
 <meta name="application-name" content="DoIt">
 <meta name="apple-mobile-web-app-title" content="DoIt">
 
 <meta name="theme-color" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" href="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" /><link rel="prev" href="http://yanghx.vip/%E9%BB%91%E9%A9%AC%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/" /><link rel="next" href="http://yanghx.vip/lucene%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/color.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/fontawesome-free/all.min.css">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" href="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" /><link rel="prev" href="http://yanghx.vip/readme/" /><link rel="next" href="http://yanghx.vip/mysql%E5%9F%BA%E7%A1%80-%E9%BB%91%E9%A9%AC/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/color.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/fontawesome-free/all.min.css">
         <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/animate/animate.min.css">
         <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
     {
         "@context": "http://schema.org",
         "@type": "BlogPosting",
-        "headline": "",
+        "headline": "Skywalking 8.7.0 源码分析学习笔记",
         "inLanguage": "zh-CN",
         "mainEntityOfPage": {
             "@type": "WebPage",
             "@id": "http:\/\/yanghx.vip\/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0\/"
-        },"genre": "posts","wordcount":  34069 ,
-        "url": "http:\/\/yanghx.vip\/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0\/","publisher": {
+        },"genre": "posts","keywords": "Skywalking","wordcount":  34069 ,
+        "url": "http:\/\/yanghx.vip\/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0\/","datePublished": "2023-03-20T02:42:30+08:00","dateModified": "2023-03-20T02:42:30+08:00","publisher": {
             "@type": "Organization",
             "name": ""},"author": {
                 "@type": "Person",
@@ -59,7 +58,7 @@
             <a href="/" title="yanghx blog">yanghx blog</a>
         </div>
         <div class="menu">
-            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 所有文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/series/"> 系列 </a><a class="menu-item" href="/posts/mysql/mysql45/"> mysql45讲 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
                         <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
                         <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
                             <i class="fas fa-search fa-fw"></i>
@@ -107,7 +106,7 @@
                     <a href="#" class="search-cancel" id="search-cancel-mobile">
                         取消
                     </a>
-                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                </div><a class="menu-item" href="/posts/" title="">所有文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/series/" title="">系列</a><a class="menu-item" href="/posts/mysql/mysql45/" title="">mysql45讲</a><a href="#" class="menu-item theme-select" title="切换主题">
                 <i class="fas fa-adjust fa-fw"></i>
                 <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
                     <option value="light">浅色</option>
@@ -125,13 +124,161 @@
     <div id="search-dropdown-mobile"></div>
 </div>
 <main class="main">
-            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="container"><div class="toc" id="toc-auto">
+        <h2 class="toc-title">目录</h2>
+        <div class="toc-content" id="toc-content-auto"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#一源码环境准备">一、源码环境准备</a>
+      <ul>
+        <li><a href="#禁用两个插件"><strong>禁用两个插件</strong></a></li>
+        <li><a href="#mac-m1芯片编译问题">mac M1芯片编译问题</a>
+          <ul>
+            <li><a href="#原因">原因</a></li>
+            <li><a href="#解决办法">解决办法</a></li>
+          </ul>
+        </li>
+        <li><a href="#将protocol生成的文件加入classpath">将<code>protocol</code>生成的文件加入<code>classPath</code></a></li>
+      </ul>
+    </li>
+    <li><a href="#二-agent">二、 Agent</a>
+      <ul>
+        <li><a href="#原理概述">原理概述</a></li>
+        <li><a href="#启动方式">启动方式</a></li>
+        <li><a href="#启动流程">启动流程</a>
+          <ul>
+            <li><a href="#1初始化配置">1、初始化配置</a></li>
+            <li><a href="#2加载插件">2、加载插件</a>
+              <ul>
+                <li><a href="#开启类加载器的并行加载模式">开启类加载器的并行加载模式</a></li>
+                <li><a href="#从指定目录加载插件">从指定目录加载插件</a></li>
+              </ul>
+            </li>
+            <li><a href="#3插件定义体系">3、插件定义体系</a>
+              <ul>
+                <li><a href="#从doubbe插件看开发流程">从doubbe插件看开发流程</a></li>
+              </ul>
+            </li>
+            <li><a href="#4-插件加载流程">4、 插件加载流程</a></li>
+            <li><a href="#5-定制agent">5、 定制agent</a>
+              <ul>
+                <li><a href="#synthetic"><code>synthetic</code></a></li>
+                <li><a href="#nbac"><code>NBAC</code></a></li>
+              </ul>
+            </li>
+            <li><a href="#6加载服务">6、加载服务</a></li>
+            <li><a href="#7-注册关闭钩子">7 注册关闭钩子</a></li>
+          </ul>
+        </li>
+        <li><a href="#插件工作原理">插件工作原理</a>
+          <ul>
+            <li><a href="#witness机制"><code>witness机制</code></a></li>
+            <li><a href="#插件工作流程">插件工作流程</a></li>
+          </ul>
+        </li>
+        <li><a href="#服务">服务</a>
+          <ul>
+            <li><a href="#bootservice"><code>BootService</code></a></li>
+            <li><a href="#grpcchannelmanager"><code>GRPCChannelManager</code></a></li>
+            <li><a href="#servicemanagementclient"><code>ServiceManagementClient</code></a></li>
+            <li><a href="#commandservice"><code>CommandService</code></a>
+              <ul>
+                <li><a href="#commandserialnumbercache"><code>CommandSerialNumberCache</code></a></li>
+                <li><a href="#commanddeserializer"><code>CommandDeserializer</code></a></li>
+                <li><a href="#configurationdiscoverycommand"><code>ConfigurationDiscoveryCommand</code></a></li>
+                <li><a href="#commandexecutorservice"><code>CommandExecutorService</code></a></li>
+                <li><a href="#configurationdiscoverycommandexecutor"><code>ConfigurationDiscoveryCommandExecutor</code></a></li>
+                <li><a href="#configurationdiscoveryservice"><code>ConfigurationDiscoveryService</code></a>
+                  <ul>
+                    <li><a href="#getagentdynamicconfig"><code>getAgentDynamicConfig</code></a></li>
+                  </ul>
+                </li>
+                <li><a href="#handleconfigurationdiscoverycommand"><code>handleConfigurationDiscoveryCommand</code></a></li>
+              </ul>
+            </li>
+            <li><a href="#samplingservice"><code>SamplingService</code></a></li>
+            <li><a href="#jvmservice"><code>JVMService</code></a></li>
+            <li><a href="#kafkaxxxservice"><code>KafkaXxxService</code></a></li>
+            <li><a href="#statuscheckservice"><code>StatusCheckService</code></a></li>
+          </ul>
+        </li>
+        <li><a href="#链路追踪">链路追踪</a>
+          <ul>
+            <li><a href="#概念">概念</a></li>
+            <li><a href="#链路id的生成">链路ID的生成</a></li>
+            <li><a href="#image-20221213211722391httpsblog-1257196793cosap-beijingmyqcloudcomimage-20221213211722391png"><img src="https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20221213211722391.png" alt="image-20221213211722391"></a></li>
+            <li><a href="#tracesegment"><code>TraceSegment</code></a></li>
+            <li><a href="#span"><code>span</code></a>
+              <ul>
+                <li><a href="#asyncspan"><code>AsyncSpan</code></a></li>
+                <li><a href="#abstractspan"><code>AbstractSpan</code></a></li>
+                <li><a href="#abstracttracingspan"><code>AbstractTracingSpan</code></a></li>
+                <li><a href="#stackbasedtracingspan"><code>StackBasedTracingSpan</code></a></li>
+                <li><a href="#entryspan-和-exitspan-"><code>EntrySpan 和 ExitSpan </code></a></li>
+              </ul>
+            </li>
+            <li><a href="#链路追踪上下文">链路追踪上下文</a>
+              <ul>
+                <li><a href="#abstracttracercontext"><code>AbstractTracerContext</code></a>
+                  <ul>
+                    <li><a href="#跨进程传输数据">跨进程传输数据</a></li>
+                    <li><a href="#跨线程传输数据">跨线程传输数据</a></li>
+                  </ul>
+                </li>
+                <li><a href="#tracingcontext"><code>TracingContext</code></a>
+                  <ul>
+                    <li><a href="#activespanstack">activeSpanStack</a></li>
+                    <li><a href="#createentryspan"><code>createEntrySpan()</code></a></li>
+                    <li><a href="#stopspan"><code>stopSpan()</code></a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li><a href="#上下文适配器-contextmanager">上下文适配器 <code>ContextManager</code></a></li>
+            <li><a href="#-datacarrier"><code> DataCarrier</code></a>
+              <ul>
+                <li><a href="#基础buffer"><code>基础Buffer</code></a>
+                  <ul>
+                    <li><a href="#buffer"><code>Buffer</code></a></li>
+                    <li><a href="#arrayblockingqueuebuffer"><code>ArrayBlockingQueueBuffer</code></a></li>
+                  </ul>
+                </li>
+                <li><a href="#channels"><code>Channels</code></a></li>
+                <li><a href="#消费-consumer"><code>消费 Consumer</code></a>
+                  <ul>
+                    <li><a href="#consumerthread"><code>ConsumerThread</code></a></li>
+                    <li><a href="#multiplechannelsconsumer"><code>MultipleChannelsConsumer</code></a></li>
+                  </ul>
+                </li>
+                <li><a href="#消费驱动-drive"><code>消费驱动 Drive</code></a>
+                  <ul>
+                    <li><a href="#consumedriver"><code>ConsumeDriver</code></a></li>
+                    <li><a href="#bulkconsumepool"><code>BulkConsumePool</code></a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li><a href="#链路数据发送的-oap">链路数据发送的 OAP</a>
+              <ul>
+                <li>
+                  <ul>
+                    <li><a href="#tracesegmentserviceclient"><code>TraceSegmentServiceClient</code></a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+    </div><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "true")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Skywalking 8.7.0 源码分析学习笔记</h1><div class="post-meta">
             <div class="post-meta-line">
                 <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
-                </span></div>
-            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 34069 字&nbsp;
+                </span>&nbsp;<span class="post-category">收录于 </span>&nbsp;<span class="post-category">类别 <a href="/categories/skywalking/"><i class="far fa-folder fa-fw"></i>Skywalking</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2023-03-20">2023-03-20</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="2023-03-20">2023-03-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 34069 字&nbsp;
                 <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 69 分钟&nbsp;</div>
-        </div><div class="details toc" id="toc-static"  kept="true">
+        </div><div class="details toc" id="toc-static"  kept="">
                 <div class="details-summary toc-title">
                     <span>目录</span>
                     <span><i class="details-icon fas fa-angle-right"></i></span>
@@ -11433,7 +11580,7 @@
     <div class="post-info">
         <div class="post-info-line">
             <div class="post-info-mod">
-                <span>更新于 0001-01-01</span>
+                <span>更新于 2023-03-20</span>
             </div>
             <div class="post-info-license"></div>
         </div>
@@ -11441,26 +11588,27 @@
             <div class="post-info-md"><span><a class="link-to-mardown" href=/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.md target="_blank" rel="noopener noreferrer">阅读原始文档</a>
                     </span></div>
             <div class="post-info-share">
-                <span><a href="#" title="分享到 Twitter" data-sharer="twitter" data-url="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title="" data-via="xxxx"><i class="fab fa-twitter fa-fw"></i></a><a href="#" title="分享到 Facebook" data-sharer="facebook" data-url="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook-square fa-fw"></i></a><a href="#" title="分享到 WhatsApp" data-sharer="whatsapp" data-url="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title="" data-web><i class="fab fa-whatsapp fa-fw"></i></a><a href="#" title="分享到 Line" data-sharer="line" data-url="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=""><i data-svg-src="/lib/simple-icons/icons/line.min.svg"></i></a><a href="#" title="分享到 微博" data-sharer="weibo" data-url="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=""><i class="fab fa-weibo fa-fw"></i></a><a href="#" title="分享到 Myspace" data-sharer="myspace" data-url="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title="" data-description=""><i data-svg-src="/lib/simple-icons/icons/myspace.min.svg"></i></a><a href="#" title="分享到 Blogger" data-sharer="blogger" data-url="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title="" data-description=""><i class="fab fa-blogger fa-fw"></i></a><a href="#" title="分享到 Evernote" data-sharer="evernote" data-url="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=""><i class="fab fa-evernote fa-fw"></i></a></span>
+                <span><a href="#" title="分享到 Twitter" data-sharer="twitter" data-url="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title="Skywalking 8.7.0 源码分析学习笔记" data-via="xxxx" data-hashtags="Skywalking"><i class="fab fa-twitter fa-fw"></i></a><a href="#" title="分享到 Facebook" data-sharer="facebook" data-url="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-hashtag="Skywalking"><i class="fab fa-facebook-square fa-fw"></i></a><a href="#" title="分享到 WhatsApp" data-sharer="whatsapp" data-url="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title="Skywalking 8.7.0 源码分析学习笔记" data-web><i class="fab fa-whatsapp fa-fw"></i></a><a href="#" title="分享到 Line" data-sharer="line" data-url="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title="Skywalking 8.7.0 源码分析学习笔记"><i data-svg-src="/lib/simple-icons/icons/line.min.svg"></i></a><a href="#" title="分享到 微博" data-sharer="weibo" data-url="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title="Skywalking 8.7.0 源码分析学习笔记"><i class="fab fa-weibo fa-fw"></i></a><a href="#" title="分享到 Myspace" data-sharer="myspace" data-url="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title="Skywalking 8.7.0 源码分析学习笔记" data-description=""><i data-svg-src="/lib/simple-icons/icons/myspace.min.svg"></i></a><a href="#" title="分享到 Blogger" data-sharer="blogger" data-url="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title="Skywalking 8.7.0 源码分析学习笔记" data-description=""><i class="fab fa-blogger fa-fw"></i></a><a href="#" title="分享到 Evernote" data-sharer="evernote" data-url="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title="Skywalking 8.7.0 源码分析学习笔记"><i class="fab fa-evernote fa-fw"></i></a></span>
             </div>
         </div>
     </div>
 
     <div class="post-info-more">
-        <section class="post-tags"></section>
+        <section class="post-tags"><i class="fas fa-tags fa-fw"></i>&nbsp;<a href="/tags/skywalking/">Skywalking</a></section>
         <section>
             <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
         </section>
     </div>
 
-    <div class="post-nav"><a href="/%E9%BB%91%E9%A9%AC%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/" class="prev" rel="prev" title=""><i class="fas fa-angle-left fa-fw"></i></a>
-            <a href="/lucene%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="next" rel="next" title=""><i class="fas fa-angle-right fa-fw"></i></a></div>
+    <div class="post-nav"><a href="/readme/" class="prev" rel="prev" title=""><i class="fas fa-angle-left fa-fw"></i></a>
+            <a href="/mysql%E5%9F%BA%E7%A1%80-%E9%BB%91%E9%A9%AC/" class="next" rel="next" title="mysql基础-黑马">mysql基础-黑马<i class="fas fa-angle-right fa-fw"></i></a></div>
 </div>
 <div id="comments"></div></article></div>
         </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">
                     由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
-                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span><span class="icp-splitter">&nbsp;|&nbsp;</span><br class="icp-br"/>
+                    <span class="icp"><a  target="_blank" href="https://beian.miit.gov.cn/">京ICP备2023005717号-1</a></span></div>
             <div class="footer-line"></div>
             <div class="footer-line">
             </div>

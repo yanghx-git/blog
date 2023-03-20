@@ -6,21 +6,33 @@
         <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Mon, 20 Mar 2023 02:42:30 &#43;0800</lastBuildDate>
             <atom:link href="http://yanghx.vip/index.xml" rel="self" type="application/rss+xml" />
         <item>
-    <title>First_post</title>
-    <link>http://yanghx.vip/first_post/</link>
+    <title>arthas-黑马</title>
+    <link>http://yanghx.vip/arthas-%E9%BB%91%E9%A9%AC/</link>
     <pubDate>Mon, 20 Mar 2023 02:42:30 &#43;0800</pubDate><author>
         <name>yanghx</name>
-    </author><guid>http://yanghx.vip/first_post/</guid>
-    <description><![CDATA[Z]]></description>
+    </author><guid>http://yanghx.vip/arthas-%E9%BB%91%E9%A9%AC/</guid>
+    <description><![CDATA[《Arthas基础学习》 概述 Arthas（阿尔萨斯） 能为你做什么？ Arthas 是Alibaba开源的Java诊断工具，深受开发者喜爱。 当你遇到以下类似]]></description>
 </item><item>
-    <title>k8s基础-黑马 </title>
+    <title>k8s基础-黑马</title>
     <link>http://yanghx.vip/k8s-%E9%BB%91%E9%A9%AC/</link>
-    <pubDate>Tue, 03 Mar 2020 21:40:32 &#43;0800</pubDate><author>
-                    <name>Dillon</name>
-                </author><author>
-                    <name>PCloud</name>
-                </author><guid>http://yanghx.vip/k8s-%E9%BB%91%E9%A9%AC/</guid>
+    <pubDate>Mon, 20 Mar 2023 02:42:30 &#43;0800</pubDate><author>
+        <name>yanghx</name>
+    </author><guid>http://yanghx.vip/k8s-%E9%BB%91%E9%A9%AC/</guid>
     <description><![CDATA[视频：https://www.bilibili.com/video/BV1Qv41167ck 文档： https://gitee.com/yoo]]></description>
+</item><item>
+    <title>mysql基础-黑马</title>
+    <link>http://yanghx.vip/mysql%E5%9F%BA%E7%A1%80-%E9%BB%91%E9%A9%AC/</link>
+    <pubDate>Mon, 20 Mar 2023 02:42:30 &#43;0800</pubDate><author>
+        <name>yanghx</name>
+    </author><guid>http://yanghx.vip/mysql%E5%9F%BA%E7%A1%80-%E9%BB%91%E9%A9%AC/</guid>
+    <description><![CDATA[辣条大佬的mysql Mysql高级-day01 MySQL高级课程简介 序号 Day01 Day02 Day03 Day04 1 Linux系统安装MySQL 体系结构 应用优化 MySQL 常用工具 2 索]]></description>
+</item><item>
+    <title>Skywalking 8.7.0 源码分析学习笔记</title>
+    <link>http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
+    <pubDate>Mon, 20 Mar 2023 02:42:30 &#43;0800</pubDate><author>
+        <name>yanghx</name>
+    </author><guid>http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</guid>
+    <description><![CDATA[Skywalking 8.7.0 源码分析学习笔记 https://www.bilibili.com/video/BV1dy4y1V7ck 一、源码环境准备 下载地址: https://archive.apache.org/dist/skywalking/8.7.0/apache-skywalking-apm-8.7.0-src.tgz 禁用两个插件代码风格检查插件 前端项目编译插件 mac M1芯片编译问题此时在根目录执行 mvn clean package '-Dmaven.test.skip=true' 大佬]]></description>
 </item><item>
     <title></title>
     <link>http://yanghx.vip/readme/</link>
@@ -63,19 +75,5 @@
         <name>yanghx</name>
     </author><guid>http://yanghx.vip/13-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%A6%82%E8%BF%B0/</guid>
     <description><![CDATA[一、垃圾回收概述 1.1 概念这次我们主要关注的是黄色部分，内存的分配与回收 1.2 什么是垃圾在提到什么是垃圾之前，我先看下面一张图 从上图我们可以很明确的]]></description>
-</item><item>
-    <title></title>
-    <link>http://yanghx.vip/14-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95/</link>
-    <pubDate>Mon, 01 Jan 0001 00:00:00 &#43;0000</pubDate><author>
-        <name>yanghx</name>
-    </author><guid>http://yanghx.vip/14-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95/</guid>
-    <description><![CDATA[垃圾回收相关算法 一、标记阶段：引用计数算法在堆里存放着几乎所有的Java对象实例，在GC执行垃圾回收之前，首先需要区分出内存中那些是存活对象]]></description>
-</item><item>
-    <title></title>
-    <link>http://yanghx.vip/15-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5/</link>
-    <pubDate>Mon, 01 Jan 0001 00:00:00 &#43;0000</pubDate><author>
-        <name>yanghx</name>
-    </author><guid>http://yanghx.vip/15-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5/</guid>
-    <description><![CDATA[垃圾回收相关概念 一、System.gc()的理解在默认情况下，通过system.gc()或者Runtime.getRuntime().gc(]]></description>
 </item></channel>
 </rss>

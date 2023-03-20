@@ -11,7 +11,6 @@
 <meta property="og:url" content="http://yanghx.vip/2-%E5%AD%97%E8%8A%82%E7%A0%81%E6%8C%87%E4%BB%A4%E9%9B%86/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
 
 <meta property="og:site_name" content="yanghx blog" />
-
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
 
@@ -59,7 +58,7 @@
             <a href="/" title="yanghx blog">yanghx blog</a>
         </div>
         <div class="menu">
-            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 所有文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/series/"> 系列 </a><a class="menu-item" href="/posts/mysql/mysql45/"> mysql45讲 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
                         <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
                         <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
                             <i class="fas fa-search fa-fw"></i>
@@ -107,7 +106,7 @@
                     <a href="#" class="search-cancel" id="search-cancel-mobile">
                         取消
                     </a>
-                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                </div><a class="menu-item" href="/posts/" title="">所有文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/series/" title="">系列</a><a class="menu-item" href="/posts/mysql/mysql45/" title="">mysql45讲</a><a href="#" class="menu-item theme-select" title="切换主题">
                 <i class="fas fa-adjust fa-fw"></i>
                 <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
                     <option value="light">浅色</option>
@@ -125,13 +124,130 @@
     <div id="search-dropdown-mobile"></div>
 </div>
 <main class="main">
-            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="container"><div class="toc" id="toc-auto">
+        <h2 class="toc-title">目录</h2>
+        <div class="toc-content" id="toc-content-auto"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#一字节码指令集">一、字节码指令集</a>
+          <ul>
+            <li><a href="#11-概述">1.1 概述</a></li>
+          </ul>
+        </li>
+        <li><a href="#二加载与存储指令">二、加载与存储指令</a>
+          <ul>
+            <li><a href="#21-局部变量压栈指令">2.1 局部变量压栈指令</a></li>
+            <li><a href="#22-局部变量压栈常用指令集">2.2 局部变量压栈常用指令集</a></li>
+            <li><a href="#23-局部变量压栈指令剖析">2.3 局部变量压栈指令剖析</a></li>
+            <li><a href="#24-常量入栈指令">2.4 常量入栈指令</a></li>
+            <li><a href="#25-常量入栈常用指令集">2.5 常量入栈常用指令集</a></li>
+            <li><a href="#26-常量入栈指令剖析">2.6 常量入栈指令剖析</a></li>
+            <li><a href="#27-出栈装入局部变量表指令">2.7 出栈装入局部变量表指令</a></li>
+            <li><a href="#28-出栈装入局部变量表常用指令集">2.8 出栈装入局部变量表常用指令集</a></li>
+            <li><a href="#29-出栈装入局部变量表指令剖析">2.9 出栈装入局部变量表指令剖析</a></li>
+          </ul>
+        </li>
+        <li><a href="#三算术指令">三、算术指令</a>
+          <ul>
+            <li><a href="#整数运算">整数运算</a></li>
+            <li><a href="#逻辑运算">逻辑运算</a></li>
+            <li><a href="#移位操作">移位操作</a></li>
+            <li><a href="#按位布尔运算">按位布尔运算</a></li>
+            <li><a href="#浮点运算">浮点运算</a></li>
+            <li><a href="#31-算术指令集">3.1 算术指令集</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#集">集</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#32-算术指令举例">3.2 算术指令举例</a>
+              <ul>
+                <li><a href="#举例1">举例1</a></li>
+                <li><a href="#举例2">举例2</a></li>
+                <li><a href="#举例3">举例3</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#四类型转换指令">四、类型转换指令</a>
+          <ul>
+            <li><a href="#宽化类型转换">宽化类型转换</a></li>
+            <li><a href="#窄化类型转换">窄化类型转换</a></li>
+            <li><a href="#41-宽化类型转换剖析">4.1 宽化类型转换剖析</a></li>
+            <li><a href="#42-窄化类型转换剖析">4.2 窄化类型转换剖析</a></li>
+          </ul>
+        </li>
+        <li><a href="#五对象的创建与访问指令">五、对象的创建与访问指令</a>
+          <ul>
+            <li><a href="#对象操作指令">对象操作指令</a></li>
+            <li><a href="#数组操作指令">数组操作指令</a></li>
+            <li><a href="#51-创建指令">5.1 创建指令</a></li>
+            <li><a href="#52-字段访问指令">5.2 字段访问指令</a></li>
+            <li><a href="#53-数组操作指令">5.3 数组操作指令</a></li>
+            <li><a href="#54-类型检查指令">5.4 类型检查指令</a></li>
+          </ul>
+        </li>
+        <li><a href="#六-方法调用与返回指令">六、 方法调用与返回指令</a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#方法调用指令">方法调用指令</a></li>
+                <li><a href="#方法返回指令">方法返回指令</a></li>
+              </ul>
+            </li>
+            <li><a href="#61-方法调用指令">6.1 方法调用指令</a></li>
+            <li><a href="#62-方法返回指令">6.2 方法返回指令</a></li>
+          </ul>
+        </li>
+        <li><a href="#七操作数栈管理指令">七、操作数栈管理指令</a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#通用无类型栈操作">通用(无类型）栈操作</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#八控制转移指令">八、控制转移指令</a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#比较指令">比较指令</a></li>
+                <li><a href="#条件分支指令">条件分支指令</a></li>
+                <li><a href="#比较条件分支指令">比较条件分支指令</a></li>
+                <li><a href="#多条件分支跳转指令">多条件分支跳转指令</a></li>
+                <li><a href="#无条件跳转指令">无条件跳转指令</a></li>
+              </ul>
+            </li>
+            <li><a href="#81-比较指令">8.1 比较指令</a></li>
+            <li><a href="#82-条件跳转指令">8.2 条件跳转指令</a></li>
+            <li><a href="#83-比较条件跳转指令">8.3 比较条件跳转指令</a></li>
+            <li><a href="#85-无条件跳转">8.5 无条件跳转</a></li>
+          </ul>
+        </li>
+        <li><a href="#九-异常处理指令">九、 异常处理指令</a></li>
+        <li><a href="#十同步控制指令">十、同步控制指令</a>
+          <ul>
+            <li><a href="#线程同步">线程同步</a></li>
+            <li><a href="#101方法级的同步">10.1.方法级的同步</a></li>
+            <li><a href="#102-方法内指令指令序列的同步">10.2 方法内指令指令序列的同步</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+    </div><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "true")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
             <div class="post-meta-line">
                 <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
                 </span></div>
             <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 7070 字&nbsp;
                 <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 15 分钟&nbsp;</div>
-        </div><div class="details toc" id="toc-static"  kept="true">
+        </div><div class="details toc" id="toc-static"  kept="">
                 <div class="details-summary toc-title">
                     <span>目录</span>
                     <span><i class="details-icon fas fa-angle-right"></i></span>
@@ -1861,7 +1977,8 @@
         </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">
                     由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
-                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span><span class="icp-splitter">&nbsp;|&nbsp;</span><br class="icp-br"/>
+                    <span class="icp"><a  target="_blank" href="https://beian.miit.gov.cn/">京ICP备2023005717号-1</a></span></div>
             <div class="footer-line"></div>
             <div class="footer-line">
             </div>

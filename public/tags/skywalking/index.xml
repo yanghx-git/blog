@@ -1,0 +1,14 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Skywalking - 标签 - yanghx blog</title>
+        <link>http://yanghx.vip/tags/skywalking/</link>
+        <description>Skywalking - 标签 - yanghx blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Mon, 20 Mar 2023 02:42:30 &#43;0800</lastBuildDate><atom:link href="http://yanghx.vip/tags/skywalking/" rel="self" type="application/rss+xml" /><item>
+    <title>Skywalking 8.7.0 源码分析学习笔记</title>
+    <link>http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
+    <pubDate>Mon, 20 Mar 2023 02:42:30 &#43;0800</pubDate><author>
+        <name>yanghx</name>
+    </author><guid>http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</guid>
+    <description><![CDATA[Skywalking 8.7.0 源码分析学习笔记 https://www.bilibili.com/video/BV1dy4y1V7ck 一、源码环境准备 下载地址: https://archive.apache.org/dist/skywalking/8.7.0/apache-skywalking-apm-8.7.0-src.tgz 禁用两个插件代码风格检查插件 前端项目编译插件 mac M1芯片编译问题此时在根目录执行 mvn clean package '-Dmaven.test.skip=true' 大佬]]></description>
+</item></channel>
+</rss>

@@ -11,7 +11,6 @@
 <meta property="og:url" content="http://yanghx.vip/lucene%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
 
 <meta property="og:site_name" content="yanghx blog" />
-
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
 
@@ -22,7 +21,7 @@
 
 <meta name="theme-color" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" href="http://yanghx.vip/lucene%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" /><link rel="prev" href="http://yanghx.vip/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" /><link rel="next" href="http://yanghx.vip/grpc/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/color.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/fontawesome-free/all.min.css">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="canonical" href="http://yanghx.vip/lucene%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" /><link rel="prev" href="http://yanghx.vip/%E9%BB%91%E9%A9%AC%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/" /><link rel="next" href="http://yanghx.vip/grpc/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/color.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/fontawesome-free/all.min.css">
         <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/lib/animate/animate.min.css">
         <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
     {
@@ -59,7 +58,7 @@
             <a href="/" title="yanghx blog">yanghx blog</a>
         </div>
         <div class="menu">
-            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 所有文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/series/"> 系列 </a><a class="menu-item" href="/posts/mysql/mysql45/"> mysql45讲 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
                         <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
                         <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
                             <i class="fas fa-search fa-fw"></i>
@@ -107,7 +106,7 @@
                     <a href="#" class="search-cancel" id="search-cancel-mobile">
                         取消
                     </a>
-                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                </div><a class="menu-item" href="/posts/" title="">所有文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/series/" title="">系列</a><a class="menu-item" href="/posts/mysql/mysql45/" title="">mysql45讲</a><a href="#" class="menu-item theme-select" title="切换主题">
                 <i class="fas fa-adjust fa-fw"></i>
                 <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
                     <option value="light">浅色</option>
@@ -125,13 +124,56 @@
     <div id="search-dropdown-mobile"></div>
 </div>
 <main class="main">
-            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="container"><div class="toc" id="toc-auto">
+        <h2 class="toc-title">目录</h2>
+        <div class="toc-content" id="toc-content-auto"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#背景">背景</a></li>
+    <li><a href="#搜索引擎组件">搜索引擎组件</a></li>
+    <li><a href="#索引和域">索引和域</a>
+      <ul>
+        <li><a href="#lucene-field-域类型"><strong>Lucene Field 域类型</strong></a></li>
+        <li><a href="#索引和搜索的核心类"><strong>索引和搜索的核心类</strong></a></li>
+        <li><a href="#索引的增删改查">索引的增删改查</a></li>
+        <li><a href="#域类型">域类型</a></li>
+        <li><a href="#加权">加权</a></li>
+        <li><a href="#数值索引与段合并">数值索引与段合并</a></li>
+      </ul>
+    </li>
+    <li><a href="#主要的搜索api">主要的搜索API</a>
+      <ul>
+        <li><a href="#简单查询"><code>简单查询</code></a></li>
+        <li><a href="#indexsearcher类"><code>IndexSearcher类</code></a></li>
+        <li><a href="#lucene的多样化查询"><code>Lucene的多样化查询</code></a></li>
+        <li><a href="#解析查询表达式queryparser"><code>解析查询表达式：QueryParser</code></a></li>
+      </ul>
+    </li>
+    <li><a href="#分析器">分析器</a>
+      <ul>
+        <li><a href="#基础">基础</a></li>
+        <li><a href="#剖析分析器">剖析分析器</a></li>
+        <li><a href="#内置分析器">内置分析器</a></li>
+      </ul>
+    </li>
+    <li><a href="#高级搜索">高级搜索</a>
+      <ul>
+        <li><a href="#搜索结果排序">搜索结果排序</a></li>
+        <li><a href="#multiphrasequery"><code>MultiPhraseQuery</code></a></li>
+        <li><a href="#多个域的一次性查询">多个域的一次性查询</a></li>
+        <li><a href="#跨度查询">跨度查询</a></li>
+        <li><a href="#使用功能查询实现自定义评分">使用功能查询实现自定义评分</a></li>
+        <li><a href="#针对多索引的搜索">针对多索引的搜索</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+    </div><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "true")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
             <div class="post-meta-line">
                 <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
                 </span></div>
             <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 21492 字&nbsp;
                 <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 43 分钟&nbsp;</div>
-        </div><div class="details toc" id="toc-static"  kept="true">
+        </div><div class="details toc" id="toc-static"  kept="">
                 <div class="details-summary toc-title">
                     <span>目录</span>
                     <span><i class="details-icon fas fa-angle-right"></i></span>
@@ -1647,14 +1689,14 @@
 它也会将语汇单元转换成小写形式，并去除停用词和标点符号。</li>
 </ol>
 <p><strong>索引过程中的分析</strong></p>
-<p><a class="lightgallery" href="./lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e5%88%86%e6%9e%90%e8%bf%87%e7%a8%8b.jpg" title="分析过程" data-thumbnail="./lucene学习笔记.assets/分析过程.jpg">
+<p><a class="lightgallery" href="lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e5%88%86%e6%9e%90%e8%bf%87%e7%a8%8b.jpg" title="分析过程" data-thumbnail="lucene学习笔记.assets/分析过程.jpg">
         <img
             
             loading="lazy"
-            src="./lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e5%88%86%e6%9e%90%e8%bf%87%e7%a8%8b.jpg"
-            srcset="./lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e5%88%86%e6%9e%90%e8%bf%87%e7%a8%8b.jpg, ./lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e5%88%86%e6%9e%90%e8%bf%87%e7%a8%8b.jpg 1.5x, ./lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e5%88%86%e6%9e%90%e8%bf%87%e7%a8%8b.jpg 2x"
+            src="lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e5%88%86%e6%9e%90%e8%bf%87%e7%a8%8b.jpg"
+            srcset="lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e5%88%86%e6%9e%90%e8%bf%87%e7%a8%8b.jpg, lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e5%88%86%e6%9e%90%e8%bf%87%e7%a8%8b.jpg 1.5x, lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e5%88%86%e6%9e%90%e8%bf%87%e7%a8%8b.jpg 2x"
             sizes="auto"
-            alt="./lucene学习笔记.assets/分析过程.jpg">
+            alt="lucene学习笔记.assets/分析过程.jpg">
     </a></p>
 <p><strong>QueryParser使用分析器</strong></p>
 <div class="highlight"><div class="chroma">
@@ -1685,14 +1727,14 @@
     <a href="#%e5%89%96%e6%9e%90%e5%88%86%e6%9e%90%e5%99%a8" class="header-mark"></a>剖析分析器</h3><p><strong>语汇单元</strong></p>
 <p>语汇单元流（tokenStream）是分析过程中所产生的基本输出。在索引时，Lucene使用特定的分析器来处理需要被语汇单元化的域，
 而每个语汇单元相关的重要属性随即被编入索引中。</p>
-<p><a class="lightgallery" href="./lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e8%af%ad%e6%b1%87%e5%8d%95%e5%85%83%e6%b5%81-%e6%a1%88%e4%be%8b.jpg" title="语汇单元流-案例" data-thumbnail="./lucene学习笔记.assets/语汇单元流-案例.jpg">
+<p><a class="lightgallery" href="lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e8%af%ad%e6%b1%87%e5%8d%95%e5%85%83%e6%b5%81-%e6%a1%88%e4%be%8b.jpg" title="语汇单元流-案例" data-thumbnail="lucene学习笔记.assets/语汇单元流-案例.jpg">
         <img
             
             loading="lazy"
-            src="./lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e8%af%ad%e6%b1%87%e5%8d%95%e5%85%83%e6%b5%81-%e6%a1%88%e4%be%8b.jpg"
-            srcset="./lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e8%af%ad%e6%b1%87%e5%8d%95%e5%85%83%e6%b5%81-%e6%a1%88%e4%be%8b.jpg, ./lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e8%af%ad%e6%b1%87%e5%8d%95%e5%85%83%e6%b5%81-%e6%a1%88%e4%be%8b.jpg 1.5x, ./lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e8%af%ad%e6%b1%87%e5%8d%95%e5%85%83%e6%b5%81-%e6%a1%88%e4%be%8b.jpg 2x"
+            src="lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e8%af%ad%e6%b1%87%e5%8d%95%e5%85%83%e6%b5%81-%e6%a1%88%e4%be%8b.jpg"
+            srcset="lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e8%af%ad%e6%b1%87%e5%8d%95%e5%85%83%e6%b5%81-%e6%a1%88%e4%be%8b.jpg, lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e8%af%ad%e6%b1%87%e5%8d%95%e5%85%83%e6%b5%81-%e6%a1%88%e4%be%8b.jpg 1.5x, lucene%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0.assets/%e8%af%ad%e6%b1%87%e5%8d%95%e5%85%83%e6%b5%81-%e6%a1%88%e4%be%8b.jpg 2x"
             sizes="auto"
-            alt="./lucene学习笔记.assets/语汇单元流-案例.jpg">
+            alt="lucene学习笔记.assets/语汇单元流-案例.jpg">
     </a>
 以“the quick brown fox”的分析为例。该文本中每个语汇单元都表示一个独立的单词。一个语汇单元携带了一个文本值（即单词本身）和其他一些元数据：
 偏移量、语汇单元类型（默认：word）、以及位置增量。语汇单元可以选择性包含一些由程序定义的标志位和任意字节数的有效负载，这样程序就能根据具体需要
@@ -2286,14 +2328,15 @@ Lucene内置的分析器并不使用这些标志，但你自己设计的搜索�
         </section>
     </div>
 
-    <div class="post-nav"><a href="/skywalking8.7.0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="prev" rel="prev" title=""><i class="fas fa-angle-left fa-fw"></i></a>
+    <div class="post-nav"><a href="/%E9%BB%91%E9%A9%AC%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/" class="prev" rel="prev" title=""><i class="fas fa-angle-left fa-fw"></i></a>
             <a href="/grpc/" class="next" rel="next" title=""><i class="fas fa-angle-right fa-fw"></i></a></div>
 </div>
 <div id="comments"></div></article></div>
         </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">
                     由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
-                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span><span class="icp-splitter">&nbsp;|&nbsp;</span><br class="icp-br"/>
+                    <span class="icp"><a  target="_blank" href="https://beian.miit.gov.cn/">京ICP备2023005717号-1</a></span></div>
             <div class="footer-line"></div>
             <div class="footer-line">
             </div>

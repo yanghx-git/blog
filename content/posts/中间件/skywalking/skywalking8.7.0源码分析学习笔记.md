@@ -1,3 +1,10 @@
+---
+title: "Skywalking 8.7.0 源码分析学习笔记"
+date: 2023-03-20T02:42:30+08:00
+
+tags: ["Skywalking"]
+categories: ["Skywalking"]
+---
 # Skywalking 8.7.0 源码分析学习笔记
 
 > https://www.bilibili.com/video/BV1dy4y1V7ck

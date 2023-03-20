@@ -11,7 +11,6 @@
 <meta property="og:url" content="http://yanghx.vip/14-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%9B%B8%E5%85%B3%E7%AE%97%E6%B3%95/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
 
 <meta property="og:site_name" content="yanghx blog" />
-
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
 
@@ -59,7 +58,7 @@
             <a href="/" title="yanghx blog">yanghx blog</a>
         </div>
         <div class="menu">
-            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 所有文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/series/"> 系列 </a><a class="menu-item" href="/posts/mysql/mysql45/"> mysql45讲 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
                         <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
                         <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
                             <i class="fas fa-search fa-fw"></i>
@@ -107,7 +106,7 @@
                     <a href="#" class="search-cancel" id="search-cancel-mobile">
                         取消
                     </a>
-                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                </div><a class="menu-item" href="/posts/" title="">所有文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/series/" title="">系列</a><a class="menu-item" href="/posts/mysql/mysql45/" title="">mysql45讲</a><a href="#" class="menu-item theme-select" title="切换主题">
                 <i class="fas fa-adjust fa-fw"></i>
                 <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
                     <option value="light">浅色</option>
@@ -125,13 +124,100 @@
     <div id="search-dropdown-mobile"></div>
 </div>
 <main class="main">
-            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="container"><div class="toc" id="toc-auto">
+        <h2 class="toc-title">目录</h2>
+        <div class="toc-content" id="toc-content-auto"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#垃圾回收相关算法">垃圾回收相关算法</a>
+      <ul>
+        <li><a href="#一标记阶段引用计数算法">一、标记阶段：引用计数算法</a>
+          <ul>
+            <li><a href="#11-循环引用">1.1 循环引用</a></li>
+            <li><a href="#12-举例">1.2 举例</a></li>
+            <li><a href="#13-小结">1.3 小结</a></li>
+          </ul>
+        </li>
+        <li><a href="#二标记阶段可达性分析算法">二、标记阶段：可达性分析算法</a>
+          <ul>
+            <li><a href="#21-概念">2.1 概念</a></li>
+            <li><a href="#22-思路">2.2 思路</a></li>
+            <li><a href="#23-gc-roots可以是那些">2.3 GC Roots可以是那些？</a></li>
+            <li><a href="#24-总结">2.4 总结</a></li>
+            <li><a href="#25-小技巧">2.5 小技巧</a></li>
+            <li><a href="#26-注意">2.6 注意</a></li>
+          </ul>
+        </li>
+        <li><a href="#三对象的finalization机制">三、对象的finalization机制</a>
+          <ul>
+            <li><a href="#31-注意">3.1 注意</a></li>
+            <li><a href="#32-生存还是死亡">3.2 生存还是死亡？</a></li>
+            <li><a href="#33-具体过程">3.3 具体过程</a></li>
+            <li><a href="#34-代码演示">3.4 代码演示</a></li>
+          </ul>
+        </li>
+        <li><a href="#四mat与jprofiler的gc-roots溯源">四、MAT与JProfiler的GC Roots溯源</a>
+          <ul>
+            <li><a href="#41-mat是什么">4.1 MAT是什么？</a></li>
+            <li><a href="#42-命令行使用-jmap">4.2 命令行使用 jmap</a></li>
+            <li><a href="#43-使用jvisualvm">4.3 使用JVIsualVM</a></li>
+            <li><a href="#44-使用mat打开dump文件">4.4 使用MAT打开Dump文件</a></li>
+            <li><a href="#45-jprofiler的gc-roots溯源">4.5 JProfiler的GC Roots溯源</a></li>
+            <li><a href="#46-如何判断什么原因造成oom">4.6 如何判断什么原因造成OOM</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#五清除阶段标记-清除算法">五、清除阶段：标记-清除算法</a>
+      <ul>
+        <li><a href="#51-执行过程">5.1 执行过程</a></li>
+        <li><a href="#52-什么是清除">5.2 什么是清除？</a>
+          <ul>
+            <li><a href="#53-缺点">5.3 缺点</a></li>
+          </ul>
+        </li>
+        <li><a href="#六清除阶段复制算法">六、清除阶段：复制算法</a>
+          <ul>
+            <li><a href="#61-背景">6.1 背景</a></li>
+            <li><a href="#62-核心思想">6.2 核心思想</a></li>
+            <li><a href="#63-优点">6.3 优点</a></li>
+            <li><a href="#64-缺点">6.4 缺点</a></li>
+            <li><a href="#65-注意">6.5 注意</a></li>
+          </ul>
+        </li>
+        <li><a href="#七清除阶段标记-整理算法">七、清除阶段：标记-整理算法</a>
+          <ul>
+            <li><a href="#71-背景">7.1 背景</a></li>
+            <li><a href="#72-执行过程">7.2 执行过程</a></li>
+            <li><a href="#73-标清和标整的区别">7.3 标清和标整的区别</a></li>
+            <li><a href="#74-标整的优缺点">7.4 标整的优缺点</a>
+              <ul>
+                <li><a href="#741-优点">7.4.1 优点</a></li>
+                <li><a href="#742-缺点">7.4.2 缺点</a></li>
+              </ul>
+            </li>
+            <li><a href="#75-小结">7.5 小结</a></li>
+          </ul>
+        </li>
+        <li><a href="#八分代收集算法">八、分代收集算法</a></li>
+        <li><a href="#九增量收集算法">九、增量收集算法</a>
+          <ul>
+            <li><a href="#91-概述">9.1 概述</a></li>
+            <li><a href="#92-缺点">9.2 缺点</a></li>
+          </ul>
+        </li>
+        <li><a href="#十分区算法">十、分区算法</a></li>
+        <li><a href="#十一写到最后">十一、写到最后</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+    </div><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "true")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
             <div class="post-meta-line">
                 <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
                 </span></div>
             <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 9527 字&nbsp;
                 <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 20 分钟&nbsp;</div>
-        </div><div class="details toc" id="toc-static"  kept="true">
+        </div><div class="details toc" id="toc-static"  kept="">
                 <div class="details-summary toc-title">
                     <span>目录</span>
                     <span><i class="details-icon fas fa-angle-right"></i></span>
@@ -965,7 +1051,8 @@
         </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">
                     由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
-                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span><span class="icp-splitter">&nbsp;|&nbsp;</span><br class="icp-br"/>
+                    <span class="icp"><a  target="_blank" href="https://beian.miit.gov.cn/">京ICP备2023005717号-1</a></span></div>
             <div class="footer-line"></div>
             <div class="footer-line">
             </div>

@@ -11,7 +11,6 @@
 <meta property="og:url" content="http://yanghx.vip/11-%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
 
 <meta property="og:site_name" content="yanghx blog" />
-
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
 
@@ -59,7 +58,7 @@
             <a href="/" title="yanghx blog">yanghx blog</a>
         </div>
         <div class="menu">
-            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 所有文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/series/"> 系列 </a><a class="menu-item" href="/posts/mysql/mysql45/"> mysql45讲 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
                         <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
                         <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
                             <i class="fas fa-search fa-fw"></i>
@@ -107,7 +106,7 @@
                     <a href="#" class="search-cancel" id="search-cancel-mobile">
                         取消
                     </a>
-                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                </div><a class="menu-item" href="/posts/" title="">所有文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/series/" title="">系列</a><a class="menu-item" href="/posts/mysql/mysql45/" title="">mysql45讲</a><a href="#" class="menu-item theme-select" title="切换主题">
                 <i class="fas fa-adjust fa-fw"></i>
                 <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
                     <option value="light">浅色</option>
@@ -125,13 +124,73 @@
     <div id="search-dropdown-mobile"></div>
 </div>
 <main class="main">
-            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="container"><div class="toc" id="toc-auto">
+        <h2 class="toc-title">目录</h2>
+        <div class="toc-content" id="toc-content-auto"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#一执行引擎">一、执行引擎</a>
+          <ul>
+            <li><a href="#11-执行引擎概述">1.1 执行引擎概述</a></li>
+            <li><a href="#12-执行引擎的工作流程">1.2 执行引擎的工作流程</a></li>
+          </ul>
+        </li>
+        <li><a href="#二java代码编译和执行过程">二、Java代码编译和执行过程</a>
+          <ul>
+            <li><a href="#21-什么是解释器interpreter">2.1 什么是解释器（Interpreter）</a></li>
+            <li><a href="#22-什么是jit编译器">2.2 什么是JIT编译器</a></li>
+            <li><a href="#23-为什么java是半编译半解释型语言">2.3 为什么Java是半编译半解释型语言</a></li>
+          </ul>
+        </li>
+        <li><a href="#三-机器码指令汇编语言">三、 机器码、指令、汇编语言</a>
+          <ul>
+            <li><a href="#31-机器码">3.1 机器码</a></li>
+            <li><a href="#32-指令">3.2 指令</a></li>
+            <li><a href="#33-指令集">3.3 指令集</a></li>
+            <li><a href="#34-汇编语言">3.4 汇编语言</a></li>
+            <li><a href="#35-高级语言">3.5 高级语言</a></li>
+            <li><a href="#36-cc源程序执行过程">3.6 C、C++源程序执行过程</a></li>
+            <li><a href="#37--字节码">3.7  字节码</a></li>
+          </ul>
+        </li>
+        <li><a href="#四解释器">四、解释器</a>
+          <ul>
+            <li><a href="#41-解释器分类">4.1 解释器分类</a></li>
+            <li><a href="#42-现状">4.2 现状</a></li>
+          </ul>
+        </li>
+        <li><a href="#五-jit编译器">五、 JIT编译器</a>
+          <ul>
+            <li><a href="#51-java代码的执行分类">5.1 Java代码的执行分类</a></li>
+            <li><a href="#52-问题来了">5.2 问题来了</a></li>
+            <li><a href="#53-hotspot-jvm执行方式">5.3 HotSpot JVM执行方式</a></li>
+            <li><a href="#54-案例">5.4 案例</a></li>
+            <li><a href="#55-概念解释">5.5 概念解释</a></li>
+            <li><a href="#56-热点探测技术">5.6 热点探测技术</a></li>
+            <li><a href="#57-方法调用计数器">5.7 方法调用计数器</a></li>
+            <li><a href="#58-热点衰减">5.8 热点衰减</a></li>
+            <li><a href="#59-回边计数器">5.9 回边计数器</a></li>
+            <li><a href="#510-hotspotvm-可以设置程序执行方法">5.10 HotSpotVM 可以设置程序执行方法</a></li>
+            <li><a href="#511-hotspotvm中-jit-分类">5.11 HotSpotVM中 JIT 分类</a></li>
+            <li><a href="#512-c1-和-c2编译器不同的优化策略">5.12 C1 和 C2编译器不同的优化策略</a></li>
+            <li><a href="#513-分层编译策略">5.13 分层编译策略</a></li>
+            <li><a href="#514-总结">5.14 总结</a></li>
+            <li><a href="#515-aot编译器">5.15 AOT编译器</a></li>
+            <li><a href="#516-写到最后">5.16 写到最后</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+    </div><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "true")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
             <div class="post-meta-line">
                 <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
                 </span></div>
             <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 7142 字&nbsp;
                 <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 15 分钟&nbsp;</div>
-        </div><div class="details toc" id="toc-static"  kept="true">
+        </div><div class="details toc" id="toc-static"  kept="">
                 <div class="details-summary toc-title">
                     <span>目录</span>
                     <span><i class="details-icon fas fa-angle-right"></i></span>
@@ -570,7 +629,8 @@
         </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">
                     由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
-                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span><span class="icp-splitter">&nbsp;|&nbsp;</span><br class="icp-br"/>
+                    <span class="icp"><a  target="_blank" href="https://beian.miit.gov.cn/">京ICP备2023005717号-1</a></span></div>
             <div class="footer-line"></div>
             <div class="footer-line">
             </div>

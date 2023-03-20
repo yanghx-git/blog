@@ -11,7 +11,6 @@
 <meta property="og:url" content="http://yanghx.vip/16-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
 
 <meta property="og:site_name" content="yanghx blog" />
-
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
 
@@ -59,7 +58,7 @@
             <a href="/" title="yanghx blog">yanghx blog</a>
         </div>
         <div class="menu">
-            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 所有文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/series/"> 系列 </a><a class="menu-item" href="/posts/mysql/mysql45/"> mysql45讲 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
                         <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
                         <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
                             <i class="fas fa-search fa-fw"></i>
@@ -107,7 +106,7 @@
                     <a href="#" class="search-cancel" id="search-cancel-mobile">
                         取消
                     </a>
-                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                </div><a class="menu-item" href="/posts/" title="">所有文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/series/" title="">系列</a><a class="menu-item" href="/posts/mysql/mysql45/" title="">mysql45讲</a><a href="#" class="menu-item theme-select" title="切换主题">
                 <i class="fas fa-adjust fa-fw"></i>
                 <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
                     <option value="light">浅色</option>
@@ -125,13 +124,119 @@
     <div id="search-dropdown-mobile"></div>
 </div>
 <main class="main">
-            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="container"><div class="toc" id="toc-auto">
+        <h2 class="toc-title">目录</h2>
+        <div class="toc-content" id="toc-content-auto"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#垃圾回收器">垃圾回收器</a>
+      <ul>
+        <li><a href="#一gc分类与性能指标">一、GC分类与性能指标</a>
+          <ul>
+            <li><a href="#11-垃圾收集器分类">1.1 垃圾收集器分类</a>
+              <ul>
+                <li><a href="#111-按线程数分">1.1.1 按线程数分</a></li>
+                <li><a href="#112-按工作模式分">1.1.2 按工作模式分</a></li>
+                <li><a href="#113-按碎片处理方式分">1.1.3 按碎片处理方式分</a></li>
+              </ul>
+            </li>
+            <li><a href="#12-评估gc的性能指标">1.2 评估GC的性能指标</a></li>
+            <li><a href="#13-性能指标吞吐量">1.3 性能指标：吞吐量</a></li>
+            <li><a href="#14-性能指标暂停时间">1.4 性能指标：暂停时间</a></li>
+            <li><a href="#15-吞吐量vs暂停时间">1.5 吞吐量VS暂停时间</a></li>
+          </ul>
+        </li>
+        <li><a href="#二不同的垃圾回收器概述">二、不同的垃圾回收器概述</a>
+          <ul>
+            <li><a href="#21-垃圾回收器发展史">2.1 垃圾回收器发展史</a></li>
+            <li><a href="#22-七种经典的垃圾收集器">2.2 七种经典的垃圾收集器</a></li>
+            <li><a href="#23-七款经典收集器与垃圾分代之间的关系">2.3 七款经典收集器与垃圾分代之间的关系</a></li>
+            <li><a href="#24-垃圾收集器的组合关系">2.4 垃圾收集器的组合关系</a></li>
+            <li><a href="#25-如何查看默认垃圾收集器">2.5 如何查看默认垃圾收集器</a></li>
+          </ul>
+        </li>
+        <li><a href="#三serial回收器串行回收">三、Serial回收器：串行回收</a>
+          <ul>
+            <li><a href="#31-总结">3.1 总结</a></li>
+          </ul>
+        </li>
+        <li><a href="#四parnew回收器并行回收">四、ParNew回收器：并行回收</a></li>
+        <li><a href="#五parallel回收器吞吐量优先">五、Parallel回收器：吞吐量优先</a>
+          <ul>
+            <li><a href="#51-参数配置">5.1 参数配置</a></li>
+          </ul>
+        </li>
+        <li><a href="#六cms回收器低延迟">六、CMS回收器：低延迟</a>
+          <ul>
+            <li><a href="#61-cms为什么不使用标记整理算法">6.1 CMS为什么不使用标记整理算法？</a></li>
+            <li><a href="#62-优点">6.2 优点</a></li>
+            <li><a href="#63-缺点">6.3 缺点</a></li>
+            <li><a href="#64-设置的参数">6.4 设置的参数</a></li>
+            <li><a href="#65-小结">6.5 小结</a></li>
+            <li><a href="#66jdk后续版本中cms的变化">6.6、JDK后续版本中CMS的变化</a></li>
+          </ul>
+        </li>
+        <li><a href="#七g1回收器区域化分代式">七、G1回收器：区域化分代式</a>
+          <ul>
+            <li><a href="#71-既然我们已经有了前面几个强大的gc为什么还要发布garbage-firstg1">7.1 既然我们已经有了前面几个强大的GC，为什么还要发布Garbage First（G1）？</a></li>
+            <li><a href="#72-为什么名字叫-garbage-firstg1呢">7.2 为什么名字叫 Garbage First(G1)呢？</a></li>
+            <li><a href="#73-g1垃圾收集器的优点">7.3 G1垃圾收集器的优点</a>
+              <ul>
+                <li><a href="#731-并行与并发">7.3.1 <strong>并行与并发</strong></a></li>
+                <li><a href="#732-分代收集">7.3.2 <strong>分代收集</strong></a></li>
+                <li><a href="#733-空间整合">7.3.3 <strong>空间整合</strong></a></li>
+              </ul>
+            </li>
+            <li><a href="#74-g1垃圾收集器的缺点">7.4 G1垃圾收集器的缺点</a></li>
+            <li><a href="#75-g1参数设置">7.5 G1参数设置</a></li>
+            <li><a href="#76-g1收集器的常见操作步骤">7.6 G1收集器的常见操作步骤</a></li>
+            <li><a href="#77-g1收集器的适用场景">7.7 G1收集器的适用场景</a></li>
+            <li><a href="#78-分区region化整为零">7.8 分区Region：化整为零</a></li>
+            <li><a href="#79-g1垃圾回收器的回收过程">7.9 G1垃圾回收器的回收过程</a></li>
+            <li><a href="#710-remembered-set记忆集">7.10 Remembered Set（记忆集）</a></li>
+            <li><a href="#711-解决方法">7.11 <strong>解决方法：</strong></a></li>
+            <li><a href="#712-g1回收过程-年轻代gc">7.12 G1回收过程-年轻代GC</a></li>
+            <li><a href="#713-g1回收过程-并发标记过程">7.13 G1回收过程-并发标记过程</a></li>
+            <li><a href="#714-g1回收过程---混合回收">7.14 G1回收过程 - 混合回收</a></li>
+            <li><a href="#715-g1回收可选的过程4---full-gc">7.15 G1回收可选的过程4 - Full GC</a></li>
+            <li><a href="#716-g1回收的优化建议">7.16 G1回收的优化建议</a></li>
+          </ul>
+        </li>
+        <li><a href="#八垃圾回收器总结">八、垃圾回收器总结</a>
+          <ul>
+            <li><a href="#81-怎么选择垃圾回收器">8.1 怎么选择垃圾回收器</a></li>
+            <li><a href="#82-面试">8.2 面试</a></li>
+          </ul>
+        </li>
+        <li><a href="#九gc日志分析">九、GC日志分析</a>
+          <ul>
+            <li><a href="#91-verbosegc">9.1 verbose:gc</a></li>
+            <li><a href="#92-printgcdetails">9.2 PrintGCDetails</a></li>
+            <li><a href="#93-补充">9.3 补充</a></li>
+            <li><a href="#94-young-gc图片">9.4 Young GC图片</a></li>
+            <li><a href="#95-fullgc图片">9.5 FullGC图片、</a></li>
+            <li><a href="#96-gc回收举例">9.6 GC回收举例</a></li>
+            <li><a href="#97-gcviewer">9.7 <strong>GCViewer</strong></a></li>
+            <li><a href="#98-gc-easy">9.8 GC easy</a></li>
+          </ul>
+        </li>
+        <li><a href="#十垃圾回收器的新发展">十、垃圾回收器的新发展</a>
+          <ul>
+            <li><a href="#101-open-jdk12的shenandoash-gc">10.1 Open JDK12的Shenandoash GC</a></li>
+            <li><a href="#102-革命性的zgc">10.2 革命性的ZGC</a></li>
+            <li><a href="#103-aligc">10.3 AliGC</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+    </div><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "true")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
             <div class="post-meta-line">
                 <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
                 </span></div>
             <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 20122 字&nbsp;
                 <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 41 分钟&nbsp;</div>
-        </div><div class="details toc" id="toc-static"  kept="true">
+        </div><div class="details toc" id="toc-static"  kept="">
                 <div class="details-summary toc-title">
                     <span>目录</span>
                     <span><i class="details-icon fas fa-angle-right"></i></span>
@@ -1172,7 +1277,8 @@
         </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">
                     由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
-                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span><span class="icp-splitter">&nbsp;|&nbsp;</span><br class="icp-br"/>
+                    <span class="icp"><a  target="_blank" href="https://beian.miit.gov.cn/">京ICP备2023005717号-1</a></span></div>
             <div class="footer-line"></div>
             <div class="footer-line">
             </div>

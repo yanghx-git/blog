@@ -1,21 +1,10 @@
 ---
-title: "k8s基础-黑马 "
+title: "k8s基础-黑马"
 date: 2023-03-20T02:42:30+08:00
 
-date: 2020-03-03T21:40:32+08:00
-lastmod: 2020-03-06T21:40:32+08:00
-draft: false
-authors: ["Dillon", "PCloud"]
-description: "探索 Hugo - DoIt 主题的全部内容和背后的核心概念."
+tags: ["k8s"]
+categories: ["k8s"]
 
-tags: ["installation", "configuration"]
-categories: ["documentation"]
-series: ["getting-start"]
-series_weight: 1
-lightgallery: true
-
-toc:
-  auto: false
 ---
 
 

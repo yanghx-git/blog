@@ -11,7 +11,6 @@
 <meta property="og:url" content="http://yanghx.vip/4-%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%A0%88/" /><meta property="og:image" content="http://yanghx.vip/logo.png"/><meta property="article:section" content="posts" />
 
 <meta property="og:site_name" content="yanghx blog" />
-
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="http://yanghx.vip/logo.png"/>
 
@@ -59,7 +58,7 @@
             <a href="/" title="yanghx blog">yanghx blog</a>
         </div>
         <div class="menu">
-            <div class="menu-inner"><a class="menu-item" href="/posts/"> 文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 所有文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/series/"> 系列 </a><a class="menu-item" href="/posts/mysql/mysql45/"> mysql45讲 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
                         <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
                         <a href="#" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
                             <i class="fas fa-search fa-fw"></i>
@@ -107,7 +106,7 @@
                     <a href="#" class="search-cancel" id="search-cancel-mobile">
                         取消
                     </a>
-                </div><a class="menu-item" href="/posts/" title="">文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a href="#" class="menu-item theme-select" title="切换主题">
+                </div><a class="menu-item" href="/posts/" title="">所有文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/series/" title="">系列</a><a class="menu-item" href="/posts/mysql/mysql45/" title="">mysql45讲</a><a href="#" class="menu-item theme-select" title="切换主题">
                 <i class="fas fa-adjust fa-fw"></i>
                 <select class="color-theme-select" id="theme-select-mobile" title="切换主题">
                     <option value="light">浅色</option>
@@ -125,13 +124,88 @@
     <div id="search-dropdown-mobile"></div>
 </div>
 <main class="main">
-            <div class="container"><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "false")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
+            <div class="container"><div class="toc" id="toc-auto">
+        <h2 class="toc-title">目录</h2>
+        <div class="toc-content" id="toc-content-auto"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#虚拟机栈">虚拟机栈</a>
+      <ul>
+        <li><a href="#一虚拟机栈概述">一、虚拟机栈概述</a>
+          <ul>
+            <li><a href="#11-java虚拟机栈是什么">1.1 Java虚拟机栈是什么</a></li>
+            <li><a href="#12-生命周期">1.2 生命周期</a></li>
+            <li><a href="#13-作用">1.3 作用</a></li>
+            <li><a href="#14-栈的特点">1.4 栈的特点</a></li>
+            <li><a href="#15--开发中遇到的那些异常">1.5  开发中遇到的那些异常？</a></li>
+          </ul>
+        </li>
+        <li><a href="#二栈的存储单位">二、栈的存储单位</a>
+          <ul>
+            <li><a href="#21-栈中存储什么">2.1 栈中存储什么？</a></li>
+            <li><a href="#22-栈帧的内部结构">2.2 栈帧的内部结构</a></li>
+          </ul>
+        </li>
+        <li><a href="#三局部变量表">三、局部变量表</a>
+          <ul>
+            <li><a href="#31-关于slot的理解">3.1 关于Slot的理解</a></li>
+            <li><a href="#32-slot的重复利用">3.2 Slot的重复利用</a></li>
+            <li><a href="#33-静态变量与局部变量的对比">3.3 静态变量与局部变量的对比</a></li>
+          </ul>
+        </li>
+        <li><a href="#四操作数栈">四、操作数栈</a>
+          <ul>
+            <li><a href="#41-概念">4.1 概念</a></li>
+            <li><a href="#42-代码追踪">4.2 代码追踪</a></li>
+          </ul>
+        </li>
+        <li><a href="#五栈顶缓存技术top-of-stack-cashing">五、栈顶缓存技术：Top Of Stack Cashing</a></li>
+        <li><a href="#六-动态链接">六、 动态链接</a></li>
+        <li><a href="#七方法调用解析与分配">七、方法调用：解析与分配</a>
+          <ul>
+            <li><a href="#71-连接">7.1 连接</a>
+              <ul>
+                <li><a href="#711-静态链接">7.1.1 静态链接</a></li>
+                <li><a href="#712-动态链接">7.1.2 动态链接</a></li>
+              </ul>
+            </li>
+            <li><a href="#72-绑定机制">7.2 绑定机制</a>
+              <ul>
+                <li><a href="#721-早期绑定">7.2.1 早期绑定</a></li>
+                <li><a href="#722-晚期绑定">7.2.2 晚期绑定</a></li>
+                <li><a href="#723-早晚期绑定的发展历史">7.2.3 早晚期绑定的发展历史</a></li>
+              </ul>
+            </li>
+            <li><a href="#73-虚方法和非虚方法">7.3 虚方法和非虚方法</a>
+              <ul>
+                <li><a href="#731-普通调用指令">7.3.1 普通调用指令：</a></li>
+                <li><a href="#732-动态调用指令">7.3.2 动态调用指令：</a></li>
+              </ul>
+            </li>
+            <li><a href="#74-invokednamic指令">7.4 invokednamic指令</a></li>
+            <li><a href="#75-动态类型语言和静态类型语言">7.5 动态类型语言和静态类型语言</a></li>
+            <li><a href="#76-方法重写的本质">7.6 方法重写的本质</a>
+              <ul>
+                <li><a href="#761-java-语言中方法重写的本质">7.6.1 Java 语言中方法重写的本质：</a></li>
+                <li><a href="#762-illegalaccesserror介绍">7.6.2 IllegalAccessError介绍</a></li>
+              </ul>
+            </li>
+            <li><a href="#77-方法的调用虚方法表">7.7 方法的调用：虚方法表</a></li>
+          </ul>
+        </li>
+        <li><a href="#八方法返回地址">八、方法返回地址</a></li>
+        <li><a href="#九一些附加信息">九、一些附加信息</a></li>
+        <li><a href="#十栈的相关面试题">十、栈的相关面试题</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+    </div><script>document.getElementsByTagName("main")[0].setAttribute("pageStyle", "normal")</script><script>document.getElementsByTagName("main")[0].setAttribute("autoTOC", "true")</script><article class="page single"><h1 class="single-title animate__animated animate__flipInX"></h1><div class="post-meta">
             <div class="post-meta-line">
                 <span class="post-author"><i class="author fas fa-user-circle fa-fw"></i><a href="/" title="Author" rel=" author" class="author">yanghx</a>
                 </span></div>
             <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="far fa-edit fa-fw"></i>&nbsp;<time datetime="0001-01-01">0001-01-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 9302 字&nbsp;
                 <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 19 分钟&nbsp;</div>
-        </div><div class="details toc" id="toc-static"  kept="true">
+        </div><div class="details toc" id="toc-static"  kept="">
                 <div class="details-summary toc-title">
                     <span>目录</span>
                     <span><i class="details-icon fas fa-angle-right"></i></span>
@@ -1008,7 +1082,8 @@
         </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">
                     由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreferrer" title="Hugo 0.111.3">Hugo</a> 强力驱动&nbsp;|&nbsp;主题 - <a href="https://github.com/HEIGE-PCloud/DoIt" target="_blank" rel="noopener noreferrer" title="DoIt 0.3.0"><i class="far fa-edit fa-fw"></i> DoIt</a>
-                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank" rel="noopener noreferrer">yanghx</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span><span class="icp-splitter">&nbsp;|&nbsp;</span><br class="icp-br"/>
+                    <span class="icp"><a  target="_blank" href="https://beian.miit.gov.cn/">京ICP备2023005717号-1</a></span></div>
             <div class="footer-line"></div>
             <div class="footer-line">
             </div>
