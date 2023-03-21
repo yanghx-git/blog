@@ -305,7 +305,7 @@ theme = "DoIt"
       #  是否保持使用文章前面的静态目录
       keepStatic = false
       # 是否使侧边目录自动折叠展开
-      auto = true
+      auto = false
       # FixIt 0.2.13 | 新增 目录位置 ["left", "right"]
       position = "right"
     #  代码配置
