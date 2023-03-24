@@ -162,7 +162,7 @@ theme = "DoIt"
       # 主页显示头像的 URL
       # 将你的头像文件放置于 static 或者 assets 目录下
       # 文件路径是相对于 static 或者 assets 目录的
-      avatarURL = "/images/avatar.webp"
+      avatarURL = "https://blog-1257196793.cos.ap-beijing.myqcloud.com/image-20230324142529854.png"
       #  主页显示的网站标题 (支持 HTML 格式)
       title = ""
       # 主页显示的网站副标题
