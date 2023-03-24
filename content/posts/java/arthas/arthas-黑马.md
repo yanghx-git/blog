@@ -1,8 +1,8 @@
 ---
-title: "arthas-黑马"
+title: "arthas基础学习"
 date: 2023-03-20T02:42:30+08:00
 
-tags: ["arthas"]
+tags: ["arthas","黑马"]
 categories: ["arthas"]
 ---
 
