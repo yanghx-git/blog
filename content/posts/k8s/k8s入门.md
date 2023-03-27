@@ -1,3 +1,11 @@
+---
+title: "k8s入门笔记"
+date: 2023-03-20T02:42:30+08:00
+
+tags: ["k8s"]
+categories: ["k8s"]
+---
+
 
 
 # `k8s` 介绍
@@ -30,8 +38,8 @@ bash kainstall-centos.sh init \
 
 # 本地安装 1.22.10
 bash kainstall-centos.sh init \
-  --master 192.168.128.111 \
-  --worker 192.168.128.115 \
+  --master 192.168.128.125 \
+  --worker 192.168.128.126 \
   --user root \
   --password 123456 \
   --port 22 \
@@ -64,7 +72,7 @@ rm -rf /opt/cni
 rm -rf /var/lib/etcd
 rm -rf /var/etcd
 yum clean all
-yum remove kube* -f y
+yum remove kube* -y
 ```
 
 
@@ -561,5 +569,4 @@ Annotation 与 Label 类似，也使用 key/value 的形式进行定义，Label�
 
 - build 信息，release 信息， Docker 镜像信息等。
 - 日志库，监控库等。
-
 

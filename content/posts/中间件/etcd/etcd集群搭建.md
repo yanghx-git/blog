@@ -1,3 +1,11 @@
+---
+title: "Ectd 集群搭建"
+date: 2023年3月27日10:16:13
+
+tags: ["ectd"]
+categories: ["ectd"]
+---
+
 
 
 ### Ectd 集群搭建

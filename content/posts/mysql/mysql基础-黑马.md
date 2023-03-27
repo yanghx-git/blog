@@ -1,8 +1,8 @@
 ---
-title: "mysql基础-黑马"
+title: "mysql基础"
 date: 2023-03-20T02:42:30+08:00
 
-tags: ["mysql"]
+tags: ["mysql","黑马"]
 categories: ["mysql"]
 ---
 

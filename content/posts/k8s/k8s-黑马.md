@@ -1,8 +1,8 @@
 ---
-title: "k8s基础-黑马"
+title: "k8s基础"
 date: 2023-03-20T02:42:30+08:00
 
-tags: ["k8s"]
+tags: ["k8s","黑马"]
 categories: ["k8s"]
 
 ---
