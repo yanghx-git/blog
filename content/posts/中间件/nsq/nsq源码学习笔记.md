@@ -73,9 +73,131 @@ TODO 后面搞一个 docker-comonse 部署的例子。主要是体验一下集�
 
 ### 启动流程  `apps/nsqd/main.go`
 
-通过 `go-svc` 实现生命周期管理`(优雅关机)` 
+通过 `go-svc` 实现生命周期管理`(优雅启停)` 
 
-// TODO 单独写一篇文件 介绍 go-svc
+```
+首先实现 go-svc 提供的 Service 接口
+Init 
+Start 
+Stop
+
+svc.Run() 方法 会依次执行 Init Start 方法 。 并注册系统监听
+开一个for循环，阻塞进程，在接收到 系统停止的指令时，执行 Stop方法
+
+```
+
+#### 初始化 `Init`
+
+1. 构造 `Options` : 处理配置文件
+2. 创建 `NSQD`实例:  `nsqd.New()`
+   1. 检查 `diskqueue` 目录`(磁盘队列 文件的 路径)`。并验证这个目录没有被占用 `(目录锁 dl.Lock())`
+   2. 创建带取消的 `Context`，用于内部停止服务。
+   3. 创建 `httpcli`
+   4. 创建集群信息
+   5. 做各类检查
+   6. 创建 `tcpServer `,  `httpServer`
 
 
+
+#### 启动 `Start`
+
+1. 加载，持久化元数据
+
+2. 开一个携程执行`nsqd.Main()` 。这个携程不会退出的。`nsed.Main()`会一直阻塞
+
+   
+
+​	
+
+`nsqd.Main()`的执行流程
+
+1. 创建 `exitCh`, 用于阻塞方法
+2.  定义 `exitFunc`,封装方法，如果传入 err 不为 nil. 会打印日志，并停止 当前携程
+3. 启动 `tcpServer`
+4. 启动 `httpServer`
+5. 启动 `httpsListener`
+6. 维护 `channel` 中延时队列和等待消息确认队列
+7. 连接到 `nsqlookupd`
+
+
+
+```go
+func (n *NSQD) Main() error {
+
+	exitCh := make(chan error)
+	var once sync.Once
+	// 退出函数
+	// 如果传入 err 不为 nil. 会打印日志，并停止 当前携程
+	exitFunc := func(err error) {
+		// once.Do() 只会执行一次
+		once.Do(func() {
+			if err != nil {
+				n.logf(LOG_FATAL, "%s", err)
+			}
+			exitCh <- err
+		})
+	}
+	// 自己封装的 waitGroup。 Wrap， 会开一个携程 等待匿名函数执行
+	n.waitGroup.Wrap(func() {
+		// 创建 tcp server
+		// 里面是个无限 for 循环。 会一直阻塞
+		err := protocol.TCPServer(n.tcpListener, n.tcpServer, n.logf)
+		exitFunc(err)
+	})
+	// 创建 http server
+	if n.httpListener != nil {
+		httpServer := newHTTPServer(n, false, n.getOpts().TLSRequired == TLSRequired)
+		n.waitGroup.Wrap(func() {
+			exitFunc(http_api.Serve(n.httpListener, httpServer, "HTTP", n.logf))
+		})
+	}
+	// 创建 https server
+	if n.httpsListener != nil {
+		httpsServer := newHTTPServer(n, true, true)
+		n.waitGroup.Wrap(func() {
+			exitFunc(http_api.Serve(n.httpsListener, httpsServer, "HTTPS", n.logf))
+		})
+	}
+	// 维护 channel 中延时队列和等待消息确认队列
+	n.waitGroup.Wrap(n.queueScanLoop)
+	// 连接到 nsqlookupd
+	n.waitGroup.Wrap(n.lookupLoop)
+	// 一个统计的服务
+	if n.getOpts().StatsdAddress != "" {
+		n.waitGroup.Wrap(n.statsdLoop)
+	}
+	// 会一直阻塞
+	err := <-exitCh
+	return err
+}
+
+```
+
+
+
+```go
+type WaitGroupWrapper struct {
+	sync.WaitGroup
+}
+
+// Wrap 包装。 会阻塞一下 ，在 cb 函数执行完之后，才会退出
+func (w *WaitGroupWrapper) Wrap(cb func()) {
+	w.Add(1)
+	go func() {
+		cb()
+		w.Done()
+	}()
+}
+
+```
+
+
+
+重点看 `exitFunc`和 `waitGroup` 的配合。以 `tcpServer` 的创建为例。
+
+`waitGroup` 使用携程执行 匿名函数，并会等待这个函数结束。`tcpServe`是会一直阻塞的，直到出现异常，才会退出。 这时 `exitFunc`会捕获到err, 并触发`exitChan`,结束整个 `Main()`
+
+
+
+### TCPHandler 是如何处理连接的
 
