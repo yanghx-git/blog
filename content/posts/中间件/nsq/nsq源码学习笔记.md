@@ -12,9 +12,13 @@ categories: ["nsq"]
 
 # NSQ 源码学习笔记
 
-> 课程： https://www.bilibili.com/video/BV1qN4y157Vm/?spm_id_from=333.788&vd_source=cfe317b4e512f948eb08fc25356a8589
+> - 课程： https://www.bilibili.com/video/BV1qN4y157Vm
 >
-> 文档：https://juejin.cn/post/7128643959043129374
+> - 课程文档：https://juejin.cn/post/7128643959043129374
+>
+> - NSQ文档：https://doc.yonyoucloud.com/doc/wiki/project/nsq-guide/index.html
+
+
 
 ## 核心组件
 
@@ -122,6 +126,8 @@ svc.Run() 方法 会依次执行 Init Start 方法 。 并注册系统监听
 
 
 ```go
+// apps/nsqd/main.go:26
+
 func (n *NSQD) Main() error {
 
 	exitCh := make(chan error)
@@ -176,6 +182,8 @@ func (n *NSQD) Main() error {
 
 
 ```go
+// internal/util/wait_group_wrapper.go
+
 type WaitGroupWrapper struct {
 	sync.WaitGroup
 }
@@ -201,3 +209,179 @@ func (w *WaitGroupWrapper) Wrap(cb func()) {
 
 ### TCPHandler 是如何处理连接的
 
+1. 验证协议
+2. 创建client 
+3. 让 client 处理业务`IOLoop`
+
+```go
+// /Users/yanghx/CODES/opensoruce/nsq/nsqd/tcp.go 
+
+// Handle 处理 TCP 连接的方法
+func (p *tcpServer) Handle(conn net.Conn) {
+	p.nsqd.logf(LOG_INFO, "TCP: new client(%s)", conn.RemoteAddr())
+
+	// 4字节的魔数.表示协议的版本号
+	// The client should initialize itself by sending a 4 byte sequence indicating
+	// the version of the protocol that it intends to communicate, this will allow us
+	// to gracefully upgrade the protocol away from text/line oriented to whatever...
+	buf := make([]byte, 4)
+	// 会阻塞，直到读取够4字节  (  V2)
+	_, err := io.ReadFull(conn, buf)
+	if err != nil {
+		p.nsqd.logf(LOG_ERROR, "failed to read protocol version - %s", err)
+		conn.Close()
+		return
+	}
+	protocolMagic := string(buf)
+
+	p.nsqd.logf(LOG_INFO, "CLIENT(%s): desired protocol magic '%s'",
+		conn.RemoteAddr(), protocolMagic)
+
+	var prot protocol.Protocol
+	switch protocolMagic {
+	case "  V2":
+		// 初始化
+		prot = &protocolV2{nsqd: p.nsqd}
+	default:
+		// 协议错误，给个提示信息，结束连接
+		protocol.SendFramedResponse(conn, frameTypeError, []byte("E_BAD_PROTOCOL"))
+		conn.Close()
+		p.nsqd.logf(LOG_ERROR, "client(%s) bad protocol magic '%s'",
+			conn.RemoteAddr(), protocolMagic)
+		return
+	}
+	// 对新建立的连接创建 client
+	client := prot.NewClient(conn)
+	// 存储 连接。 放到 map中
+	p.conns.Store(conn.RemoteAddr(), client)
+
+	// io处理 (业务)
+	err = prot.IOLoop(client)
+	if err != nil {
+		p.nsqd.logf(LOG_ERROR, "client(%s) - %s", conn.RemoteAddr(), err)
+	}
+
+	p.conns.Delete(conn.RemoteAddr())
+	client.Close()
+}
+
+```
+
+
+
+### 发送消息到topic
+
+
+
+主要看 nsq 的通信协议。刚好是 `prot.IOLoop(client)`下的代码。
+
+`prot.IOLoop(client)`  同步chanal, 维护心跳。监听客户端发送的数据。
+
+并解析协议头，转化为指令，交给 `nsqd/protocol_v2.Exec()`处理。
+
+```go
+
+func (p *protocolV2) Exec(client *clientV2, params [][]byte) ([]byte, error) {
+	if bytes.Equal(params[0], []byte("IDENTIFY")) {
+		return p.IDENTIFY(client, params)
+	}
+	err := enforceTLSPolicy(client, p, params[0])
+	if err != nil {
+		return nil, err
+	}
+	switch {
+	case bytes.Equal(params[0], []byte("FIN")):
+		return p.FIN(client, params)
+	case bytes.Equal(params[0], []byte("RDY")):
+		return p.RDY(client, params)
+	case bytes.Equal(params[0], []byte("REQ")):
+		return p.REQ(client, params)
+	case bytes.Equal(params[0], []byte("PUB")):
+		return p.PUB(client, params)
+	case bytes.Equal(params[0], []byte("MPUB")):
+		return p.MPUB(client, params)
+	case bytes.Equal(params[0], []byte("DPUB")):
+		return p.DPUB(client, params)
+	case bytes.Equal(params[0], []byte("NOP")):
+		return p.NOP(client, params)
+	case bytes.Equal(params[0], []byte("TOUCH")):
+		return p.TOUCH(client, params)
+	case bytes.Equal(params[0], []byte("SUB")):
+		return p.SUB(client, params)
+	case bytes.Equal(params[0], []byte("CLS")):
+		return p.CLS(client, params)
+	case bytes.Equal(params[0], []byte("AUTH")):
+		return p.AUTH(client, params)
+	}
+	return nil, protocol.NewFatalClientErr(nil, "E_INVALID", fmt.Sprintf("invalid command %s", params[0]))
+}
+```
+
+
+
+发送消息是 `PUB`
+
+```GO
+
+func (p *protocolV2) PUB(client *clientV2, params [][]byte) ([]byte, error) {
+	var err error
+
+	if len(params) < 2 {
+		return nil, protocol.NewFatalClientErr(nil, "E_INVALID", "PUB insufficient number of parameters")
+	}
+
+	// 验证 topicName 是否合法
+	topicName := string(params[1])
+	if !protocol.IsValidTopicName(topicName) {
+		return nil, protocol.NewFatalClientErr(nil, "E_BAD_TOPIC",
+			fmt.Sprintf("PUB topic name %q is not valid", topicName))
+	}
+	// 读取4字节， 获取 消息体长度
+	bodyLen, err := readLen(client.Reader, client.lenSlice)
+	if err != nil {
+		return nil, protocol.NewFatalClientErr(err, "E_BAD_MESSAGE", "PUB failed to read message body size")
+	}
+
+	if bodyLen <= 0 {
+		return nil, protocol.NewFatalClientErr(nil, "E_BAD_MESSAGE",
+			fmt.Sprintf("PUB invalid message body size %d", bodyLen))
+	}
+
+	if int64(bodyLen) > p.nsqd.getOpts().MaxMsgSize {
+		return nil, protocol.NewFatalClientErr(nil, "E_BAD_MESSAGE",
+			fmt.Sprintf("PUB message too big %d > %d", bodyLen, p.nsqd.getOpts().MaxMsgSize))
+	}
+	// 消息体
+	messageBody := make([]byte, bodyLen)
+	_, err = io.ReadFull(client.Reader, messageBody)
+	if err != nil {
+		return nil, protocol.NewFatalClientErr(err, "E_BAD_MESSAGE", "PUB failed to read message body")
+	}
+
+	//
+	if err := p.CheckAuth(client, "PUB", topicName, ""); err != nil {
+		return nil, err
+	}
+
+	// 获取topic ,不存在的话 会创建
+	topic := p.nsqd.GetTopic(topicName)
+	msg := NewMessage(topic.GenerateID(), messageBody)
+	err = topic.PutMessage(msg)
+	if err != nil {
+		return nil, protocol.NewFatalClientErr(err, "E_PUB_FAILED", "PUB failed "+err.Error())
+	}
+
+	client.PublishedMessage(topicName, 1)
+
+	return okBytes, nil
+}
+
+```
+
+
+
+
+
+### 看看 topic 是如何创建的
+
+> 上面的 `p.nsqd.GetTopic(topicName)` 就是创建 topic 的入口
