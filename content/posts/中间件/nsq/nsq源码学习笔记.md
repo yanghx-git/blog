@@ -385,3 +385,234 @@ func (p *protocolV2) PUB(client *clientV2, params [][]byte) ([]byte, error) {
 ### 看看 topic 是如何创建的
 
 > 上面的 `p.nsqd.GetTopic(topicName)` 就是创建 topic 的入口
+
+`p.nsqd.GetTopic(topicName)` 首先检查是否已经创建了 `（topicMap）`。不存在的话，进入创建流程。
+
+
+
+`topic/NewTopic()`
+
+1. 初始化`struct`
+
+   ```go
+   	t := &Topic{
+   		name:              topicName,
+   		channelMap:        make(map[string]*Channel), // 存储 topic 下的 Channel 信息
+   		memoryMsgChan:     make(chan *Message, nsqd.getOpts().MemQueueSize),
+   		startChan:         make(chan int, 1),
+   		exitChan:          make(chan int),
+   		channelUpdateChan: make(chan int),
+   		nsqd:              nsqd,
+   		paused:            0,
+   		pauseChan:         make(chan int),
+   		deleteCallback:    deleteCallback,
+   		idFactory:         NewGUIDFactory(nsqd.getOpts().ID), // 消息 id 的工厂
+   	}
+   ```
+
+   
+
+2. 判断是否临时 `topic`,临时 topic 的数据不写如磁盘，是一个单独的 backend。 普通 topic 的 backend 是 `diskqueue` 磁盘队列
+
+3. 启动一个携程，*将* *message* *分发到* *topic* *下所有的* *channel*  `t.waitGroup.Wrap(t.messagePump)`
+
+4. 发送通知
+
+### 发送给 topic 的数据存那了
+
+顺着 topic 的创建，接着看 PUB 函数。下一步就是 创建 `Messaage` 结构体，和 存储 `Message`。
+
+```go
+
+func (p *protocolV2) PUB(client *clientV2, params [][]byte) ([]byte, error) {
+	var err error
+
+	if len(params) < 2 {
+		return nil, protocol.NewFatalClientErr(nil, "E_INVALID", "PUB insufficient number of parameters")
+	}
+
+	// 验证 topicName 是否合法
+	topicName := string(params[1])
+	if !protocol.IsValidTopicName(topicName) {
+		return nil, protocol.NewFatalClientErr(nil, "E_BAD_TOPIC",
+			fmt.Sprintf("PUB topic name %q is not valid", topicName))
+	}
+	// 读取4字节， 获取 消息体长度
+	bodyLen, err := readLen(client.Reader, client.lenSlice)
+	if err != nil {
+		return nil, protocol.NewFatalClientErr(err, "E_BAD_MESSAGE", "PUB failed to read message body size")
+	}
+
+	if bodyLen <= 0 {
+		return nil, protocol.NewFatalClientErr(nil, "E_BAD_MESSAGE",
+			fmt.Sprintf("PUB invalid message body size %d", bodyLen))
+	}
+
+	if int64(bodyLen) > p.nsqd.getOpts().MaxMsgSize {
+		return nil, protocol.NewFatalClientErr(nil, "E_BAD_MESSAGE",
+			fmt.Sprintf("PUB message too big %d > %d", bodyLen, p.nsqd.getOpts().MaxMsgSize))
+	}
+	// 消息体
+	messageBody := make([]byte, bodyLen)
+	_, err = io.ReadFull(client.Reader, messageBody)
+	if err != nil {
+		return nil, protocol.NewFatalClientErr(err, "E_BAD_MESSAGE", "PUB failed to read message body")
+	}
+
+	//
+	if err := p.CheckAuth(client, "PUB", topicName, ""); err != nil {
+		return nil, err
+	}
+
+	// 获取topic ,不存在的话 会创建
+	topic := p.nsqd.GetTopic(topicName)
+	// 创建  message
+	msg := NewMessage(topic.GenerateID(), messageBody)
+	// 将 message 发送给 topic 中的队列 channel
+	err = topic.PutMessage(msg)
+	if err != nil {
+		return nil, protocol.NewFatalClientErr(err, "E_PUB_FAILED", "PUB failed "+err.Error())
+	}
+	// 统计 发送消息的数量
+	client.PublishedMessage(topicName, 1)
+
+	return okBytes, nil
+}
+
+```
+
+
+
+写 `Message` 的流程
+
+1. 拿锁
+2. 检查  `memoryMsgChan 小于0, 临时topic,延时消息`，不写入队列，
+3. 将数据写入 backend,也就是队列，一般是磁盘 backend。
+
+
+
+```go
+// 重点的写入流程
+func (t *Topic) put(m *Message) error {
+	// If mem-queue-size == 0, avoid memory chan, for more consistent ordering,
+	// but try to use memory chan for deferred messages (they lose deferred timer
+	// in backend queue) or if topic is ephemeral (there is no backend queue).
+
+	// 如果 mem-queue-size == 0，避免 memory chan，以获得更一致的排序，
+	// 但尝试对延迟消息使用 memory chan（它们会丢失延迟计时器 在后端队列中）或者如果主题是临时的（没有后端队列）。
+	if cap(t.memoryMsgChan) > 0 || t.ephemeral || m.deferred != 0 {
+		select {
+		case t.memoryMsgChan <- m:
+			return nil
+		default:
+			break // write to backend
+		}
+	}
+	// 会将数据写入 backend
+	err := writeMessageToBackend(m, t.backend)
+	t.nsqd.SetHealth(err)
+	if err != nil {
+		t.nsqd.logf(LOG_ERROR,
+			"TOPIC(%s) ERROR: failed to write message to backend - %s",
+			t.name, err)
+		return err
+	}
+	return nil
+}
+```
+
+
+
+### 消费者如何订阅消息
+
+看 `protocol_v2/SUB()`
+
+1. 检查 client 状态， 只能是 `stateInit`
+2. 心跳检查，禁用心跳的，不让订阅
+3. 参数检查
+4. 认证
+5. 获取 topic , 没有就新增
+6. 获取 channel , 没有就新增
+7. 将 topic, channel ,client 关联起来。`一个 topic 有多个 channel ,一个 channel 有多个 client ,一个 client 只对应一个 Channel`
+8. 里面用了一个for循环，是重试机制，因为 channel 和 topic 可能是临时的，或者正在退出，这种情况下要重试一次。
+9.  订阅成功，更新 client 的订阅状态，并发送通知。
+
+
+
+```go
+
+// SUB <topic_name> <channel_name>\n
+// <topic_name> - 字符串 (建议包含 #ephemeral 后缀)
+// <channel_name> - 字符串 (建议包含 #ephemeral 后缀)
+func (p *protocolV2) SUB(client *clientV2, params [][]byte) ([]byte, error) {
+	// 判断 client 的状态
+	if atomic.LoadInt32(&client.State) != stateInit {
+		return nil, protocol.NewFatalClientErr(nil, "E_INVALID", "cannot SUB in current state")
+	}
+	// 心跳检查，不能在禁用心跳的情况下进行 SUB
+	if client.HeartbeatInterval <= 0 {
+		return nil, protocol.NewFatalClientErr(nil, "E_INVALID", "cannot SUB with heartbeats disabled")
+	}
+	// 参数检查 是否  sub topicName channelName
+	if len(params) < 3 {
+		return nil, protocol.NewFatalClientErr(nil, "E_INVALID", "SUB insufficient number of parameters")
+	}
+
+	topicName := string(params[1])
+	if !protocol.IsValidTopicName(topicName) {
+		return nil, protocol.NewFatalClientErr(nil, "E_BAD_TOPIC",
+			fmt.Sprintf("SUB topic name %q is not valid", topicName))
+	}
+
+	channelName := string(params[2])
+	if !protocol.IsValidChannelName(channelName) {
+		return nil, protocol.NewFatalClientErr(nil, "E_BAD_CHANNEL",
+			fmt.Sprintf("SUB channel name %q is not valid", channelName))
+	}
+	// 认证
+	if err := p.CheckAuth(client, "SUB", topicName, channelName); err != nil {
+		return nil, err
+	}
+
+	// This retry-loop is a work-around for a race condition, where the
+	// last client can leave the channel between GetChannel() and AddClient().
+	// Avoid adding a client to an ephemeral channel / topic which has started exiting.
+	// 这个重试循环是一个竞争条件的变通方法，其中
+	// 最后一个客户端可以离开 GetChannel() 和 AddClient() 之间的通道。
+	// 避免将客户端添加到已开始退出的临时通道/主题。
+
+	var channel *Channel
+	for i := 1; ; i++ {
+		// 取 topic ,没有的话，就创建
+		topic := p.nsqd.GetTopic(topicName)
+		// 去 channel ,没有的话，就创建
+		channel = topic.GetChannel(channelName)
+		// 把 client 放入 Channel 中, 一个 Channel 对应多个 client
+		if err := channel.AddClient(client.ID, client); err != nil {
+			return nil, protocol.NewFatalClientErr(err, "E_SUB_FAILED", "SUB failed "+err.Error())
+		}
+		// 临时，或者 topic,channel 正在退出
+		if (channel.ephemeral && channel.Exiting()) || (topic.ephemeral && topic.Exiting()) {
+			// 移除这个client
+			channel.RemoveClient(client.ID)
+			if i < 2 {
+				time.Sleep(100 * time.Millisecond)
+				continue
+			}
+			return nil, protocol.NewFatalClientErr(nil, "E_SUB_FAILED", "SUB failed to deleted topic/channel")
+		}
+		break
+	}
+	// 更新 client 的 State 为 stateSubscribed 表示已订阅，无法再次订阅
+	atomic.StoreInt32(&client.State, stateSubscribed)
+	// 一个 client 只关联一个 Channel ， 一个 	Channel 关联多个 Client
+	client.Channel = channel
+	// update message pump
+	// 发送订阅事件到 channel
+	client.SubEventChan <- channel
+
+	return okBytes, nil
+}
+
+```
+
