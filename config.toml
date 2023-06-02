@@ -749,10 +749,10 @@ series = "series"
     title = ""
     weight = 4
    [[menu.main]]
-     identifier = "mysql45"
+     identifier = "资源"
      pre = ""
      post = ""
-     name = "mysql45讲"
-     url = "/posts/mysql/mysql45/"
+     name = "资源"
+     url = "/资源/资源列表"
      title = ""
      weight = 5
