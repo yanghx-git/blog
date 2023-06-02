@@ -748,7 +748,7 @@ series = "series"
     url = "/series/"
     title = ""
     weight = 4
-   [[menu.main]]
+  [[menu.main]]
      identifier = "资源"
      pre = ""
      post = ""
@@ -756,3 +756,28 @@ series = "series"
      url = "/资源/资源列表"
      title = ""
      weight = 5
+  [[menu.main]]
+     identifier = "authors"
+     pre = ""
+     post = ""
+     name = "作者"
+     url = "/authors/"
+     title = ""
+     weight = 6
+
+  [[menu.main]]
+     identifier = "showcase"
+     pre = ""
+     post = ""
+     name = "作品"
+     url = "/showcase/"
+     title = ""
+     weight = 7
+  [[main]]
+    identifier = "about"
+    pre = ""
+    post = ""
+    name = "关于"
+    url = "/about/"
+    title = ""
+    weight = 8
