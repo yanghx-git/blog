@@ -166,7 +166,7 @@ theme = "DoIt"
       #  主页显示的网站标题 (支持 HTML 格式)
       title = ""
       # 主页显示的网站副标题
-      subtitle = "yanghx blog"
+      subtitle = "要做勇士,不做恶龙!"
       # 是否为副标题显示打字机动画
       typeit = true
       # 是否显示社交账号
@@ -307,7 +307,7 @@ theme = "DoIt"
       # 是否使侧边目录自动折叠展开
       auto = false
       # FixIt 0.2.13 | 新增 目录位置 ["left", "right"]
-      position = "right"
+      position = "left"
     #  代码配置
     [params.page.code]
       # 是否显示代码块的复制按钮
@@ -757,27 +757,27 @@ series = "series"
      title = ""
      weight = 5
   [[menu.main]]
-     identifier = "authors"
-     pre = ""
-     post = ""
-     name = "作者"
-     url = "/authors/"
-     title = ""
-     weight = 6
-
-  [[menu.main]]
-     identifier = "showcase"
-     pre = ""
-     post = ""
-     name = "作品"
-     url = "/showcase/"
-     title = ""
-     weight = 7
-  [[main]]
     identifier = "about"
     pre = ""
     post = ""
     name = "关于"
-    url = "/about/"
-    title = ""
+    url = "/about/about"
+    title = "关于"
     weight = 8
+  # [[menu.main]]
+  #    identifier = "authors"
+  #    pre = ""
+  #    post = ""
+  #    name = "作者"
+  #    url = "/authors/"
+  #    title = ""
+  #    weight = 6
+
+  # [[menu.main]]
+  #    identifier = "showcase"
+  #    pre = ""
+  #    post = ""
+  #    name = "作品"
+  #    url = "/showcase/"
+  #    title = ""
+  #    weight = 7
